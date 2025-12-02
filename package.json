@@ -1,10 +1,9 @@
 {
-  "name": "jsonjoy-builder",
+  "name": "@uponu-solutions/jsonjoy-builder",
   "license": "MIT",
   "description": "Visual JSON Schema editor for creating and manipulating JSON Schema definitions with an intuitive interface.",
   "author": {
-    "name": "Ophir LOJKINE",
-    "url": "http://ophir.dev/"
+    "name": "UPONU Solutions"
   },
   "keywords": [
     "json",
@@ -19,7 +18,7 @@
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/lovasoa/jsonjoy-builder"
+    "url": "https://github.com/uponusolutions/jsonjoy-builder"
   },
   "files": [
     "dist",
@@ -55,7 +54,7 @@
     "typecheck": "tsc --build --force",
     "test": "tsx --tsconfig tsconfig.test.json --test test/**/*.test.{js,ts,tsx}",
     "test:snapshots": "tsx --test-update-snapshots --tsconfig tsconfig.test.json --test test/**/*.test.{js,ts,tsx}",
-    "prepack": "npm run build"
+    "prepack": "pnpm run build"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",
@@ -108,5 +107,5 @@
     "tsx": "^4.20.6",
     "typescript": "^5.9.2"
   },
-  "packageManager": "npm@10.9.3+sha512.e84875bb943e908557780f1eee5d9cfc7a67145730ae4b77ef10ccba30f96ded6096859af69ea3dc5b2fde60725d79aa247cbed9c12544c30bf28a4d4fbc4825"
+  "packageManager": "pnpm@10.24.0"
 }
