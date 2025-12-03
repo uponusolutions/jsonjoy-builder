@@ -3,6 +3,7 @@ import { useTranslation } from "../../hooks/use-translation.ts";
 import {
   createFieldSchema,
   renameObjectProperty,
+  reorderProperties,
   updateObjectProperty,
   updatePropertyRequired,
 } from "../../lib/schemaEditor.ts";
@@ -95,6 +96,12 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
     onChange(newSchema);
   };
 
+  // Handle reordering fields via drag and drop
+  const handleReorderFields = (fromIndex: number, toIndex: number) => {
+    const newSchema = reorderProperties(asObjectSchema(schema), fromIndex, toIndex);
+    onChange(newSchema);
+  };
+
   const hasFields =
     !isBooleanSchema(schema) &&
     schema.properties &&
@@ -121,6 +128,7 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
             onAddField={handleAddField}
             onEditField={handleEditField}
             onDeleteField={handleDeleteField}
+            onReorderFields={handleReorderFields}
           />
         )}
       </div>

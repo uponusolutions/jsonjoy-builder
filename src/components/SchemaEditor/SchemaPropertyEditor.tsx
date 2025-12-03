@@ -1,4 +1,5 @@
-import { ChevronDown, ChevronRight, X } from "lucide-react";
+import type { DraggableProvidedDragHandleProps } from "@hello-pangea/dnd";
+import { ChevronDown, ChevronRight, GripVertical, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Input } from "../../components/ui/input.tsx";
 import { useTranslation } from "../../hooks/use-translation.ts";
@@ -29,6 +30,7 @@ export interface SchemaPropertyEditorProps {
   onRequiredChange: (required: boolean) => void;
   onSchemaChange: (schema: ObjectJSONSchema) => void;
   depth?: number;
+  dragHandleProps?: DraggableProvidedDragHandleProps | null;
 }
 
 export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
@@ -42,6 +44,7 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
   onRequiredChange,
   onSchemaChange,
   depth = 0,
+  dragHandleProps,
 }) => {
   const t = useTranslation();
   const [expanded, setExpanded] = useState(false);
@@ -102,6 +105,18 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
     >
       <div className="relative json-field-row justify-between group">
         <div className="flex items-center gap-2 grow min-w-0">
+          {/* Drag handle */}
+          {dragHandleProps && (
+            <button
+              type="button"
+              {...dragHandleProps}
+              className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Drag to reorder"
+            >
+              <GripVertical size={16} />
+            </button>
+          )}
+
           {/* Expand/collapse button */}
           <button
             type="button"

@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [pluginReact()],
   server: {
     host: "::",
-    port: 8080,
+    port: 10000,
   },
   output: {
     distPath: {

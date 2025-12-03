@@ -1,4 +1,11 @@
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  type DropResult,
+} from "@hello-pangea/dnd";
 import { type FC, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import { getSchemaProperties } from "../../lib/schemaEditor.ts";
 import type {
@@ -16,12 +23,14 @@ interface SchemaFieldListProps {
   onAddField: (newField: NewField) => void;
   onEditField: (name: string, updatedField: NewField) => void;
   onDeleteField: (name: string) => void;
+  onReorderFields?: (fromIndex: number, toIndex: number) => void;
 }
 
 const SchemaFieldList: FC<SchemaFieldListProps> = ({
   schema,
   onEditField,
   onDeleteField,
+  onReorderFields,
   readOnly = false,
 }) => {
   const t = useTranslation();
@@ -108,25 +117,100 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
     [schema, t],
   );
 
+  const handleDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+    if (result.source.index === result.destination.index) return;
+    onReorderFields?.(result.source.index, result.destination.index);
+  };
+
+  // When readOnly or no reorder handler, render without drag-drop
+  if (readOnly || !onReorderFields) {
+    return (
+      <div className="space-y-2 animate-in">
+        {properties.map((property) => (
+          <SchemaPropertyEditor
+            key={property.name}
+            name={property.name}
+            schema={property.schema}
+            required={property.required}
+            validationNode={validationTree.children[property.name] ?? undefined}
+            onDelete={() => onDeleteField(property.name)}
+            onNameChange={(newName) => handleNameChange(property.name, newName)}
+            onRequiredChange={(required) =>
+              handleRequiredChange(property.name, required)
+            }
+            onSchemaChange={(schema) =>
+              handleSchemaChange(property.name, schema)
+            }
+            readOnly={readOnly}
+          />
+        ))}
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-2 animate-in">
-      {properties.map((property) => (
-        <SchemaPropertyEditor
-          key={property.name}
-          name={property.name}
-          schema={property.schema}
-          required={property.required}
-          validationNode={validationTree.children[property.name] ?? undefined}
-          onDelete={() => onDeleteField(property.name)}
-          onNameChange={(newName) => handleNameChange(property.name, newName)}
-          onRequiredChange={(required) =>
-            handleRequiredChange(property.name, required)
-          }
-          onSchemaChange={(schema) => handleSchemaChange(property.name, schema)}
-          readOnly={readOnly}
-        />
-      ))}
-    </div>
+    <DragDropContext onDragEnd={handleDragEnd}>
+      <Droppable droppableId="schema-fields">
+        {(provided) => (
+          <div
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+            className="space-y-2 animate-in"
+          >
+            {properties.map((property, index) => (
+              <Draggable
+                key={property.name}
+                draggableId={property.name}
+                index={index}
+              >
+                {(provided, snapshot) => {
+                  const content = (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      className={snapshot.isDragging ? "opacity-90 shadow-lg" : ""}
+                    >
+                      <SchemaPropertyEditor
+                        name={property.name}
+                        schema={property.schema}
+                        required={property.required}
+                        validationNode={
+                          validationTree.children[property.name] ?? undefined
+                        }
+                        onDelete={() => onDeleteField(property.name)}
+                        onNameChange={(newName) =>
+                          handleNameChange(property.name, newName)
+                        }
+                        onRequiredChange={(required) =>
+                          handleRequiredChange(property.name, required)
+                        }
+                        onSchemaChange={(schema) =>
+                          handleSchemaChange(property.name, schema)
+                        }
+                        readOnly={readOnly}
+                        dragHandleProps={provided.dragHandleProps}
+                      />
+                    </div>
+                  );
+
+                  // Use portal when dragging to avoid transform issues
+                  // Wrap in jsonjoy class to preserve styles
+                  if (snapshot.isDragging) {
+                    return createPortal(
+                      <div className="jsonjoy">{content}</div>,
+                      document.body,
+                    );
+                  }
+                  return content;
+                }}
+              </Draggable>
+            ))}
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
+    </DragDropContext>
   );
 };
 

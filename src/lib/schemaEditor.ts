@@ -96,6 +96,28 @@ export function removeObjectProperty(
 }
 
 /**
+ * Reorders properties in an object schema
+ */
+export function reorderProperties(
+  schema: ObjectJSONSchema,
+  fromIndex: number,
+  toIndex: number,
+): ObjectJSONSchema {
+  if (!isObjectSchema(schema) || !schema.properties) return schema;
+
+  const entries = Object.entries(schema.properties);
+  if (fromIndex < 0 || fromIndex >= entries.length) return schema;
+  if (toIndex < 0 || toIndex >= entries.length) return schema;
+
+  const newSchema = copySchema(schema);
+  const [moved] = entries.splice(fromIndex, 1);
+  entries.splice(toIndex, 0, moved);
+
+  newSchema.properties = Object.fromEntries(entries);
+  return newSchema;
+}
+
+/**
  * Updates the 'required' status of a property
  */
 export function updatePropertyRequired(
