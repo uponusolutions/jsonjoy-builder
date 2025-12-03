@@ -8,6 +8,7 @@ import { type FC, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import { getSchemaProperties } from "../../lib/schemaEditor.ts";
+import { cn } from "../../lib/utils.ts";
 import type {
   JSONSchema as JSONSchemaType,
   NewField,
@@ -25,6 +26,7 @@ interface SchemaFieldListProps {
   onDeleteField: (name: string) => void;
   onReorderFields?: (fromIndex: number, toIndex: number) => void;
   showDescription?: boolean;
+  disableAnimations?: boolean;
 }
 
 const SchemaFieldList: FC<SchemaFieldListProps> = ({
@@ -34,6 +36,7 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
   onReorderFields,
   readOnly = false,
   showDescription = true,
+  disableAnimations = false,
 }) => {
   const t = useTranslation();
 
@@ -128,7 +131,7 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
   // When readOnly or no reorder handler, render without drag-drop
   if (readOnly || !onReorderFields) {
     return (
-      <div className="space-y-2 animate-in">
+      <div className={cn("space-y-2", !disableAnimations && "animate-in")}>
         {properties.map((property) => (
           <SchemaPropertyEditor
             key={property.name}
@@ -146,6 +149,7 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
             }
             readOnly={readOnly}
             showDescription={showDescription}
+            disableAnimations={disableAnimations}
           />
         ))}
       </div>
@@ -159,7 +163,7 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
           <div
             {...provided.droppableProps}
             ref={provided.innerRef}
-            className="space-y-2 animate-in"
+            className={cn("space-y-2", !disableAnimations && "animate-in")}
           >
             {properties.map((property, index) => (
               <Draggable
@@ -194,6 +198,7 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
                         readOnly={readOnly}
                         dragHandleProps={provided.dragHandleProps}
                         showDescription={showDescription}
+                        disableAnimations={disableAnimations}
                       />
                     </div>
                   );

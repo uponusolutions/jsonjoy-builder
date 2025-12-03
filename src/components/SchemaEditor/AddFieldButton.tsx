@@ -18,6 +18,7 @@ import {
   TooltipTrigger,
 } from "../../components/ui/tooltip.tsx";
 import { useTranslation } from "../../hooks/use-translation.ts";
+import { cn } from "../../lib/utils.ts";
 import type {
   NewField,
   ObjectJSONSchema,
@@ -30,12 +31,14 @@ interface AddFieldButtonProps {
   onAddField: (field: NewField) => void;
   variant?: "primary" | "secondary";
   showDescription?: boolean;
+  disableAnimations?: boolean;
 }
 
 const AddFieldButton: FC<AddFieldButtonProps> = ({
   onAddField,
   variant = "primary",
   showDescription = true,
+  disableAnimations = false,
 }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [fieldName, setFieldName] = useState("");
@@ -96,12 +99,12 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
       >
         <CirclePlus
           size={16}
-          className="group-hover:scale-110 transition-transform"
+          className={cn(!disableAnimations && "group-hover:scale-110 transition-transform")}
         />
         <span>{t.fieldAddNewButton}</span>
       </Button>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen} disableAnimations={disableAnimations}>
         <DialogContent className="md:max-w-[1200px] max-h-[85vh] w-[95vw] p-4 sm:p-6 jsonjoy flex flex-col">
           <DialogHeader className="mb-4 shrink-0">
             <DialogTitle className="text-xl flex flex-wrap items-center gap-2">
@@ -227,6 +230,7 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
                       id={fieldTypeId}
                       value={fieldType}
                       onChange={handleTypeChange}
+                      disableAnimations={disableAnimations}
                     />
                   </div>
 
@@ -252,6 +256,7 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
                       validationNode={undefined}
                       onChange={handleValidationChange}
                       depth={0}
+                      disableAnimations={disableAnimations}
                     />
                   </div>
                 </div>

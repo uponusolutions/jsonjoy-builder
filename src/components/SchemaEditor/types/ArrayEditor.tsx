@@ -24,6 +24,7 @@ const ArrayEditor: React.FC<TypeEditorProps> = ({
   onChange,
   depth = 0,
   showDescription = true,
+  disableAnimations = false,
 }) => {
   const t = useTranslation();
   const [minItems, setMinItems] = useState<number | undefined>(
@@ -212,6 +213,7 @@ const ArrayEditor: React.FC<TypeEditorProps> = ({
           <TypeDropdown
             readOnly={readOnly}
             value={itemType}
+            disableAnimations={disableAnimations}
             onChange={(newType) => {
               handleItemSchemaChange({
                 ...withObjectSchema(itemsSchema, (s) => s, {}),
@@ -229,6 +231,7 @@ const ArrayEditor: React.FC<TypeEditorProps> = ({
           onChange={handleItemSchemaChange}
           depth={depth + 1}
           showDescription={showDescription}
+          disableAnimations={disableAnimations}
         />
       </div>
     </div>

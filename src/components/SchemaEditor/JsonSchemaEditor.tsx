@@ -24,6 +24,7 @@ export interface JsonSchemaEditorProps {
   setSchema?: (schema: JSONSchema) => void;
   className?: string;
   showDescription?: boolean;
+  disableAnimations?: boolean;
 }
 
 /** @public */
@@ -33,6 +34,7 @@ const JsonSchemaEditor: FC<JsonSchemaEditorProps> = ({
   setSchema,
   className,
   showDescription = true,
+  disableAnimations = false,
 }) => {
   // Handle schema changes and propagate to parent if needed
   const handleSchemaChange = (newSchema: JSONSchema) => {
@@ -127,6 +129,7 @@ const JsonSchemaEditor: FC<JsonSchemaEditorProps> = ({
               schema={schema}
               onChange={handleSchemaChange}
               showDescription={showDescription}
+              disableAnimations={disableAnimations}
             />
           </TabsContent>
 
@@ -174,6 +177,7 @@ const JsonSchemaEditor: FC<JsonSchemaEditorProps> = ({
               schema={schema}
               onChange={handleSchemaChange}
               showDescription={showDescription}
+              disableAnimations={disableAnimations}
             />
           </div>
           {/** biome-ignore lint/a11y/noStaticElementInteractions: What exactly does this div do? */}

@@ -18,6 +18,7 @@ export interface SchemaVisualEditorProps {
   readOnly: boolean;
   onChange: (schema: JSONSchema) => void;
   showDescription?: boolean;
+  disableAnimations?: boolean;
 }
 
 /** @public */
@@ -26,6 +27,7 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
   onChange,
   readOnly = false,
   showDescription = true,
+  disableAnimations = false,
 }) => {
   const t = useTranslation();
   // Handle adding a top-level field
@@ -113,7 +115,7 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
     <div className="p-4 h-full flex flex-col overflow-auto jsonjoy">
       {!readOnly && (
         <div className="mb-6 shrink-0">
-          <AddFieldButton onAddField={handleAddField} showDescription={showDescription} />
+          <AddFieldButton onAddField={handleAddField} showDescription={showDescription} disableAnimations={disableAnimations} />
         </div>
       )}
 
@@ -132,6 +134,7 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
             onDeleteField={handleDeleteField}
             onReorderFields={handleReorderFields}
             showDescription={showDescription}
+            disableAnimations={disableAnimations}
           />
         )}
       </div>

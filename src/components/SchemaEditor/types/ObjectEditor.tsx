@@ -18,6 +18,7 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
   depth = 0,
   readOnly = false,
   showDescription = true,
+  disableAnimations = false,
 }) => {
   const t = useTranslation();
 
@@ -134,6 +135,7 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
               }
               depth={depth}
               showDescription={showDescription}
+              disableAnimations={disableAnimations}
             />
           ))}
         </div>
@@ -145,7 +147,7 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
 
       {!readOnly && (
         <div className="mt-4">
-          <AddFieldButton onAddField={handleAddProperty} variant="secondary" showDescription={showDescription} />
+          <AddFieldButton onAddField={handleAddProperty} variant="secondary" showDescription={showDescription} disableAnimations={disableAnimations} />
         </div>
       )}
     </div>

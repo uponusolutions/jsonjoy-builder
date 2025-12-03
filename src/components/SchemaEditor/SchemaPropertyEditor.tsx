@@ -32,6 +32,7 @@ export interface SchemaPropertyEditorProps {
   depth?: number;
   dragHandleProps?: DraggableProvidedDragHandleProps | null;
   showDescription?: boolean;
+  disableAnimations?: boolean;
 }
 
 export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
@@ -47,6 +48,7 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
   depth = 0,
   dragHandleProps,
   showDescription = true,
+  disableAnimations = false,
 }) => {
   const t = useTranslation();
   const [expanded, setExpanded] = useState(false);
@@ -101,7 +103,8 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
   return (
     <div
       className={cn(
-        "mb-2 animate-in rounded-lg border transition-all duration-200",
+        "mb-2 rounded-lg border",
+        !disableAnimations && "animate-in transition-all duration-200",
         depth > 0 && "ml-0 sm:ml-4 border-l border-l-border/40",
       )}
     >
@@ -112,7 +115,10 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
             <button
               type="button"
               {...dragHandleProps}
-              className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground transition-colors"
+              className={cn(
+                "cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground",
+                !disableAnimations && "transition-colors"
+              )}
               aria-label="Drag to reorder"
             >
               <GripVertical size={16} />
@@ -122,7 +128,10 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
           {/* Expand/collapse button */}
           <button
             type="button"
-            className="text-muted-foreground hover:text-foreground transition-colors"
+            className={cn(
+              "text-muted-foreground hover:text-foreground",
+              !disableAnimations && "transition-colors"
+            )}
             onClick={() => setExpanded(!expanded)}
             aria-label={expanded ? t.collapse : t.expand}
           >
@@ -147,7 +156,10 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
                   type="button"
                   onClick={() => setIsEditingName(true)}
                   onKeyDown={(e) => e.key === "Enter" && setIsEditingName(true)}
-                  className="json-field-label font-medium cursor-text px-2 py-0.5 -mx-0.5 rounded-sm hover:bg-secondary/30 hover:shadow-xs hover:ring-1 hover:ring-ring/20 transition-all text-left truncate min-w-[80px] max-w-[50%]"
+                  className={cn(
+                    "json-field-label font-medium cursor-text px-2 py-0.5 -mx-0.5 rounded-sm hover:bg-secondary/30 hover:shadow-xs hover:ring-1 hover:ring-ring/20 text-left truncate min-w-[80px] max-w-[50%]",
+                    !disableAnimations && "transition-all"
+                  )}
                 >
                   {name}
                 </button>
@@ -171,7 +183,10 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
                     type="button"
                     onClick={() => setIsEditingDesc(true)}
                     onKeyDown={(e) => e.key === "Enter" && setIsEditingDesc(true)}
-                    className="text-xs text-muted-foreground italic cursor-text px-2 py-0.5 -mx-0.5 rounded-sm hover:bg-secondary/30 hover:shadow-xs hover:ring-1 hover:ring-ring/20 transition-all text-left truncate flex-1 max-w-[40%] mr-2"
+                    className={cn(
+                      "text-xs text-muted-foreground italic cursor-text px-2 py-0.5 -mx-0.5 rounded-sm hover:bg-secondary/30 hover:shadow-xs hover:ring-1 hover:ring-ring/20 text-left truncate flex-1 max-w-[40%] mr-2",
+                      !disableAnimations && "transition-all"
+                    )}
                   >
                     {tempDesc}
                   </button>
@@ -180,7 +195,10 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
                     type="button"
                     onClick={() => setIsEditingDesc(true)}
                     onKeyDown={(e) => e.key === "Enter" && setIsEditingDesc(true)}
-                    className="text-xs text-muted-foreground/50 italic cursor-text px-2 py-0.5 -mx-0.5 rounded-sm hover:bg-secondary/30 hover:shadow-xs hover:ring-1 hover:ring-ring/20 transition-all opacity-0 group-hover:opacity-100 text-left truncate flex-1 max-w-[40%] mr-2"
+                    className={cn(
+                      "text-xs text-muted-foreground/50 italic cursor-text px-2 py-0.5 -mx-0.5 rounded-sm hover:bg-secondary/30 hover:shadow-xs hover:ring-1 hover:ring-ring/20 opacity-0 group-hover:opacity-100 text-left truncate flex-1 max-w-[40%] mr-2",
+                      !disableAnimations && "transition-all"
+                    )}
                   >
                     {t.propertyDescriptionButton}
                   </button>
@@ -192,6 +210,7 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
               <TypeDropdown
                 value={type}
                 readOnly={readOnly}
+                disableAnimations={disableAnimations}
                 onChange={(newType) => {
                   onSchemaChange({
                     ...asObjectSchema(schema),
@@ -205,7 +224,8 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
                 type="button"
                 onClick={() => !readOnly && onRequiredChange(!required)}
                 className={cn(
-                  "text-xs px-2 py-1 rounded-md font-medium min-w-[80px] text-center cursor-pointer hover:shadow-xs hover:ring-2 hover:ring-ring/30 active:scale-95 transition-all whitespace-nowrap",
+                  "text-xs px-2 py-1 rounded-md font-medium min-w-[80px] text-center cursor-pointer whitespace-nowrap",
+                  !disableAnimations && "hover:shadow-xs hover:ring-2 hover:ring-ring/30 active:scale-95 transition-all",
                   required
                     ? "bg-red-50 text-red-500"
                     : "bg-secondary text-muted-foreground",
@@ -233,7 +253,10 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
             <button
               type="button"
               onClick={onDelete}
-              className="p-1 rounded-md hover:bg-secondary hover:text-destructive transition-colors opacity-0 group-hover:opacity-100"
+              className={cn(
+                "p-1 rounded-md hover:bg-secondary hover:text-destructive opacity-0 group-hover:opacity-100",
+                !disableAnimations && "transition-colors"
+              )}
               aria-label={t.propertyDelete}
             >
               <X size={16} />
@@ -244,7 +267,7 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
 
       {/* Type-specific editor */}
       {expanded && (
-        <div className="pt-1 pb-2 px-2 sm:px-3 animate-in">
+        <div className={cn("pt-1 pb-2 px-2 sm:px-3", !disableAnimations && "animate-in")}>
           {readOnly && tempDesc && <p className="pb-2">{tempDesc}</p>}
           <TypeEditor
             schema={schema}
@@ -253,6 +276,7 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
             onChange={handleSchemaUpdate}
             depth={depth + 1}
             showDescription={showDescription}
+            disableAnimations={disableAnimations}
           />
         </div>
       )}

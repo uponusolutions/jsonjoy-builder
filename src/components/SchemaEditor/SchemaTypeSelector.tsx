@@ -8,6 +8,7 @@ interface SchemaTypeSelectorProps {
   id?: string;
   value: SchemaType;
   onChange: (value: SchemaType) => void;
+  disableAnimations?: boolean;
 }
 
 interface TypeOption {
@@ -48,6 +49,7 @@ const SchemaTypeSelector: FC<SchemaTypeSelectorProps> = ({
   id,
   value,
   onChange,
+  disableAnimations = false,
 }) => {
   const t = useTranslation();
   return (
@@ -61,7 +63,8 @@ const SchemaTypeSelector: FC<SchemaTypeSelectorProps> = ({
           key={type.id}
           title={t[type.description]}
           className={cn(
-            "p-2.5 rounded-lg border-2 text-left transition-all duration-200",
+            "p-2.5 rounded-lg border-2 text-left",
+            !disableAnimations && "transition-all duration-200",
             value === type.id
               ? "border-primary bg-primary/5 shadow-xs"
               : "border-border hover:border-primary/30 hover:bg-secondary",

@@ -9,6 +9,7 @@ export interface TypeDropdownProps {
   onChange: (value: SchemaType) => void;
   className?: string;
   readOnly: boolean;
+  disableAnimations?: boolean;
 }
 
 const typeOptions: SchemaType[] = [
@@ -25,6 +26,7 @@ export const TypeDropdown: React.FC<TypeDropdownProps> = ({
   onChange,
   className,
   readOnly,
+  disableAnimations = false,
 }) => {
   const t = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -54,7 +56,7 @@ export const TypeDropdown: React.FC<TypeDropdownProps> = ({
         className={cn(
           "text-xs px-3.5 py-1.5 rounded-md font-medium text-center flex items-center justify-between",
           getTypeColor(value),
-          "hover:shadow-xs hover:ring-1 hover:ring-ring/30 active:scale-95 transition-all",
+          !disableAnimations && "hover:shadow-xs hover:ring-1 hover:ring-ring/30 active:scale-95 transition-all",
           readOnly ? "" : "w-[92px]",
           className,
         )}
@@ -65,7 +67,10 @@ export const TypeDropdown: React.FC<TypeDropdownProps> = ({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-[140px] rounded-md border bg-popover shadow-lg animate-in fade-in-50 zoom-in-95">
+        <div className={cn(
+          "absolute z-50 mt-1 w-[140px] rounded-md border bg-popover shadow-lg",
+          !disableAnimations && "animate-in fade-in-50 zoom-in-95"
+        )}>
           <div className="py-1">
             {typeOptions.map((type) => (
               <button
@@ -73,7 +78,8 @@ export const TypeDropdown: React.FC<TypeDropdownProps> = ({
                 type="button"
                 className={cn(
                   "w-full text-left px-3 py-1.5 text-xs flex items-center justify-between",
-                  "hover:bg-muted/50 transition-colors",
+                  !disableAnimations && "hover:bg-muted/50 transition-colors",
+                  disableAnimations && "hover:bg-muted/50",
                   value === type && "font-medium",
                 )}
                 onClick={() => {

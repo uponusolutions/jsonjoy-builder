@@ -10,6 +10,7 @@ import {
   PencilOff,
   RefreshCw,
   User,
+  Zap,
 } from "lucide-react";
 import React, { useState } from "react";
 import { exampleSchema } from "../../demo/utils/schemaExample.ts";
@@ -32,6 +33,7 @@ const Index = () => {
   const [schema, setSchema] = useState<JSONSchema>(exampleSchema);
   const [readOnly, setReadOnly] = useState<boolean>(false);
   const [showDescription, setShowDescription] = useState<boolean>(true);
+  const [disableAnimations, setDisableAnimations] = useState<boolean>(false);
   const [inferDialogOpen, setInferDialogOpen] = useState(false);
   const [validateDialogOpen, setValidateDialogOpen] = useState(false);
   const [language, setLanguage] = useState("en");
@@ -154,6 +156,14 @@ const Index = () => {
                   <FileText size={16} />
                   {showDescription ? "Hide Descriptions" : "Show Descriptions"}
                 </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setDisableAnimations(!disableAnimations)}
+                  className="gap-2"
+                >
+                  <Zap size={16} />
+                  {disableAnimations ? "Enable Animations" : "Disable Animations"}
+                </Button>
                 <div>
                   <Select value={language} onValueChange={handleLanguageChange}>
                     <SelectTrigger className="h-10 font-medium">
@@ -181,6 +191,7 @@ const Index = () => {
               readOnly={readOnly}
               setSchema={setSchema}
               showDescription={showDescription}
+              disableAnimations={disableAnimations}
               className="shadow-lg animate-in border-border/50 backdrop-blur-xs"
             />
           </div>
