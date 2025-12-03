@@ -1,10 +1,20 @@
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  type DropResult,
+} from "@hello-pangea/dnd";
+import { useId } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "../../../hooks/use-translation.ts";
 import {
   getSchemaProperties,
   removeObjectProperty,
+  reorderProperties,
   updateObjectProperty,
   updatePropertyRequired,
 } from "../../../lib/schemaEditor.ts";
+import { cn } from "../../../lib/utils.ts";
 import type { NewField, ObjectJSONSchema } from "../../../types/jsonSchema.ts";
 import { asObjectSchema, isBooleanSchema } from "../../../types/jsonSchema.ts";
 import AddFieldButton from "../AddFieldButton.tsx";
@@ -111,34 +121,88 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
     onChange(newSchema);
   };
 
+  const droppableId = useId();
+
+  const handleDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+    if (result.source.index === result.destination.index) return;
+
+    const newSchema = reorderProperties(
+      normalizedSchema,
+      result.source.index,
+      result.destination.index,
+    );
+    onChange(newSchema);
+  };
+
   return (
     <div className="space-y-4">
       {properties.length > 0 ? (
-        <div className="space-y-2">
-          {properties.map((property) => (
-            <SchemaPropertyEditor
-              readOnly={readOnly}
-              key={property.name}
-              name={property.name}
-              schema={property.schema}
-              required={property.required}
-              validationNode={validationNode?.children[property.name]}
-              onDelete={() => handleDeleteProperty(property.name)}
-              onNameChange={(newName) =>
-                handlePropertyNameChange(property.name, newName)
-              }
-              onRequiredChange={(required) =>
-                handlePropertyRequiredChange(property.name, required)
-              }
-              onSchemaChange={(schema) =>
-                handlePropertySchemaChange(property.name, schema)
-              }
-              depth={depth}
-              showDescription={showDescription}
-              disableAnimations={disableAnimations}
-            />
-          ))}
-        </div>
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId={droppableId}>
+            {(provided) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                className="space-y-2"
+              >
+                {properties.map((property, index) => (
+                  <Draggable
+                    key={property.name}
+                    draggableId={`${droppableId}-${property.name}`}
+                    index={index}
+                    isDragDisabled={readOnly}
+                  >
+                    {(provided, snapshot) => {
+                      const draggableContent = (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          className={cn(
+                            snapshot.isDragging && "opacity-90 shadow-lg",
+                          )}
+                        >
+                          <SchemaPropertyEditor
+                            readOnly={readOnly}
+                            name={property.name}
+                            schema={property.schema}
+                            required={property.required}
+                            validationNode={validationNode?.children[property.name]}
+                            onDelete={() => handleDeleteProperty(property.name)}
+                            onNameChange={(newName) =>
+                              handlePropertyNameChange(property.name, newName)
+                            }
+                            onRequiredChange={(required) =>
+                              handlePropertyRequiredChange(property.name, required)
+                            }
+                            onSchemaChange={(schema) =>
+                              handlePropertySchemaChange(property.name, schema)
+                            }
+                            depth={depth}
+                            showDescription={showDescription}
+                            disableAnimations={disableAnimations}
+                            dragHandleProps={provided.dragHandleProps}
+                          />
+                        </div>
+                      );
+
+                      // Use portal when dragging to escape stacking context
+                      // Wrap in jsonjoy class to preserve styles
+                      if (snapshot.isDragging) {
+                        return createPortal(
+                          <div className="jsonjoy">{draggableContent}</div>,
+                          document.body,
+                        );
+                      }
+                      return draggableContent;
+                    }}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
       ) : (
         <div className="text-sm text-muted-foreground italic p-2 text-center border rounded-md">
           {t.objectPropertiesNone}
