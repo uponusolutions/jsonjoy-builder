@@ -20,6 +20,7 @@ export interface TypeEditorProps {
   validationNode: ValidationTreeNode | undefined;
   onChange: (schema: ObjectJSONSchema) => void;
   depth?: number;
+  showDescription?: boolean;
 }
 
 const TypeEditor: React.FC<TypeEditorProps> = ({
@@ -28,6 +29,7 @@ const TypeEditor: React.FC<TypeEditorProps> = ({
   onChange,
   depth = 0,
   readOnly = false,
+  showDescription = true,
 }) => {
   const type = withObjectSchema(
     schema,
@@ -81,6 +83,7 @@ const TypeEditor: React.FC<TypeEditorProps> = ({
           onChange={onChange}
           depth={depth}
           validationNode={validationNode}
+          showDescription={showDescription}
         />
       )}
       {type === "array" && (
@@ -90,6 +93,7 @@ const TypeEditor: React.FC<TypeEditorProps> = ({
           onChange={onChange}
           depth={depth}
           validationNode={validationNode}
+          showDescription={showDescription}
         />
       )}
     </Suspense>

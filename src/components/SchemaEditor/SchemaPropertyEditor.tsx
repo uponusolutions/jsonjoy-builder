@@ -31,6 +31,7 @@ export interface SchemaPropertyEditorProps {
   onSchemaChange: (schema: ObjectJSONSchema) => void;
   depth?: number;
   dragHandleProps?: DraggableProvidedDragHandleProps | null;
+  showDescription?: boolean;
 }
 
 export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
@@ -45,6 +46,7 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
   onSchemaChange,
   depth = 0,
   dragHandleProps,
+  showDescription = true,
 }) => {
   const t = useTranslation();
   const [expanded, setExpanded] = useState(false);
@@ -152,36 +154,37 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
               )}
 
               {/* Description */}
-              {!readOnly && isEditingDesc ? (
-                <Input
-                  value={tempDesc}
-                  onChange={(e) => setTempDesc(e.target.value)}
-                  onBlur={handleDescSubmit}
-                  onKeyDown={(e) => e.key === "Enter" && handleDescSubmit()}
-                  placeholder={t.propertyDescriptionPlaceholder}
-                  className="h-8 text-xs text-muted-foreground italic flex-1 min-w-[150px] z-10"
-                  autoFocus
-                  onFocus={(e) => e.target.select()}
-                />
-              ) : tempDesc ? (
-                <button
-                  type="button"
-                  onClick={() => setIsEditingDesc(true)}
-                  onKeyDown={(e) => e.key === "Enter" && setIsEditingDesc(true)}
-                  className="text-xs text-muted-foreground italic cursor-text px-2 py-0.5 -mx-0.5 rounded-sm hover:bg-secondary/30 hover:shadow-xs hover:ring-1 hover:ring-ring/20 transition-all text-left truncate flex-1 max-w-[40%] mr-2"
-                >
-                  {tempDesc}
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setIsEditingDesc(true)}
-                  onKeyDown={(e) => e.key === "Enter" && setIsEditingDesc(true)}
-                  className="text-xs text-muted-foreground/50 italic cursor-text px-2 py-0.5 -mx-0.5 rounded-sm hover:bg-secondary/30 hover:shadow-xs hover:ring-1 hover:ring-ring/20 transition-all opacity-0 group-hover:opacity-100 text-left truncate flex-1 max-w-[40%] mr-2"
-                >
-                  {t.propertyDescriptionButton}
-                </button>
-              )}
+              {showDescription &&
+                (!readOnly && isEditingDesc ? (
+                  <Input
+                    value={tempDesc}
+                    onChange={(e) => setTempDesc(e.target.value)}
+                    onBlur={handleDescSubmit}
+                    onKeyDown={(e) => e.key === "Enter" && handleDescSubmit()}
+                    placeholder={t.propertyDescriptionPlaceholder}
+                    className="h-8 text-xs text-muted-foreground italic flex-1 min-w-[150px] z-10"
+                    autoFocus
+                    onFocus={(e) => e.target.select()}
+                  />
+                ) : tempDesc ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingDesc(true)}
+                    onKeyDown={(e) => e.key === "Enter" && setIsEditingDesc(true)}
+                    className="text-xs text-muted-foreground italic cursor-text px-2 py-0.5 -mx-0.5 rounded-sm hover:bg-secondary/30 hover:shadow-xs hover:ring-1 hover:ring-ring/20 transition-all text-left truncate flex-1 max-w-[40%] mr-2"
+                  >
+                    {tempDesc}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingDesc(true)}
+                    onKeyDown={(e) => e.key === "Enter" && setIsEditingDesc(true)}
+                    className="text-xs text-muted-foreground/50 italic cursor-text px-2 py-0.5 -mx-0.5 rounded-sm hover:bg-secondary/30 hover:shadow-xs hover:ring-1 hover:ring-ring/20 transition-all opacity-0 group-hover:opacity-100 text-left truncate flex-1 max-w-[40%] mr-2"
+                  >
+                    {t.propertyDescriptionButton}
+                  </button>
+                ))}
             </div>
 
             {/* Type display */}
@@ -249,6 +252,7 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
             validationNode={validationNode}
             onChange={handleSchemaUpdate}
             depth={depth + 1}
+            showDescription={showDescription}
           />
         </div>
       )}

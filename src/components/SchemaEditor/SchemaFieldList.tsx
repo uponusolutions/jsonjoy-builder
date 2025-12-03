@@ -24,6 +24,7 @@ interface SchemaFieldListProps {
   onEditField: (name: string, updatedField: NewField) => void;
   onDeleteField: (name: string) => void;
   onReorderFields?: (fromIndex: number, toIndex: number) => void;
+  showDescription?: boolean;
 }
 
 const SchemaFieldList: FC<SchemaFieldListProps> = ({
@@ -32,6 +33,7 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
   onDeleteField,
   onReorderFields,
   readOnly = false,
+  showDescription = true,
 }) => {
   const t = useTranslation();
 
@@ -143,6 +145,7 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
               handleSchemaChange(property.name, schema)
             }
             readOnly={readOnly}
+            showDescription={showDescription}
           />
         ))}
       </div>
@@ -190,6 +193,7 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
                         }
                         readOnly={readOnly}
                         dragHandleProps={provided.dragHandleProps}
+                        showDescription={showDescription}
                       />
                     </div>
                   );

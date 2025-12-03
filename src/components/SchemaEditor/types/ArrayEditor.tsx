@@ -23,6 +23,7 @@ const ArrayEditor: React.FC<TypeEditorProps> = ({
   validationNode,
   onChange,
   depth = 0,
+  showDescription = true,
 }) => {
   const t = useTranslation();
   const [minItems, setMinItems] = useState<number | undefined>(
@@ -227,6 +228,7 @@ const ArrayEditor: React.FC<TypeEditorProps> = ({
           validationNode={validationNode}
           onChange={handleItemSchemaChange}
           depth={depth + 1}
+          showDescription={showDescription}
         />
       </div>
     </div>

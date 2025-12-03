@@ -29,11 +29,13 @@ import TypeEditor from "./TypeEditor.tsx";
 interface AddFieldButtonProps {
   onAddField: (field: NewField) => void;
   variant?: "primary" | "secondary";
+  showDescription?: boolean;
 }
 
 const AddFieldButton: FC<AddFieldButtonProps> = ({
   onAddField,
   variant = "primary",
+  showDescription = true,
 }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [fieldName, setFieldName] = useState("");
@@ -146,33 +148,35 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
                     />
                   </div>
 
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                      <label
-                        htmlFor={fieldDescId}
-                        className="text-sm font-medium"
-                      >
-                        {t.fieldDescription}
-                      </label>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Info className="h-4 w-4 text-muted-foreground shrink-0" />
-                          </TooltipTrigger>
-                          <TooltipContent className="max-w-[90vw]">
-                            <p>{t.fieldDescriptionTooltip}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                  {showDescription && (
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                        <label
+                          htmlFor={fieldDescId}
+                          className="text-sm font-medium"
+                        >
+                          {t.fieldDescription}
+                        </label>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="h-4 w-4 text-muted-foreground shrink-0" />
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-[90vw]">
+                              <p>{t.fieldDescriptionTooltip}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                      <Input
+                        id={fieldDescId}
+                        value={fieldDesc}
+                        onChange={(e) => setFieldDesc(e.target.value)}
+                        placeholder={t.fieldDescriptionPlaceholder}
+                        className="text-sm w-full"
+                      />
                     </div>
-                    <Input
-                      id={fieldDescId}
-                      value={fieldDesc}
-                      onChange={(e) => setFieldDesc(e.target.value)}
-                      placeholder={t.fieldDescriptionPlaceholder}
-                      className="text-sm w-full"
-                    />
-                  </div>
+                  )}
 
                   <div className="flex items-center gap-3 p-3 rounded-lg border bg-muted/50">
                     <input

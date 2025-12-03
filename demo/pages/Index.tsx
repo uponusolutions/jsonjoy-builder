@@ -3,6 +3,7 @@ import {
   CirclePlus,
   Code,
   FileJson,
+  FileText,
   GitBranch,
   Package,
   Pencil,
@@ -30,6 +31,7 @@ import type { JSONSchema } from "../../src/types/jsonSchema.ts";
 const Index = () => {
   const [schema, setSchema] = useState<JSONSchema>(exampleSchema);
   const [readOnly, setReadOnly] = useState<boolean>(false);
+  const [showDescription, setShowDescription] = useState<boolean>(true);
   const [inferDialogOpen, setInferDialogOpen] = useState(false);
   const [validateDialogOpen, setValidateDialogOpen] = useState(false);
   const [language, setLanguage] = useState("en");
@@ -144,6 +146,14 @@ const Index = () => {
                     </>
                   )}
                 </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowDescription(!showDescription)}
+                  className="gap-2"
+                >
+                  <FileText size={16} />
+                  {showDescription ? "Hide Descriptions" : "Show Descriptions"}
+                </Button>
                 <div>
                   <Select value={language} onValueChange={handleLanguageChange}>
                     <SelectTrigger className="h-10 font-medium">
@@ -170,6 +180,7 @@ const Index = () => {
               schema={schema}
               readOnly={readOnly}
               setSchema={setSchema}
+              showDescription={showDescription}
               className="shadow-lg animate-in border-border/50 backdrop-blur-xs"
             />
           </div>

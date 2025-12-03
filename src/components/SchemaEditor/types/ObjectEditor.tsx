@@ -17,6 +17,7 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
   onChange,
   depth = 0,
   readOnly = false,
+  showDescription = true,
 }) => {
   const t = useTranslation();
 
@@ -132,6 +133,7 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
                 handlePropertySchemaChange(property.name, schema)
               }
               depth={depth}
+              showDescription={showDescription}
             />
           ))}
         </div>
@@ -143,7 +145,7 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
 
       {!readOnly && (
         <div className="mt-4">
-          <AddFieldButton onAddField={handleAddProperty} variant="secondary" />
+          <AddFieldButton onAddField={handleAddProperty} variant="secondary" showDescription={showDescription} />
         </div>
       )}
     </div>
