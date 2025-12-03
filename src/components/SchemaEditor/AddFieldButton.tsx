@@ -18,8 +18,13 @@ import {
   TooltipTrigger,
 } from "../../components/ui/tooltip.tsx";
 import { useTranslation } from "../../hooks/use-translation.ts";
-import type { NewField, SchemaType } from "../../types/jsonSchema.ts";
+import type {
+  NewField,
+  ObjectJSONSchema,
+  SchemaType,
+} from "../../types/jsonSchema.ts";
 import SchemaTypeSelector from "./SchemaTypeSelector.tsx";
+import TypeEditor from "./TypeEditor.tsx";
 
 interface AddFieldButtonProps {
   onAddField: (field: NewField) => void;
@@ -35,12 +40,24 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
   const [fieldType, setFieldType] = useState<SchemaType>("string");
   const [fieldDesc, setFieldDesc] = useState("");
   const [fieldRequired, setFieldRequired] = useState(false);
+  const [fieldValidation, setFieldValidation] = useState<ObjectJSONSchema>({
+    type: "string",
+  });
   const fieldNameId = useId();
   const fieldDescId = useId();
   const fieldRequiredId = useId();
   const fieldTypeId = useId();
 
   const t = useTranslation();
+
+  const handleTypeChange = (newType: SchemaType) => {
+    setFieldType(newType);
+    setFieldValidation({ type: newType });
+  };
+
+  const handleValidationChange = (schema: ObjectJSONSchema) => {
+    setFieldValidation(schema);
+  };
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -51,12 +68,18 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
       type: fieldType,
       description: fieldDesc,
       required: fieldRequired,
+      validation: {
+        ...fieldValidation,
+        type: fieldType,
+        description: fieldDesc || undefined,
+      },
     });
 
     setFieldName("");
     setFieldType("string");
     setFieldDesc("");
     setFieldRequired(false);
+    setFieldValidation({ type: "string" });
     setDialogOpen(false);
   };
 
@@ -77,8 +100,8 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
       </Button>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="md:max-w-[1200px] max-h-[85vh] w-[95vw] p-4 sm:p-6 jsonjoy">
-          <DialogHeader className="mb-4">
+        <DialogContent className="md:max-w-[1200px] max-h-[85vh] w-[95vw] p-4 sm:p-6 jsonjoy flex flex-col">
+          <DialogHeader className="mb-4 shrink-0">
             <DialogTitle className="text-xl flex flex-wrap items-center gap-2">
               {t.fieldAddNewLabel}
               <Badge variant="secondary" className="text-xs">
@@ -90,134 +113,148 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="space-y-4 min-w-[280px]">
-                <div>
-                  <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                    <label
-                      htmlFor={fieldNameId}
-                      className="text-sm font-medium"
-                    >
-                      {t.fieldNameLabel}
-                    </label>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Info className="h-4 w-4 text-muted-foreground shrink-0" />
-                        </TooltipTrigger>
-                        <TooltipContent className="max-w-[90vw]">
-                          <p>{t.fieldNameTooltip}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+          <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+            <div className="flex-1 overflow-y-auto px-1 py-1 -mx-1">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="space-y-4 min-w-[280px]">
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                      <label
+                        htmlFor={fieldNameId}
+                        className="text-sm font-medium"
+                      >
+                        {t.fieldNameLabel}
+                      </label>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="h-4 w-4 text-muted-foreground shrink-0" />
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-[90vw]">
+                            <p>{t.fieldNameTooltip}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                    <Input
+                      id={fieldNameId}
+                      value={fieldName}
+                      onChange={(e) => setFieldName(e.target.value)}
+                      placeholder={t.fieldNamePlaceholder}
+                      className="font-mono text-sm w-full"
+                      required
+                    />
                   </div>
-                  <Input
-                    id={fieldNameId}
-                    value={fieldName}
-                    onChange={(e) => setFieldName(e.target.value)}
-                    placeholder={t.fieldNamePlaceholder}
-                    className="font-mono text-sm w-full"
-                    required
-                  />
-                </div>
 
-                <div>
-                  <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                    <label
-                      htmlFor={fieldDescId}
-                      className="text-sm font-medium"
-                    >
-                      {t.fieldDescription}
-                    </label>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Info className="h-4 w-4 text-muted-foreground shrink-0" />
-                        </TooltipTrigger>
-                        <TooltipContent className="max-w-[90vw]">
-                          <p>{t.fieldDescriptionTooltip}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                      <label
+                        htmlFor={fieldDescId}
+                        className="text-sm font-medium"
+                      >
+                        {t.fieldDescription}
+                      </label>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="h-4 w-4 text-muted-foreground shrink-0" />
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-[90vw]">
+                            <p>{t.fieldDescriptionTooltip}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                    <Input
+                      id={fieldDescId}
+                      value={fieldDesc}
+                      onChange={(e) => setFieldDesc(e.target.value)}
+                      placeholder={t.fieldDescriptionPlaceholder}
+                      className="text-sm w-full"
+                    />
                   </div>
-                  <Input
-                    id={fieldDescId}
-                    value={fieldDesc}
-                    onChange={(e) => setFieldDesc(e.target.value)}
-                    placeholder={t.fieldDescriptionPlaceholder}
-                    className="text-sm w-full"
-                  />
-                </div>
 
-                <div className="flex items-center gap-3 p-3 rounded-lg border bg-muted/50">
-                  <input
-                    type="checkbox"
-                    id={fieldRequiredId}
-                    checked={fieldRequired}
-                    onChange={(e) => setFieldRequired(e.target.checked)}
-                    className="rounded border-gray-300 shrink-0"
-                  />
-                  <label htmlFor={fieldRequiredId} className="text-sm">
-                    {t.fieldRequiredLabel}
-                  </label>
-                </div>
-              </div>
-
-              <div className="space-y-4 min-w-[280px]">
-                <div>
-                  <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                    <label
-                      htmlFor={fieldTypeId}
-                      className="text-sm font-medium"
-                    >
-                      {t.fieldType}
+                  <div className="flex items-center gap-3 p-3 rounded-lg border bg-muted/50">
+                    <input
+                      type="checkbox"
+                      id={fieldRequiredId}
+                      checked={fieldRequired}
+                      onChange={(e) => setFieldRequired(e.target.checked)}
+                      className="rounded border-gray-300 shrink-0"
+                    />
+                    <label htmlFor={fieldRequiredId} className="text-sm">
+                      {t.fieldRequiredLabel}
                     </label>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <HelpCircle className="h-4 w-4 text-muted-foreground shrink-0" />
-                        </TooltipTrigger>
-                        <TooltipContent
-                          side="left"
-                          className="w-72 max-w-[90vw]"
-                        >
-                          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-                            <div>• {t.fieldTypeTooltipString}</div>
-                            <div>• {t.fieldTypeTooltipNumber}</div>
-                            <div>• {t.fieldTypeTooltipBoolean}</div>
-                            <div>• {t.fieldTypeTooltipObject}</div>
-                            <div className="col-span-2">
-                              • {t.fieldTypeTooltipArray}
+                  </div>
+                </div>
+
+                <div className="space-y-4 min-w-[280px]">
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                      <label
+                        htmlFor={fieldTypeId}
+                        className="text-sm font-medium"
+                      >
+                        {t.fieldType}
+                      </label>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <HelpCircle className="h-4 w-4 text-muted-foreground shrink-0" />
+                          </TooltipTrigger>
+                          <TooltipContent
+                            side="left"
+                            className="w-72 max-w-[90vw]"
+                          >
+                            <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                              <div>• {t.fieldTypeTooltipString}</div>
+                              <div>• {t.fieldTypeTooltipNumber}</div>
+                              <div>• {t.fieldTypeTooltipBoolean}</div>
+                              <div>• {t.fieldTypeTooltipObject}</div>
+                              <div className="col-span-2">
+                                • {t.fieldTypeTooltipArray}
+                              </div>
                             </div>
-                          </div>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                    <SchemaTypeSelector
+                      id={fieldTypeId}
+                      value={fieldType}
+                      onChange={handleTypeChange}
+                    />
                   </div>
-                  <SchemaTypeSelector
-                    id={fieldTypeId}
-                    value={fieldType}
-                    onChange={setFieldType}
-                  />
-                </div>
 
-                <div className="rounded-lg border bg-muted/50 p-3 hidden md:block">
-                  <p className="text-xs font-medium mb-2">
-                    {t.fieldTypeExample}
-                  </p>
-                  <code className="text-sm bg-background/80 p-2 rounded block overflow-x-auto">
-                    {fieldType === "string" && '"example"'}
-                    {fieldType === "number" && "42"}
-                    {fieldType === "boolean" && "true"}
-                    {fieldType === "object" && '{ "key": "value" }'}
-                    {fieldType === "array" && '["item1", "item2"]'}
-                  </code>
+                  <div className="rounded-lg border bg-muted/50 p-3 hidden md:block">
+                    <p className="text-xs font-medium mb-2">
+                      {t.fieldTypeExample}
+                    </p>
+                    <code className="text-sm bg-background/80 p-2 rounded block overflow-x-auto">
+                      {fieldType === "string" && '"example"'}
+                      {fieldType === "number" && "42"}
+                      {fieldType === "integer" && "42"}
+                      {fieldType === "boolean" && "true"}
+                      {fieldType === "object" && '{ "key": "value" }'}
+                      {fieldType === "array" && '["item1", "item2"]'}
+                    </code>
+                  </div>
+
+                  {/* Type-specific validation options */}
+                  <div className="rounded-lg border bg-muted/50 p-3">
+                    <TypeEditor
+                      schema={fieldValidation}
+                      readOnly={false}
+                      validationNode={undefined}
+                      onChange={handleValidationChange}
+                      depth={0}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
 
-            <DialogFooter className="mt-6 gap-2 flex-wrap">
+            <DialogFooter className="mt-6 gap-2 flex-wrap shrink-0 pt-4 border-t">
               <Button
                 type="button"
                 variant="outline"
