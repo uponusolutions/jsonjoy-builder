@@ -2,6 +2,7 @@ import type { FC } from "react";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import {
   createFieldSchema,
+  renameObjectProperty,
   updateObjectProperty,
   updatePropertyRequired,
 } from "../../lib/schemaEditor.ts";
@@ -50,12 +51,14 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
     // Create a field schema based on the updated field data
     const fieldSchema = createFieldSchema(updatedField);
 
-    // Update the field in the schema
-    let newSchema = updateObjectProperty(
-      asObjectSchema(schema),
-      updatedField.name,
-      fieldSchema,
-    );
+    let newSchema = asObjectSchema(schema);
+
+    // Use renameObjectProperty to preserve position when name changes
+    if (name !== updatedField.name) {
+      newSchema = renameObjectProperty(newSchema, name, updatedField.name, fieldSchema);
+    } else {
+      newSchema = updateObjectProperty(newSchema, name, fieldSchema);
+    }
 
     // Update required status
     newSchema = updatePropertyRequired(
@@ -63,29 +66,6 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
       updatedField.name,
       updatedField.required || false,
     );
-
-    // If name changed, we need to remove the old field
-    if (name !== updatedField.name) {
-      const { properties, ...rest } = newSchema;
-      const { [name]: _, ...remainingProps } = properties || {};
-
-      newSchema = {
-        ...rest,
-        properties: remainingProps,
-      };
-
-      // Re-add the field with the new name
-      newSchema = updateObjectProperty(
-        newSchema,
-        updatedField.name,
-        fieldSchema,
-      );
-
-      // Re-update required status if needed
-      if (updatedField.required) {
-        newSchema = updatePropertyRequired(newSchema, updatedField.name, true);
-      }
-    }
 
     // Update the schema
     onChange(newSchema);

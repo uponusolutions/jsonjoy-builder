@@ -36,6 +36,43 @@ export function updateObjectProperty(
 }
 
 /**
+ * Renames a property in an object schema while preserving its position
+ */
+export function renameObjectProperty(
+  schema: ObjectJSONSchema,
+  oldName: string,
+  newName: string,
+  newPropertySchema: JSONSchema,
+): ObjectJSONSchema {
+  if (!isObjectSchema(schema) || !schema.properties) return schema;
+  if (oldName === newName) {
+    return updateObjectProperty(schema, oldName, newPropertySchema);
+  }
+  if (!(oldName in schema.properties)) return schema;
+
+  const newSchema = copySchema(schema);
+  const newProperties: Record<string, JSONSchema> = {};
+
+  for (const [key, value] of Object.entries(newSchema.properties)) {
+    if (key === oldName) {
+      newProperties[newName] = newPropertySchema;
+    } else {
+      newProperties[key] = value;
+    }
+  }
+
+  newSchema.properties = newProperties;
+
+  if (newSchema.required) {
+    newSchema.required = newSchema.required.map((name) =>
+      name === oldName ? newName : name,
+    );
+  }
+
+  return newSchema;
+}
+
+/**
  * Removes a property from an object schema
  */
 export function removeObjectProperty(
