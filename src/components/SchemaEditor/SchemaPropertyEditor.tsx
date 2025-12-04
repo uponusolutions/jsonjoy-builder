@@ -181,16 +181,17 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
                 ) : tempDesc ? (
                   <button
                     type="button"
-                    onClick={() => setIsEditingDesc(true)}
-                    onKeyDown={(e) => e.key === "Enter" && setIsEditingDesc(true)}
+                    onClick={() => !readOnly && setIsEditingDesc(true)}
+                    onKeyDown={(e) => !readOnly && e.key === "Enter" && setIsEditingDesc(true)}
                     className={cn(
-                      "text-xs text-muted-foreground italic cursor-text px-2 py-0.5 -mx-0.5 rounded-sm hover:bg-secondary/30 hover:shadow-xs hover:ring-1 hover:ring-ring/20 text-left truncate flex-1 max-w-[40%] mr-2",
+                      "text-xs text-muted-foreground italic px-2 py-0.5 -mx-0.5 rounded-sm text-left truncate flex-1 max-w-[40%] mr-2",
+                      !readOnly && "cursor-text hover:bg-secondary/30 hover:shadow-xs hover:ring-1 hover:ring-ring/20",
                       !disableAnimations && "transition-all"
                     )}
                   >
                     {tempDesc}
                   </button>
-                ) : (
+                ) : !readOnly && (
                   <button
                     type="button"
                     onClick={() => setIsEditingDesc(true)}
