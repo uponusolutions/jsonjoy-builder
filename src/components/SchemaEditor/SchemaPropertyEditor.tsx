@@ -151,6 +151,10 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
                   autoFocus
                   onFocus={(e) => e.target.select()}
                 />
+              ) : readOnly ? (
+                <span className="json-field-label font-medium px-2 py-0.5 -mx-0.5 text-left truncate min-w-[80px] max-w-[50%]">
+                  {name}
+                </span>
               ) : (
                 <button
                   type="button"
@@ -179,18 +183,23 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
                     onFocus={(e) => e.target.select()}
                   />
                 ) : tempDesc ? (
-                  <button
-                    type="button"
-                    onClick={() => !readOnly && setIsEditingDesc(true)}
-                    onKeyDown={(e) => !readOnly && e.key === "Enter" && setIsEditingDesc(true)}
-                    className={cn(
-                      "text-xs text-muted-foreground italic px-2 py-0.5 -mx-0.5 rounded-sm text-left truncate flex-1 max-w-[40%] mr-2",
-                      !readOnly && "cursor-text hover:bg-secondary/30 hover:shadow-xs hover:ring-1 hover:ring-ring/20",
-                      !disableAnimations && "transition-all"
-                    )}
-                  >
-                    {tempDesc}
-                  </button>
+                  readOnly ? (
+                    <span className="text-xs text-muted-foreground italic px-2 py-0.5 -mx-0.5 text-left truncate flex-1 max-w-[40%] mr-2">
+                      {tempDesc}
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingDesc(true)}
+                      onKeyDown={(e) => e.key === "Enter" && setIsEditingDesc(true)}
+                      className={cn(
+                        "text-xs text-muted-foreground italic px-2 py-0.5 -mx-0.5 rounded-sm text-left truncate flex-1 max-w-[40%] mr-2 cursor-text hover:bg-secondary/30 hover:shadow-xs hover:ring-1 hover:ring-ring/20",
+                        !disableAnimations && "transition-all"
+                      )}
+                    >
+                      {tempDesc}
+                    </button>
+                  )
                 ) : !readOnly && (
                   <button
                     type="button"
