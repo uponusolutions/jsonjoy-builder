@@ -167,20 +167,20 @@ export function JsonValidator({
 
         {validationResult && (
           <div
-            className={`rounded-md p-4 ${validationResult.valid ? "bg-green-50 border border-green-200" : "bg-red-50 border border-red-200"} transition-all duration-300 ease-in-out`}
+            className={`rounded-md p-4 ${validationResult.valid ? "bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800" : "bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800"} transition-all duration-300 ease-in-out`}
           >
             <div className="flex items-center">
               {validationResult.valid ? (
                 <>
                   <Check className="h-5 w-5 text-green-500 mr-2" />
-                  <p className="text-green-700 font-medium">
+                  <p className="text-green-700 dark:text-green-300 font-medium">
                     {t.validatorValid}
                   </p>
                 </>
               ) : (
                 <>
                   <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
-                  <p className="text-red-700 font-medium">
+                  <p className="text-red-700 dark:text-red-300 font-medium">
                     {validationResult.errors.length === 1
                       ? validationResult.errors[0].path === "/"
                         ? t.validatorErrorInvalidSyntax
@@ -199,13 +199,13 @@ export function JsonValidator({
                 <div className="mt-3 max-h-[200px] overflow-y-auto">
                   {validationResult.errors[0] && (
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-red-700">
+                      <span className="text-sm font-medium text-red-700 dark:text-red-300">
                         {validationResult.errors[0].path === "/"
                           ? t.validatorErrorPathRoot
                           : validationResult.errors[0].path}
                       </span>
                       {validationResult.errors[0].line && (
-                        <span className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600">
+                        <span className="text-xs bg-secondary px-2 py-1 rounded text-muted-foreground">
                           {validationResult.errors[0].column
                             ? formatTranslation(
                                 t.validatorErrorLocationLineAndColumn,
@@ -227,7 +227,7 @@ export function JsonValidator({
                       <button
                         key={`error-${error.path}-${index}`}
                         type="button"
-                        className="w-full text-left bg-white border border-red-100 rounded-md p-3 shadow-xs hover:shadow-md transition-shadow duration-200 cursor-pointer"
+                        className="w-full text-left bg-card border border-red-100 dark:border-red-900 rounded-md p-3 shadow-xs hover:shadow-md transition-shadow duration-200 cursor-pointer"
                         onClick={() =>
                           error.line &&
                           error.column &&
@@ -236,17 +236,17 @@ export function JsonValidator({
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <p className="text-sm font-medium text-red-700">
+                            <p className="text-sm font-medium text-red-700 dark:text-red-300">
                               {error.path === "/"
                                 ? t.validatorErrorPathRoot
                                 : error.path}
                             </p>
-                            <p className="text-sm text-gray-600 mt-1">
+                            <p className="text-sm text-muted-foreground mt-1">
                               {error.message}
                             </p>
                           </div>
                           {error.line && (
-                            <div className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600">
+                            <div className="text-xs bg-secondary px-2 py-1 rounded text-muted-foreground">
                               {error.column
                                 ? formatTranslation(
                                     t.validatorErrorLocationLineAndColumn,

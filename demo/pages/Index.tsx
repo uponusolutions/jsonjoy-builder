@@ -25,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../src/components/ui/select.tsx";
+import { ThemeToggle } from "../../src/components/ui/theme-toggle.tsx";
 import { en } from "../../src/i18n/locales/en.ts";
 import { TranslationContext } from "../../src/i18n/translation-context.ts";
 import type { JSONSchema } from "../../src/types/jsonSchema.ts";
@@ -87,7 +88,7 @@ const Index = () => {
                 <FileJson size={16} className="mr-1.5" />
                 Easy Schema Builder
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 animate-in">
+              <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 animate-in text-foreground">
                 Create JSON Schemas{" "}
                 <span className="text-primary">Visually</span>
               </h1>
@@ -177,6 +178,7 @@ const Index = () => {
                     </SelectContent>
                   </Select>
                 </div>
+                <ThemeToggle size="default" className="h-10 w-10" />
               </div>
             </div>
           </div>
@@ -217,7 +219,7 @@ const Index = () => {
                 <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
                   <span className="text-primary font-bold text-xl">1</span>
                 </div>
-                <h3 className="text-lg font-medium mb-2">
+                <h3 className="text-lg font-medium mb-2 text-foreground">
                   Define Schema Structure
                 </h3>
                 <p className="text-muted-foreground text-sm">
@@ -231,7 +233,7 @@ const Index = () => {
                 <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
                   <span className="text-primary font-bold text-xl">2</span>
                 </div>
-                <h3 className="text-lg font-medium mb-2">
+                <h3 className="text-lg font-medium mb-2 text-foreground">
                   Create Complex Types
                 </h3>
                 <p className="text-muted-foreground text-sm">
@@ -245,7 +247,7 @@ const Index = () => {
                 <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
                   <span className="text-primary font-bold text-xl">3</span>
                 </div>
-                <h3 className="text-lg font-medium mb-2">Use Your Schema</h3>
+                <h3 className="text-lg font-medium mb-2 text-foreground">Use Your Schema</h3>
                 <p className="text-muted-foreground text-sm">
                   Export for form validation in React Hook Form, API
                   documentation with OpenAPI, or backend validation with
@@ -257,13 +259,13 @@ const Index = () => {
             {/* Use Case Examples */}
             <div className="mt-10 grid md:grid-cols-2 gap-6 animate-in">
               <div className="glass-panel p-6">
-                <h3 className="text-lg font-medium mb-2">API Development</h3>
+                <h3 className="text-lg font-medium mb-2 text-foreground">API Development</h3>
                 <p className="text-muted-foreground text-sm mb-3">
                   Define request/response schemas for endpoints like{" "}
                   <code>/api/users</code> to ensure proper data validation and
                   consistent API documentation.
                 </p>
-                <div className="text-xs bg-muted/50 p-2 rounded text-left overflow-x-auto">
+                <div className="text-xs bg-muted/50 p-2 rounded text-left overflow-x-auto text-foreground">
                   {`{
   "type": "object",
   "properties": {
@@ -276,13 +278,13 @@ const Index = () => {
               </div>
 
               <div className="glass-panel p-6">
-                <h3 className="text-lg font-medium mb-2">Form Validation</h3>
+                <h3 className="text-lg font-medium mb-2 text-foreground">Form Validation</h3>
                 <p className="text-muted-foreground text-sm mb-3">
                   Create schemas for checkout forms with shipping details,
                   payment information, and order specifics - all with proper
                   validation rules.
                 </p>
-                <div className="text-xs text-wrap bg-muted/50 p-2 rounded text-left overflow-x-auto">
+                <div className="text-xs text-wrap bg-muted/50 p-2 rounded text-left overflow-x-auto text-foreground">
                   {JSON.stringify(
                     {
                       type: "object",
@@ -311,7 +313,7 @@ const Index = () => {
 
             {/* Tools Section */}
             <div className="mt-12 animate-in">
-              <h2 className="text-2xl font-bold text-center mb-6">
+              <h2 className="text-2xl font-bold text-center mb-6 text-foreground">
                 Ecosystem & Tools
               </h2>
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -408,7 +410,7 @@ const Index = () => {
                   },
                 ].map((section) => (
                   <div key={section.title} className="glass-panel p-4">
-                    <h3 className="text-md font-medium mb-2">
+                    <h3 className="text-md font-medium mb-2 text-foreground">
                       {section.title}
                     </h3>
                     <ul className="text-sm text-muted-foreground space-y-2">

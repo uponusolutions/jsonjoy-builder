@@ -331,7 +331,7 @@ const StringEditor: React.FC<TypeEditorProps> = ({
             <button
               type="button"
               onClick={handleAddEnumValue}
-              className="px-3 py-1 h-8 rounded-md bg-secondary text-xs font-medium hover:bg-secondary/80"
+              className="px-3 py-1 h-8 rounded-md bg-secondary text-secondary-foreground text-xs font-medium hover:bg-secondary/80"
             >
               Add
             </button>

@@ -126,7 +126,7 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
                     <div className="flex flex-wrap items-center gap-2 mb-1.5">
                       <label
                         htmlFor={fieldNameId}
-                        className="text-sm font-medium"
+                        className="text-sm font-medium text-foreground"
                       >
                         {t.fieldNameLabel}
                       </label>
@@ -156,7 +156,7 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
                       <div className="flex flex-wrap items-center gap-2 mb-1.5">
                         <label
                           htmlFor={fieldDescId}
-                          className="text-sm font-medium"
+                          className="text-sm font-medium text-foreground"
                         >
                           {t.fieldDescription}
                         </label>
@@ -187,9 +187,9 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
                       id={fieldRequiredId}
                       checked={fieldRequired}
                       onChange={(e) => setFieldRequired(e.target.checked)}
-                      className="rounded border-gray-300 shrink-0"
+                      className="rounded border-input bg-background shrink-0 accent-primary"
                     />
-                    <label htmlFor={fieldRequiredId} className="text-sm">
+                    <label htmlFor={fieldRequiredId} className="text-sm text-foreground">
                       {t.fieldRequiredLabel}
                     </label>
                   </div>
@@ -200,7 +200,7 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
                     <div className="flex flex-wrap items-center gap-2 mb-1.5">
                       <label
                         htmlFor={fieldTypeId}
-                        className="text-sm font-medium"
+                        className="text-sm font-medium text-foreground"
                       >
                         {t.fieldType}
                       </label>
@@ -235,10 +235,10 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
                   </div>
 
                   <div className="rounded-lg border bg-muted/50 p-3 hidden md:block">
-                    <p className="text-xs font-medium mb-2">
+                    <p className="text-xs font-medium mb-2 text-foreground">
                       {t.fieldTypeExample}
                     </p>
-                    <code className="text-sm bg-background/80 p-2 rounded block overflow-x-auto">
+                    <code className="text-sm bg-background/80 p-2 rounded block overflow-x-auto text-foreground">
                       {fieldType === "string" && '"example"'}
                       {fieldType === "number" && "42"}
                       {fieldType === "integer" && "42"}

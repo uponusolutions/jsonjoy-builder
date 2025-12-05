@@ -140,7 +140,7 @@
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
+    border-color: var(--border, currentcolor);
   }
 }
 
@@ -153,11 +153,11 @@
 }
 
 @utility json-editor-container {
-  @apply bg-white backdrop-blur-md rounded-xl border border-border shadow-xs;
+  @apply bg-card backdrop-blur-md rounded-xl border border-border shadow-xs;
 }
 
 @utility glass-panel {
-  @apply bg-white/90 backdrop-blur-md rounded-xl border border-border shadow-xs;
+  @apply bg-card/90 backdrop-blur-md rounded-xl border border-border shadow-xs;
 }
 
 @utility animate-in {

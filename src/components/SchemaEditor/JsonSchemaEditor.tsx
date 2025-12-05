@@ -96,7 +96,7 @@ const JsonSchemaEditor: FC<JsonSchemaEditorProps> = ({
       <div className="block lg:hidden w-full">
         <Tabs defaultValue="visual" className="w-full">
           <div className="flex items-center justify-between px-4 py-3 border-b w-full">
-            <h3 className="font-medium">{t.schemaEditorTitle}</h3>
+            <h3 className="font-medium text-foreground">{t.schemaEditorTitle}</h3>
             <div className="flex items-center gap-2">
               <button
                 type="button"
@@ -157,7 +157,7 @@ const JsonSchemaEditor: FC<JsonSchemaEditorProps> = ({
         )}
       >
         <div className="flex items-center justify-between px-4 py-3 border-b w-full shrink-0">
-          <h3 className="font-medium">{t.schemaEditorTitle}</h3>
+          <h3 className="font-medium text-foreground">{t.schemaEditorTitle}</h3>
           <button
             type="button"
             onClick={toggleFullscreen}

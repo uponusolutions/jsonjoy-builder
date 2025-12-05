@@ -19,6 +19,8 @@ export interface SchemaVisualEditorProps {
   onChange: (schema: JSONSchema) => void;
   showDescription?: boolean;
   disableAnimations?: boolean;
+  /** Theme mode: 'light' or 'dark'. Default is 'light'. */
+  theme?: "light" | "dark";
 }
 
 /** @public */
@@ -28,6 +30,7 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
   readOnly = false,
   showDescription = true,
   disableAnimations = false,
+  theme = "light",
 }) => {
   const t = useTranslation();
   // Handle adding a top-level field
@@ -111,8 +114,10 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
     schema.properties &&
     Object.keys(schema.properties).length > 0;
 
+  const themeClass = theme === "dark" ? "dark" : "";
+
   return (
-    <div className="p-4 h-full flex flex-col overflow-auto jsonjoy">
+    <div className={`p-4 h-full flex flex-col overflow-auto jsonjoy ${themeClass}`}>
       {!readOnly && (
         <div className="mb-6 shrink-0">
           <AddFieldButton onAddField={handleAddField} showDescription={showDescription} disableAnimations={disableAnimations} />

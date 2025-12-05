@@ -65,20 +65,15 @@ export const defaultEditorOptions: MonacoEditorOptions = {
 export function useMonacoTheme() {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Check for dark mode by examining CSS variables
+  // Check for dark mode by examining the dark class on document or .jsonjoy element
   useEffect(() => {
     const checkDarkMode = () => {
-      // Get the current background color value
-      const backgroundColor = getComputedStyle(document.documentElement)
-        .getPropertyValue("--background")
-        .trim();
+      // Check if dark class is present on html element or any jsonjoy container
+      const htmlHasDark = document.documentElement.classList.contains("dark");
+      const jsonjoyElement = document.querySelector(".jsonjoy");
+      const jsonjoyHasDark = jsonjoyElement?.classList.contains("dark") ?? false;
 
-      // If the background color HSL has a low lightness value, it's likely dark mode
-      const isDark =
-        backgroundColor.includes("222.2") ||
-        backgroundColor.includes("84% 4.9%");
-
-      setIsDarkMode(isDark);
+      setIsDarkMode(htmlHasDark || jsonjoyHasDark);
     };
 
     // Check initially
@@ -88,8 +83,17 @@ export function useMonacoTheme() {
     const observer = new MutationObserver(checkDarkMode);
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ["class", "style"],
+      attributeFilter: ["class"],
     });
+
+    // Also observe jsonjoy elements
+    const jsonjoyElements = document.querySelectorAll(".jsonjoy");
+    for (const el of jsonjoyElements) {
+      observer.observe(el, {
+        attributes: true,
+        attributeFilter: ["class"],
+      });
+    }
 
     return () => observer.disconnect();
   }, []);

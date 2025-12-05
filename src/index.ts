@@ -12,6 +12,8 @@ import SchemaVisualEditor, {
 
 export * from "./components/features/JsonValidator.tsx";
 export * from "./components/features/SchemaInferencer.tsx";
+export * from "./components/ui/theme-toggle.tsx";
+export * from "./hooks/use-theme.ts";
 export * from "./i18n/locales/de.ts";
 export * from "./i18n/locales/en.ts";
 export * from "./i18n/translation-context.ts";

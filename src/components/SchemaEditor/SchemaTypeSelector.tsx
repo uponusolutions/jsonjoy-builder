@@ -71,7 +71,7 @@ const SchemaTypeSelector: FC<SchemaTypeSelectorProps> = ({
           )}
           onClick={() => onChange(type.id)}
         >
-          <div className="font-medium text-sm">{t[type.label]}</div>
+          <div className="font-medium text-sm text-foreground">{t[type.label]}</div>
           <div className="text-xs text-muted-foreground line-clamp-1">
             {t[type.description]}
           </div>

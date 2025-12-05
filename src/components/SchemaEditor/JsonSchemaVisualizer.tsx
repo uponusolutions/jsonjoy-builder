@@ -74,7 +74,7 @@ const JsonSchemaVisualizer: FC<JsonSchemaVisualizerProps> = ({
       )}
     >
       <div className="flex items-center justify-between bg-secondary/80 backdrop-blur-xs px-4 py-2 border-b shrink-0">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 text-foreground">
           <FileJson size={18} />
           <span className="font-medium text-sm">{t.visualizerSource}</span>
         </div>
