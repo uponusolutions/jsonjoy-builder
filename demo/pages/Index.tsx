@@ -10,21 +10,29 @@ import {
   PencilOff,
   RefreshCw,
   User,
-  Zap,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import {
+  Anchor,
+  Badge,
+  Box,
+  Button,
+  Center,
+  Container,
+  Group,
+  Paper,
+  Select,
+  SimpleGrid,
+  Stack,
+  Text,
+  ThemeIcon,
+  Title,
+  useMantineColorScheme,
+} from "@mantine/core";
 import { exampleSchema } from "../../demo/utils/schemaExample.ts";
 import { JsonValidator } from "../../src/components/features/JsonValidator.tsx";
 import { SchemaInferencer } from "../../src/components/features/SchemaInferencer.tsx";
 import JsonSchemaEditor from "../../src/components/SchemaEditor/JsonSchemaEditor.tsx";
-import { Button } from "../../src/components/ui/button.tsx";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../src/components/ui/select.tsx";
 import { ThemeToggle } from "../../src/components/ui/theme-toggle.tsx";
 import { useTheme } from "../../src/hooks/use-theme.ts";
 import { en } from "../../src/i18n/locales/en.ts";
@@ -35,20 +43,22 @@ const Index = () => {
   const [schema, setSchema] = useState<JSONSchema>(exampleSchema);
   const [readOnly, setReadOnly] = useState<boolean>(false);
   const [showDescription, setShowDescription] = useState<boolean>(true);
-  const [disableAnimations, setDisableAnimations] = useState<boolean>(false);
   const [inferDialogOpen, setInferDialogOpen] = useState(false);
   const [validateDialogOpen, setValidateDialogOpen] = useState(false);
   const [language, setLanguage] = useState("en");
   const [translation, setTranslation] = useState(en);
   const { resolvedTheme } = useTheme();
+  const { setColorScheme } = useMantineColorScheme();
 
   useEffect(() => {
     if (resolvedTheme === "dark") {
       document.documentElement.classList.add("dark");
+      setColorScheme("dark");
     } else {
       document.documentElement.classList.remove("dark");
+      setColorScheme("light");
     }
-  }, [resolvedTheme]);
+  }, [resolvedTheme, setColorScheme]);
 
   const handleReset = () => setSchema(exampleSchema);
 
@@ -78,141 +88,148 @@ const Index = () => {
 
   return (
     <TranslationContext value={translation}>
-      <div
-        className={`min-h-screen bg-linear-to-b from-background to-background/95 relative overflow-hidden jsonjoy ${
-          resolvedTheme === "dark" ? "dark" : ""
-        }`}
+      <Box
+        style={{
+          minHeight: "100vh",
+          background:
+            resolvedTheme === "dark"
+              ? "linear-gradient(to bottom, var(--mantine-color-dark-7), var(--mantine-color-dark-8))"
+              : "linear-gradient(to bottom, var(--mantine-color-gray-0), var(--mantine-color-white))",
+          position: "relative",
+          overflow: "hidden",
+        }}
       >
         {/* Background accent */}
-        <div
-          className="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-3xl opacity-50 animate-float"
-          aria-hidden="true"
+        <Box
+          style={{
+            position: "absolute",
+            top: -100,
+            right: -100,
+            width: 400,
+            height: 400,
+            borderRadius: "50%",
+            background: "var(--mantine-color-blue-filled)",
+            opacity: 0.1,
+            filter: "blur(80px)",
+            zIndex: 0,
+          }}
         />
-        <div
-          className="absolute -bottom-32 -left-32 w-96 h-96 bg-primary/5 rounded-full blur-3xl opacity-50 animate-float"
-          style={{ animationDelay: "1s" }}
-          aria-hidden="true"
+        <Box
+          style={{
+            position: "absolute",
+            bottom: -100,
+            left: -100,
+            width: 400,
+            height: 400,
+            borderRadius: "50%",
+            background: "var(--mantine-color-blue-filled)",
+            opacity: 0.05,
+            filter: "blur(80px)",
+            zIndex: 0,
+          }}
         />
 
-        <div className="container mx-auto px-0 sm:px-2 md:px-6 lg:px-8 pt-16 pb-24 relative z-10">
-          <div className="max-w-4xl mx-auto">
+        <Container
+          size="xl"
+          py="xl"
+          style={{ position: "relative", zIndex: 1 }}
+        >
+          <Stack align="center" gap="xl" mb={50}>
             {/* Header */}
-            <div className="text-center mb-12">
-              <div className="bg-primary/10 text-primary inline-flex items-center px-3 py-1 rounded-full text-sm font-medium mb-4">
-                <FileJson size={16} className="mr-1.5" />
+            <Stack align="center" gap="xs" ta="center">
+              <Badge
+                variant="light"
+                size="lg"
+                leftSection={<FileJson size={14} />}
+                color="blue"
+              >
                 Easy Schema Builder
-              </div>
-              <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 animate-in text-foreground">
+              </Badge>
+              <Title order={1} size={48} style={{ lineHeight: 1.1 }}>
                 Create JSON Schemas{" "}
-                <span className="text-primary">Visually</span>
-              </h1>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto animate-in">
+                <Text span c="blue" inherit>
+                  Visually
+                </Text>
+              </Title>
+              <Text size="xl" c="dimmed" maw={600}>
                 Design your data structure effortlessly without writing a single
                 line of code. Perfect for APIs, forms, and data validation.
-              </p>
-            </div>
+              </Text>
+            </Stack>
 
             {/* Action Buttons */}
-            <div className="flex flex-wrap justify-center gap-4 mb-8 animate-in">
-              <div className="flex flex-nowrap gap-4">
-                <Button
-                  variant="outline"
-                  onClick={handleReset}
-                  className="gap-2"
-                >
-                  <RefreshCw size={16} />
-                  Reset to Example
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleClear}
-                  className="gap-2"
-                >
-                  <CirclePlus size={16} />
-                  Start from Scratch
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleInferSchema}
-                  className="gap-2"
-                >
-                  <Code size={16} />
-                  Infer from JSON
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleValidateJson}
-                  className="gap-2"
-                >
-                  <CheckCircle size={16} />
-                  Validate JSON
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleReadOnlyToggle}
-                  className="gap-2"
-                >
-                  {!readOnly && (
-                    <>
-                      <PencilOff size={16} /> Read-Only
-                    </>
-                  )}
-                  {readOnly && (
-                    <>
-                      <Pencil size={16} /> Writable
-                    </>
-                  )}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setShowDescription(!showDescription)}
-                  className="gap-2"
-                >
-                  <FileText size={16} />
-                  {showDescription ? "Hide Descriptions" : "Show Descriptions"}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setDisableAnimations(!disableAnimations)}
-                  className="gap-2"
-                >
-                  <Zap size={16} />
-                  {disableAnimations ? "Enable Animations" : "Disable Animations"}
-                </Button>
-                <div>
-                  <Select value={language} onValueChange={handleLanguageChange}>
-                    <SelectTrigger className="h-10 font-medium">
-                      <SelectValue placeholder="Language" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="en">English</SelectItem>
-                      <SelectItem value="de">German</SelectItem>
-                      <SelectItem value="fr">French</SelectItem>
-                      <SelectItem value="ru">Russian</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <ThemeToggle size="default" className="h-10 w-10" />
-              </div>
-            </div>
-          </div>
+            <Group justify="center" gap="sm">
+              <Button
+                variant="outline"
+                onClick={handleReset}
+                leftSection={<RefreshCw size={16} />}
+              >
+                Reset to Example
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleClear}
+                leftSection={<CirclePlus size={16} />}
+              >
+                Start from Scratch
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleInferSchema}
+                leftSection={<Code size={16} />}
+              >
+                Infer from JSON
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleValidateJson}
+                leftSection={<CheckCircle size={16} />}
+              >
+                Validate JSON
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleReadOnlyToggle}
+                leftSection={
+                  readOnly ? <Pencil size={16} /> : <PencilOff size={16} />
+                }
+              >
+                {readOnly ? "Writable" : "Read-Only"}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setShowDescription(!showDescription)}
+                leftSection={<FileText size={16} />}
+              >
+                {showDescription ? "Hide Descriptions" : "Show Descriptions"}
+              </Button>
 
-          {/* Language Selector */}
-          <div className="flex justify-center mb-6"></div>
+              <Select
+                value={language}
+                onChange={(value) => handleLanguageChange(value || "en")}
+                data={[
+                  { value: "en", label: "English" },
+                  { value: "de", label: "German" },
+                  { value: "fr", label: "French" },
+                  { value: "ru", label: "Russian" },
+                ]}
+                placeholder="Language"
+                w={130}
+              />
+              <ThemeToggle size="default" />
+            </Group>
+          </Stack>
 
-          {/* Schema Editor - full width on large screens */}
-                    <div className="max-w-4xl mx-auto lg:max-w-none">
+          {/* Schema Editor */}
+          <Paper shadow="md" radius="md" withBorder>
             <JsonSchemaEditor
               schema={schema}
               readOnly={readOnly}
               setSchema={setSchema}
               showDescription={showDescription}
-              disableAnimations={disableAnimations}
               theme={resolvedTheme}
-              className="shadow-lg animate-in border-border/50 backdrop-blur-xs"
             />
-          </div>
-
+          </Paper>
 
           {/* Schema inferencer component */}
           <SchemaInferencer
@@ -228,61 +245,61 @@ const Index = () => {
             schema={schema}
           />
 
-          {/* How It Works - kept within max-w-4xl */}
-          <div className="max-w-4xl mx-auto">
-            <div className="mt-16 grid md:grid-cols-3 gap-6 text-center animate-in">
-              <div className="glass-panel p-6">
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <span className="text-primary font-bold text-xl">1</span>
-                </div>
-                <h3 className="text-lg font-medium mb-2 text-foreground">
-                  Define Schema Structure
-                </h3>
-                <p className="text-muted-foreground text-sm">
-                  Create a user profile schema with name, email, and age fields.
-                  Specify string formats for emails, min/max for ages, and
-                  required fields.
-                </p>
-              </div>
-
-              <div className="glass-panel p-6">
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <span className="text-primary font-bold text-xl">2</span>
-                </div>
-                <h3 className="text-lg font-medium mb-2 text-foreground">
-                  Create Complex Types
-                </h3>
-                <p className="text-muted-foreground text-sm">
-                  Build product catalogs with nested objects for variants,
-                  arrays for tags, and enums for predefined categories or status
-                  values.
-                </p>
-              </div>
-
-              <div className="glass-panel p-6">
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <span className="text-primary font-bold text-xl">3</span>
-                </div>
-                <h3 className="text-lg font-medium mb-2 text-foreground">Use Your Schema</h3>
-                <p className="text-muted-foreground text-sm">
-                  Export for form validation in React Hook Form, API
-                  documentation with OpenAPI, or backend validation with
-                  libraries like Ajv.
-                </p>
-              </div>
-            </div>
+          {/* How It Works */}
+          <Container size="lg" mt={80}>
+            <SimpleGrid cols={{ base: 1, md: 3 }} spacing="xl">
+              {[
+                {
+                  step: 1,
+                  title: "Define Schema Structure",
+                  desc: "Create a user profile schema with name, email, and age fields. Specify string formats for emails, min/max for ages, and required fields.",
+                },
+                {
+                  step: 2,
+                  title: "Create Complex Types",
+                  desc: "Build product catalogs with nested objects for variants, arrays for tags, and enums for predefined categories or status values.",
+                },
+                {
+                  step: 3,
+                  title: "Use Your Schema",
+                  desc: "Export for form validation in React Hook Form, API documentation with OpenAPI, or backend validation with libraries like Ajv.",
+                },
+              ].map((item) => (
+                <Paper key={item.step} p="xl" radius="md" withBorder>
+                  <ThemeIcon size={48} radius="md" variant="light" mb="md">
+                    <Text fw={700} size="xl">
+                      {item.step}
+                    </Text>
+                  </ThemeIcon>
+                  <Title order={3} size="h4" mb="sm">
+                    {item.title}
+                  </Title>
+                  <Text size="sm" c="dimmed">
+                    {item.desc}
+                  </Text>
+                </Paper>
+              ))}
+            </SimpleGrid>
 
             {/* Use Case Examples */}
-            <div className="mt-10 grid md:grid-cols-2 gap-6 animate-in">
-              <div className="glass-panel p-6">
-                <h3 className="text-lg font-medium mb-2 text-foreground">API Development</h3>
-                <p className="text-muted-foreground text-sm mb-3">
-                  Define request/response schemas for endpoints like{" "}
-                  <code>/api/users</code> to ensure proper data validation and
-                  consistent API documentation.
-                </p>
-                <div className="text-xs bg-muted/50 p-2 rounded text-left overflow-x-auto text-foreground">
-                  {`{
+            <SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl" mt={40}>
+              <Paper p="xl" radius="md" withBorder>
+                <Title order={3} size="h4" mb="sm">
+                  API Development
+                </Title>
+                <Text size="sm" c="dimmed" mb="md">
+                  Define request/response schemas for endpoints like /api/users
+                  to ensure proper data validation and consistent API
+                  documentation.
+                </Text>
+                <Paper
+                  bg={resolvedTheme === "dark" ? "dark.6" : "gray.1"}
+                  p="xs"
+                  radius="sm"
+                  style={{ overflowX: "auto" }}
+                >
+                  <Text component="pre" size="xs" style={{ margin: 0 }}>
+                    {`{
   "type": "object",
   "properties": {
     "username": { "type": "string", "minLength": 3 },
@@ -290,49 +307,59 @@ const Index = () => {
   },
   "required": ["username", "email"]
 }`}
-                </div>
-              </div>
+                  </Text>
+                </Paper>
+              </Paper>
 
-              <div className="glass-panel p-6">
-                <h3 className="text-lg font-medium mb-2 text-foreground">Form Validation</h3>
-                <p className="text-muted-foreground text-sm mb-3">
+              <Paper p="xl" radius="md" withBorder>
+                <Title order={3} size="h4" mb="sm">
+                  Form Validation
+                </Title>
+                <Text size="sm" c="dimmed" mb="md">
                   Create schemas for checkout forms with shipping details,
                   payment information, and order specifics - all with proper
                   validation rules.
-                </p>
-                <div className="text-xs text-wrap bg-muted/50 p-2 rounded text-left overflow-x-auto text-foreground">
-                  {JSON.stringify(
-                    {
-                      type: "object",
-                      properties: {
-                        zipCode: { type: "string", pattern: "^\\d{5}$" },
+                </Text>
+                <Paper
+                  bg={resolvedTheme === "dark" ? "dark.6" : "gray.1"}
+                  p="xs"
+                  radius="sm"
+                  style={{ overflowX: "auto" }}
+                >
+                  <Text component="pre" size="xs" style={{ margin: 0 }}>
+                    {JSON.stringify(
+                      {
+                        type: "object",
+                        properties: {
+                          zipCode: { type: "string", pattern: "^\\d{5}$" },
+                        },
+                        paymentMethod: {
+                          type: "string",
+                          enum: ["credit", "paypal"],
+                        },
                       },
-                      paymentMethod: {
-                        type: "string",
-                        enum: ["credit", "paypal"],
-                      },
-                    },
-                    null,
-                    2,
-                  )}
-                </div>
-              </div>
-            </div>
+                      null,
+                      2,
+                    )}
+                  </Text>
+                </Paper>
+              </Paper>
+            </SimpleGrid>
 
             {/* Footer */}
-            <div className="mt-16 text-center text-sm text-muted-foreground">
-              <p>
+            <Stack align="center" mt={80} mb={40}>
+              <Text c="dimmed" size="sm" ta="center">
                 Built with simplicity in mind. Design beautiful data structures
                 without technical knowledge.
-              </p>
-            </div>
+              </Text>
+            </Stack>
 
             {/* Tools Section */}
-            <div className="mt-12 animate-in">
-              <h2 className="text-2xl font-bold text-center mb-6 text-foreground">
+            <Box mt={50}>
+              <Title order={2} ta="center" mb="xl">
                 Ecosystem & Tools
-              </h2>
-              <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+              </Title>
+              <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="md">
                 {[
                   {
                     title: "Form Generation",
@@ -425,49 +452,60 @@ const Index = () => {
                     ],
                   },
                 ].map((section) => (
-                  <div key={section.title} className="glass-panel p-4">
-                    <h3 className="text-md font-medium mb-2 text-foreground">
+                  <Paper key={section.title} p="md" withBorder>
+                    <Title order={4} size="h5" mb="sm">
                       {section.title}
-                    </h3>
-                    <ul className="text-sm text-muted-foreground space-y-2">
+                    </Title>
+                    <Stack gap="xs">
                       {section.links.map((link) => (
-                        <li key={link.url} className="flex items-start">
-                          <span className="text-primary mr-2">•</span>
-                          <span>
-                            <strong>
-                              <a
-                                href={link.url}
-                                target="_blank"
-                                rel="nofollow noopener noreferrer"
-                              >
-                                {link.name}
-                              </a>
-                            </strong>
+                        <Group
+                          key={link.url}
+                          align="flex-start"
+                          wrap="nowrap"
+                          gap="xs"
+                        >
+                          <Text c="blue">•</Text>
+                          <Text size="sm" c="dimmed">
+                            <Anchor
+                              href={link.url}
+                              target="_blank"
+                              rel="nofollow noopener noreferrer"
+                              fw={700}
+                            >
+                              {link.name}
+                            </Anchor>
                             {" - "}
                             {link.description}
-                          </span>
-                        </li>
+                          </Text>
+                        </Group>
                       ))}
-                    </ul>
-                  </div>
+                    </Stack>
+                  </Paper>
                 ))}
-              </div>
-              <div className="mt-6 text-center">
-                <a
+              </SimpleGrid>
+              <Center mt="lg">
+                <Anchor
                   href="https://json-schema.org/tools"
                   target="_blank"
                   rel="nofollow noopener noreferrer"
-                  className="text-sm text-primary hover:underline"
                 >
                   Explore more JSON Schema tools →
-                </a>
-              </div>
-            </div>
+                </Anchor>
+              </Center>
+            </Box>
 
             {/* Author Footer */}
-            <div className="mt-16 py-4 border-t border-border/30 backdrop-blur-xs">
-              <div className="flex items-center justify-center gap-2 text-sm">
-                <span className="text-muted-foreground">Built by</span>
+            <Box
+              mt={80}
+              py="md"
+              style={{
+                borderTop: "1px solid var(--mantine-color-default-border)",
+              }}
+            >
+              <Group justify="center" gap="xs">
+                <Text size="sm" c="dimmed">
+                  Built by
+                </Text>
                 {[
                   {
                     href: "https://ophir.dev",
@@ -490,25 +528,33 @@ const Index = () => {
                   },
                 ].map((link, index, array) => (
                   <React.Fragment key={link.href}>
-                    <a
+                    <Anchor
                       href={link.href}
-                      className="font-medium text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
-                      {...(link.target && { target: link.target })}
-                      {...(link.rel && { rel: link.rel })}
+                      target={link.target}
+                      rel={link.rel}
+                      c="blue"
+                      fw={500}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "4px",
+                      }}
                     >
-                      <link.icon size={14} className="opacity-70" />
-                      <span>{link.text}</span>
-                    </a>
+                      <link.icon size={14} style={{ opacity: 0.7 }} />
+                      {link.text}
+                    </Anchor>
                     {index < array.length - 1 && (
-                      <span className="mx-1">•</span>
+                      <Text span c="dimmed" mx={4}>
+                        •
+                      </Text>
                     )}
                   </React.Fragment>
                 ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+              </Group>
+            </Box>
+          </Container>
+        </Container>
+      </Box>
     </TranslationContext>
   );
 };

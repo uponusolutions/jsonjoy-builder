@@ -150,29 +150,3 @@ export const ExpandButton: React.FC<ExpandButtonProps> = ({
   );
 };
 
-// FieldActions - extract for reuse
-export interface FieldActionsProps {
-  onDelete: () => void;
-}
-
-export const FieldActions: React.FC<FieldActionsProps> = ({ onDelete }) => {
-  const t = useTranslation();
-  const X = React.lazy(() =>
-    import("lucide-react").then((mod) => ({ default: mod.X })),
-  );
-
-  return (
-    <div className="flex items-center gap-1 text-muted-foreground">
-      <button
-        type="button"
-        onClick={onDelete}
-        className="p-1 rounded-md hover:bg-secondary hover:text-destructive transition-colors opacity-0 group-hover:opacity-100"
-        aria-label={t.fieldDelete}
-      >
-        <Suspense fallback={<div className="w-[16px] h-[16px]" />}>
-          <X size={16} />
-        </Suspense>
-      </button>
-    </div>
-  );
-};

@@ -1,7 +1,8 @@
 import { render } from "@testing-library/react";
-import "global-jsdom/register";
+import "../../../setup.ts";
 import { describe, test } from "node:test";
 import React from "react";
+import { MantineProvider } from "@mantine/core";
 import NumberEditor from "../../../../src/components/SchemaEditor/types/NumberEditor.tsx";
 
 describe("NumberEditor", () => {
@@ -9,20 +10,28 @@ describe("NumberEditor", () => {
     const element = React.createElement(NumberEditor, {
       readOnly: false,
       onChange: () => {},
+      validationNode: undefined,
       schema: {
         type: "number",
       },
     });
-    t.assert.snapshot(render(element).container.innerHTML);
+    t.assert.snapshot(
+      render(React.createElement(MantineProvider, null, element)).container
+        .innerHTML,
+    );
   });
   test("read-only mode doesn't show constraints", (t) => {
     const element = React.createElement(NumberEditor, {
       readOnly: true,
       onChange: () => {},
+      validationNode: undefined,
       schema: {
         type: "number",
       },
     });
-    t.assert.snapshot(render(element).container.innerHTML);
+    t.assert.snapshot(
+      render(React.createElement(MantineProvider, null, element)).container
+        .innerHTML,
+    );
   });
 });

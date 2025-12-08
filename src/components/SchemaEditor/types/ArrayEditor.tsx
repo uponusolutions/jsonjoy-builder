@@ -1,18 +1,21 @@
-import { useId, useMemo, useState } from "react";
-import { Input } from "../../../components/ui/input.tsx";
-import { Label } from "../../../components/ui/label.tsx";
-import { Switch } from "../../../components/ui/switch.tsx";
+import { useId, useState } from "react";
+import {
+  Switch,
+  Text,
+  Group,
+  Stack,
+  Box,
+  SimpleGrid,
+  Paper,
+  TextInput,
+} from "@mantine/core";
 import { useTranslation } from "../../../hooks/use-translation.ts";
 import { getArrayItemsSchema } from "../../../lib/schemaEditor.ts";
-import { cn } from "../../../lib/utils.ts";
 import type {
   ObjectJSONSchema,
   SchemaType,
 } from "../../../types/jsonSchema.ts";
-import {
-  isBooleanSchema,
-  withObjectSchema,
-} from "../../../types/jsonSchema.ts";
+import { withObjectSchema } from "../../../types/jsonSchema.ts";
 import TypeDropdown from "../TypeDropdown.tsx";
 import type { TypeEditorProps } from "../TypeEditor.tsx";
 import TypeEditor from "../TypeEditor.tsx";
@@ -24,7 +27,6 @@ const ArrayEditor: React.FC<TypeEditorProps> = ({
   onChange,
   depth = 0,
   showDescription = true,
-  disableAnimations = false,
 }) => {
   const t = useTranslation();
   const [minItems, setMinItems] = useState<number | undefined>(
@@ -51,190 +53,139 @@ const ArrayEditor: React.FC<TypeEditorProps> = ({
     "string" as SchemaType,
   );
 
-  // Handle validation settings change
-  const handleValidationChange = () => {
-    const validationProps: ObjectJSONSchema = {
-      type: "array",
-      ...(isBooleanSchema(schema) ? {} : schema),
-      minItems: minItems,
-      maxItems: maxItems,
-      uniqueItems: uniqueItems || undefined,
-    };
-
-    // Keep the items schema
-    if (validationProps.items === undefined && itemsSchema) {
-      validationProps.items = itemsSchema;
-    }
-
-    // Clean up undefined values
-    const propsToKeep: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(validationProps)) {
-      if (value !== undefined) {
-        propsToKeep[key] = value;
-      }
-    }
-
-    onChange(propsToKeep as ObjectJSONSchema);
+  const handleMinItemsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value
+      ? Number.parseInt(e.target.value, 10)
+      : undefined;
+    setMinItems(val);
+    onChange({
+      ...withObjectSchema(schema, (s) => s, {}),
+      minItems: val,
+    });
   };
 
-  // Handle item schema changes
-  const handleItemSchemaChange = (updatedItemSchema: ObjectJSONSchema) => {
-    const updatedSchema: ObjectJSONSchema = {
-      type: "array",
-      ...(isBooleanSchema(schema) ? {} : schema),
-      items: updatedItemSchema,
-    };
-
-    onChange(updatedSchema);
+  const handleMaxItemsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value
+      ? Number.parseInt(e.target.value, 10)
+      : undefined;
+    setMaxItems(val);
+    onChange({
+      ...withObjectSchema(schema, (s) => s, {}),
+      maxItems: val,
+    });
   };
 
-  const minMaxError = useMemo(
-    () =>
-      validationNode?.validation.errors?.find((err) => err.path[0] === "minmax")
-        ?.message,
-    [validationNode],
-  );
+  const handleUniqueItemsChange = (checked: boolean) => {
+    setUniqueItems(checked);
+    onChange({
+      ...withObjectSchema(schema, (s) => s, {}),
+      uniqueItems: checked,
+    });
+  };
 
-  const minItemsError = useMemo(
-    () =>
-      validationNode?.validation.errors?.find(
-        (err) => err.path[0] === "minItems",
-      )?.message,
-    [validationNode],
-  );
+  const handleItemsTypeChange = (newType: SchemaType) => {
+    // Create a new items schema with the new type
+    const newItemsSchema: ObjectJSONSchema = {
+      ...withObjectSchema(itemsSchema, (s) => s, {}),
+      type: newType,
+    };
 
-  const maxItemsError = useMemo(
-    () =>
-      validationNode?.validation.errors?.find(
-        (err) => err.path[0] === "maxItems",
-      )?.message,
-    [validationNode],
-  );
+    onChange({
+      ...withObjectSchema(schema, (s) => s, {}),
+      items: newItemsSchema,
+    });
+  };
+
+  const handleItemsSchemaChange = (newItemsSchema: ObjectJSONSchema) => {
+    onChange({
+      ...withObjectSchema(schema, (s) => s, {}),
+      items: newItemsSchema,
+    });
+  };
 
   return (
-    <div className="space-y-6">
-      {/* Array validation settings */}
-      {(!readOnly || !!maxItems || !!minItems) && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {(!readOnly || !!minItems) && (
-            <div className="space-y-2">
-              <Label
-                htmlFor={minItemsId}
-                className={
-                  (!!minMaxError || !!minItemsError) && "text-destructive"
-                }
-              >
-                {t.arrayMinimumLabel}
-              </Label>
-              <Input
-                id={minItemsId}
-                type="number"
-                min={0}
-                value={minItems ?? ""}
-                onChange={(e) => {
-                  const value = e.target.value
-                    ? Number(e.target.value)
-                    : undefined;
-                  setMinItems(value);
-                  // Don't update immediately to avoid too many rerenders
-                }}
-                onBlur={handleValidationChange}
-                placeholder={t.arrayMinimumPlaceholder}
-                className={cn("h-8", !!minMaxError && "border-destructive")}
-              />
-            </div>
-          )}
+    <Stack gap="md">
+      <SimpleGrid cols={2} spacing="md">
+        <Stack gap="xs">
+          <Text component="label" htmlFor={minItemsId} size="sm" fw={500}>
+            {t.arrayMinimumLabel}
+          </Text>
+          <TextInput
+            id={minItemsId}
+            type="number"
+            min={0}
+            value={minItems ?? ""}
+            onChange={handleMinItemsChange}
+            placeholder="0"
+            disabled={readOnly}
+          />
+        </Stack>
+        <Stack gap="xs">
+          <Text component="label" htmlFor={maxItemsId} size="sm" fw={500}>
+            {t.arrayMaximumLabel}
+          </Text>
+          <TextInput
+            id={maxItemsId}
+            type="number"
+            min={0}
+            value={maxItems ?? ""}
+            onChange={handleMaxItemsChange}
+            placeholder="∞"
+            disabled={readOnly}
+          />
+        </Stack>
+      </SimpleGrid>
 
-          {(!readOnly || !!maxItems) && (
-            <div className="space-y-2">
-              <Label
-                htmlFor={maxItemsId}
-                className={
-                  (!!minMaxError || !!maxItemsError) && "text-destructive"
-                }
-              >
-                {t.arrayMaximumLabel}
-              </Label>
-              <Input
-                id={maxItemsId}
-                type="number"
-                min={0}
-                value={maxItems ?? ""}
-                onChange={(e) => {
-                  const value = e.target.value
-                    ? Number(e.target.value)
-                    : undefined;
-                  setMaxItems(value);
-                  // Don't update immediately to avoid too many rerenders
-                }}
-                onBlur={handleValidationChange}
-                placeholder={t.arrayMaximumPlaceholder}
-                className={cn("h-8", !!minMaxError && "border-destructive")}
-              />
-            </div>
-          )}
-          {(!!minMaxError || !!minItemsError || !!maxItemsError) && (
-            <div className="text-xs text-destructive italic md:col-span-2 whitespace-pre-line">
-              {[minMaxError, minItemsError ?? maxItemsError]
-                .filter(Boolean)
-                .join("\n")}
-            </div>
-          )}
-        </div>
-      )}
-
-      {(!readOnly || !!uniqueItems) && (
-        <div className="flex items-center space-x-2">
+      <Paper withBorder p="xs" radius="md" shadow="xs">
+        <Group justify="space-between" align="center">
+          <Stack gap={2}>
+            <Text component="label" htmlFor={uniqueItemsId} size="sm" fw={500}>
+              {t.arrayForceUniqueItemsLabel}
+            </Text>
+          </Stack>
           <Switch
             id={uniqueItemsId}
             checked={uniqueItems}
-            onCheckedChange={(checked) => {
-              setUniqueItems(checked);
-              setTimeout(handleValidationChange, 0);
-            }}
+            onChange={(e) => handleUniqueItemsChange(e.currentTarget.checked)}
+            disabled={readOnly}
           />
-          <Label htmlFor={uniqueItemsId} className="cursor-pointer">
-            {t.arrayForceUniqueItemsLabel}
-          </Label>
-        </div>
-      )}
+        </Group>
+      </Paper>
 
-      {/* Array item type editor */}
-      <div
-        className={cn(
-          "space-y-2 pt-4 border-border/40",
-          !readOnly || !!minItems || !!maxItems || !!uniqueItems
-            ? "border-t"
-            : null,
-        )}
+      <Stack
+        gap="md"
+        pt="xs"
+        style={{ borderTop: "1px solid var(--mantine-color-default-border)" }}
       >
-        <div className="flex items-center justify-between mb-4">
-          <Label>{t.arrayItemTypeLabel}</Label>
+        <Group justify="space-between" align="center">
+          <Text size="sm" fw={500}>
+            {t.arrayItemTypeLabel}
+          </Text>
           <TypeDropdown
-            readOnly={readOnly}
             value={itemType}
-            disableAnimations={disableAnimations}
-            onChange={(newType) => {
-              handleItemSchemaChange({
-                ...withObjectSchema(itemsSchema, (s) => s, {}),
-                type: newType,
-              });
-            }}
+            onChange={handleItemsTypeChange}
+            readOnly={readOnly}
           />
-        </div>
+        </Group>
 
-        {/* Item schema editor */}
-        <TypeEditor
-          readOnly={readOnly}
-          schema={itemsSchema}
-          validationNode={validationNode}
-          onChange={handleItemSchemaChange}
-          depth={depth + 1}
-          showDescription={showDescription}
-          disableAnimations={disableAnimations}
-        />
-      </div>
-    </div>
+        <Box
+          pl="md"
+          ml="xs"
+          style={{
+            borderLeft: "2px solid var(--mantine-color-default-border)",
+          }}
+        >
+          <TypeEditor
+            schema={itemsSchema}
+            readOnly={readOnly}
+            validationNode={validationNode?.children?.items}
+            onChange={handleItemsSchemaChange}
+            depth={depth + 1}
+            showDescription={showDescription}
+          />
+        </Box>
+      </Stack>
+    </Stack>
   );
 };
 

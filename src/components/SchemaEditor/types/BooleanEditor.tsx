@@ -1,8 +1,6 @@
 import { useId } from "react";
-import { Label } from "../../../components/ui/label.tsx";
-import { Switch } from "../../../components/ui/switch.tsx";
+import { Switch, Text, Group, Stack, Paper } from "@mantine/core";
 import { useTranslation } from "../../../hooks/use-translation.ts";
-import type { ObjectJSONSchema } from "../../../types/jsonSchema.ts";
 import { withObjectSchema } from "../../../types/jsonSchema.ts";
 import type { TypeEditorProps } from "../TypeEditor.tsx";
 
@@ -52,86 +50,55 @@ const BooleanEditor: React.FC<TypeEditorProps> = ({
       }
     } else {
       // If disallowing this value
-      if (hasRestrictions && !enumValues?.includes(value)) {
-        // Already disallowed, nothing to do
-        return;
+      if (!hasRestrictions) {
+        // Currently no restrictions, so we need to restrict to the OTHER value
+        newEnum = [!value];
+      } else {
+        // Remove this value from enum
+        newEnum = enumValues?.filter((v) => v !== value);
       }
-
-      // Create a new enum with just the opposite value
-      newEnum = [!value];
     }
 
-    // Create a new validation object with just the type and enum
-    const updatedValidation: ObjectJSONSchema = {
-      type: "boolean",
-    };
-
-    if (newEnum) {
-      updatedValidation.enum = newEnum;
-    } else {
-      // Remove enum property if no restrictions
-      onChange({ type: "boolean" });
-      return;
-    }
-
-    onChange(updatedValidation);
+    onChange({
+      ...withObjectSchema(schema, (s) => s, {}),
+      enum: newEnum,
+    });
   };
 
-  const hasEnum = enumValues && enumValues.length > 0;
-
   return (
-    <div className="space-y-4">
-      {readOnly && !hasEnum && (
-        <p className="text-sm text-muted-foreground italic">
-          {t.booleanNoConstraint}
-        </p>
-      )}
-      {(!readOnly || !allowsTrue || !allowsFalse) && (
-        <div className="space-y-2 pt-2">
-          {(!readOnly || hasEnum) && (
-            <>
-              <Label>Allowed Values</Label>
+    <Stack gap="md">
+      <Paper withBorder p="xs" radius="md" shadow="xs">
+        <Group justify="space-between" align="center">
+          <Stack gap={2}>
+            <Text component="label" htmlFor={allowTrueId} size="sm" fw={500}>
+              {t.booleanAllowTrueLabel}
+            </Text>
+          </Stack>
+          <Switch
+            id={allowTrueId}
+            checked={allowsTrue}
+            onChange={(e) => handleAllowedChange(true, e.currentTarget.checked)}
+            disabled={readOnly}
+          />
+        </Group>
+      </Paper>
 
-              <div className="space-y-3">
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id={allowTrueId}
-                    checked={allowsTrue}
-                    disabled={readOnly}
-                    onCheckedChange={(checked) =>
-                      handleAllowedChange(true, checked)
-                    }
-                  />
-                  <Label htmlFor={allowTrueId} className="cursor-pointer">
-                    {t.booleanAllowTrueLabel}
-                  </Label>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id={allowFalseId}
-                    checked={allowsFalse}
-                    disabled={readOnly}
-                    onCheckedChange={(checked) =>
-                      handleAllowedChange(false, checked)
-                    }
-                  />
-                  <Label htmlFor={allowFalseId} className="cursor-pointer">
-                    {t.booleanAllowFalseLabel}
-                  </Label>
-                </div>
-              </div>
-            </>
-          )}
-
-          {!allowsTrue && !allowsFalse && (
-            <p className="text-xs text-amber-600 mt-2">
-              {t.booleanNeitherWarning}
-            </p>
-          )}
-        </div>
-      )}
-    </div>
+      <Paper withBorder p="xs" radius="md" shadow="xs">
+        <Group justify="space-between" align="center">
+          <Stack gap={2}>
+            <Text component="label" htmlFor={allowFalseId} size="sm" fw={500}>
+              {t.booleanAllowFalseLabel}
+            </Text>
+          </Stack>
+          <Switch
+            id={allowFalseId}
+            checked={allowsFalse}
+            onChange={(e) => handleAllowedChange(false, e.currentTarget.checked)}
+            disabled={readOnly}
+          />
+        </Group>
+      </Paper>
+    </Stack>
   );
 };
 

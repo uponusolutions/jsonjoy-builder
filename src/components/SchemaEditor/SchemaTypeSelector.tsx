@@ -1,14 +1,13 @@
 import type { FC } from "react";
+import { SimpleGrid, UnstyledButton, Text, Paper } from "@mantine/core";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import type { Translation } from "../../i18n/translation-keys.ts";
-import { cn } from "../../lib/utils.ts";
 import type { SchemaType } from "../../types/jsonSchema.ts";
 
 interface SchemaTypeSelectorProps {
   id?: string;
   value: SchemaType;
   onChange: (value: SchemaType) => void;
-  disableAnimations?: boolean;
 }
 
 interface TypeOption {
@@ -49,35 +48,42 @@ const SchemaTypeSelector: FC<SchemaTypeSelectorProps> = ({
   id,
   value,
   onChange,
-  disableAnimations = false,
 }) => {
   const t = useTranslation();
   return (
-    <div
-      id={id}
-      className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-2"
-    >
+    <SimpleGrid cols={{ base: 1, xs: 2, md: 3 }} spacing="xs" id={id}>
       {typeOptions.map((type) => (
-        <button
-          type="button"
+        <UnstyledButton
           key={type.id}
           title={t[type.description]}
-          className={cn(
-            "p-2.5 rounded-lg border-2 text-left",
-            !disableAnimations && "transition-all duration-200",
-            value === type.id
-              ? "border-primary bg-primary/5 shadow-xs"
-              : "border-border hover:border-primary/30 hover:bg-secondary",
-          )}
           onClick={() => onChange(type.id)}
+          style={{ width: "100%" }}
         >
-          <div className="font-medium text-sm text-foreground">{t[type.label]}</div>
-          <div className="text-xs text-muted-foreground line-clamp-1">
-            {t[type.description]}
-          </div>
-        </button>
+          <Paper
+            withBorder
+            p="xs"
+            radius="md"
+            style={{
+              borderColor:
+                value === type.id
+                  ? "var(--mantine-color-blue-filled)"
+                  : undefined,
+              backgroundColor:
+                value === type.id
+                  ? "var(--mantine-color-blue-light)"
+                  : undefined,
+            }}
+          >
+            <Text size="sm" fw={500}>
+              {t[type.label]}
+            </Text>
+            <Text size="xs" c="dimmed" lineClamp={1}>
+              {t[type.description]}
+            </Text>
+          </Paper>
+        </UnstyledButton>
       ))}
-    </div>
+    </SimpleGrid>
   );
 };
 

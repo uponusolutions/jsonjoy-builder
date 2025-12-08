@@ -1,4 +1,5 @@
 import { lazy, Suspense } from "react";
+import { Loader, Center } from "@mantine/core";
 import type {
   JSONSchema,
   ObjectJSONSchema,
@@ -21,7 +22,6 @@ export interface TypeEditorProps {
   onChange: (schema: ObjectJSONSchema) => void;
   depth?: number;
   showDescription?: boolean;
-  disableAnimations?: boolean;
 }
 
 const TypeEditor: React.FC<TypeEditorProps> = ({
@@ -31,7 +31,6 @@ const TypeEditor: React.FC<TypeEditorProps> = ({
   depth = 0,
   readOnly = false,
   showDescription = true,
-  disableAnimations = false,
 }) => {
   const type = withObjectSchema(
     schema,
@@ -40,7 +39,13 @@ const TypeEditor: React.FC<TypeEditorProps> = ({
   );
 
   return (
-    <Suspense fallback={<div>Loading editor...</div>}>
+    <Suspense
+      fallback={
+        <Center>
+          <Loader size="sm" />
+        </Center>
+      }
+    >
       {type === "string" && (
         <StringEditor
           readOnly={readOnly}
@@ -86,7 +91,6 @@ const TypeEditor: React.FC<TypeEditorProps> = ({
           depth={depth}
           validationNode={validationNode}
           showDescription={showDescription}
-          disableAnimations={disableAnimations}
         />
       )}
       {type === "array" && (
@@ -97,7 +101,6 @@ const TypeEditor: React.FC<TypeEditorProps> = ({
           depth={depth}
           validationNode={validationNode}
           showDescription={showDescription}
-          disableAnimations={disableAnimations}
         />
       )}
     </Suspense>

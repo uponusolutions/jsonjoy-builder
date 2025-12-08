@@ -1,3 +1,4 @@
+import { Stack, Box, Text, ScrollArea } from "@mantine/core";
 import type { FC } from "react";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import {
@@ -18,7 +19,6 @@ export interface SchemaVisualEditorProps {
   readOnly: boolean;
   onChange: (schema: JSONSchema) => void;
   showDescription?: boolean;
-  disableAnimations?: boolean;
   /** Theme mode: 'light' or 'dark'. Default is 'light'. */
   theme?: "light" | "dark";
 }
@@ -29,7 +29,6 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
   onChange,
   readOnly = false,
   showDescription = true,
-  disableAnimations = false,
   theme = "light",
 }) => {
   const t = useTranslation();
@@ -63,7 +62,12 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
 
     // Use renameObjectProperty to preserve position when name changes
     if (name !== updatedField.name) {
-      newSchema = renameObjectProperty(newSchema, name, updatedField.name, fieldSchema);
+      newSchema = renameObjectProperty(
+        newSchema,
+        name,
+        updatedField.name,
+        fieldSchema,
+      );
     } else {
       newSchema = updateObjectProperty(newSchema, name, fieldSchema);
     }
@@ -105,7 +109,11 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
 
   // Handle reordering fields via drag and drop
   const handleReorderFields = (fromIndex: number, toIndex: number) => {
-    const newSchema = reorderProperties(asObjectSchema(schema), fromIndex, toIndex);
+    const newSchema = reorderProperties(
+      asObjectSchema(schema),
+      fromIndex,
+      toIndex,
+    );
     onChange(newSchema);
   };
 
@@ -117,19 +125,22 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
   const themeClass = theme === "dark" ? "dark" : "";
 
   return (
-    <div className={`p-4 h-full flex flex-col overflow-auto jsonjoy ${themeClass}`}>
+    <Stack h="100%" p="md" className={`jsonjoy ${themeClass}`}>
       {!readOnly && (
-        <div className="mb-6 shrink-0">
-          <AddFieldButton onAddField={handleAddField} showDescription={showDescription} disableAnimations={disableAnimations} />
-        </div>
+        <Box mb="md">
+          <AddFieldButton
+            onAddField={handleAddField}
+            showDescription={showDescription}
+          />
+        </Box>
       )}
 
-      <div className="grow overflow-auto">
+      <ScrollArea style={{ flexGrow: 1 }}>
         {!hasFields ? (
-          <div className="text-center py-10 text-muted-foreground">
-            <p className="mb-3">{t.visualEditorNoFieldsHint1}</p>
-            <p className="text-sm">{t.visualEditorNoFieldsHint2}</p>
-          </div>
+          <Stack align="center" py="xl" c="dimmed">
+            <Text mb="xs">{t.visualEditorNoFieldsHint1}</Text>
+            <Text size="sm">{t.visualEditorNoFieldsHint2}</Text>
+          </Stack>
         ) : (
           <SchemaFieldList
             schema={schema}
@@ -139,11 +150,10 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
             onDeleteField={handleDeleteField}
             onReorderFields={handleReorderFields}
             showDescription={showDescription}
-            disableAnimations={disableAnimations}
           />
         )}
-      </div>
-    </div>
+      </ScrollArea>
+    </Stack>
   );
 };
 

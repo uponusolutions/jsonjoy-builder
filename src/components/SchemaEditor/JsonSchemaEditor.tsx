@@ -5,12 +5,7 @@ import {
   useRef,
   useState,
 } from "react";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "../../components/ui/tabs.tsx";
+import { ActionIcon, Box, Group, Paper, Tabs, Text } from "@mantine/core";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import { cn } from "../../lib/utils.ts";
 import type { JSONSchema } from "../../types/jsonSchema.ts";
@@ -24,7 +19,6 @@ export interface JsonSchemaEditorProps {
   setSchema?: (schema: JSONSchema) => void;
   className?: string;
   showDescription?: boolean;
-  disableAnimations?: boolean;
   theme?: "light" | "dark";
 }
 
@@ -35,7 +29,6 @@ const JsonSchemaEditor: FC<JsonSchemaEditorProps> = ({
   setSchema,
   className,
   showDescription = true,
-  disableAnimations = false,
   theme,
 }) => {
   // Handle schema changes and propagate to parent if needed
@@ -54,10 +47,6 @@ const JsonSchemaEditor: FC<JsonSchemaEditorProps> = ({
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
   };
-
-  const fullscreenClass = isFullscreen
-    ? "fixed inset-0 z-50 bg-background"
-    : "";
 
   const handleMouseDown = (e: ReactMouseEvent) => {
     e.preventDefault();
@@ -86,125 +75,140 @@ const JsonSchemaEditor: FC<JsonSchemaEditorProps> = ({
   };
 
   return (
-    <div
+    <Paper
+      withBorder
       className={cn(
-        "json-editor-container w-full",
-        fullscreenClass,
+        "json-editor-container",
         className,
         "jsonjoy",
         theme === "dark" && "dark",
       )}
+      pos={isFullscreen ? "fixed" : "relative"}
+      top={isFullscreen ? 0 : undefined}
+      left={isFullscreen ? 0 : undefined}
+      right={isFullscreen ? 0 : undefined}
+      bottom={isFullscreen ? 0 : undefined}
+      h={isFullscreen ? "100vh" : "600px"}
+      w="100%"
+      display="flex"
+      style={{
+        flexDirection: "column",
+        overflow: "hidden",
+        zIndex: isFullscreen ? 50 : undefined,
+      }}
     >
       {/* For mobile screens - show as tabs */}
-      <div className="block lg:hidden w-full">
-        <Tabs defaultValue="visual" className="w-full">
-          <div className="flex items-center justify-between px-4 py-3 border-b w-full">
-            <h3 className="font-medium text-foreground">{t.schemaEditorTitle}</h3>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={toggleFullscreen}
-                className="p-1.5 rounded-md hover:bg-secondary transition-colors"
-                aria-label="Toggle fullscreen"
-              >
-                <Maximize2 size={16} />
-              </button>
-              <TabsList className="grid grid-cols-2 w-[200px]">
-                <TabsTrigger value="visual">
-                  {t.schemaEditorEditModeVisual}
-                </TabsTrigger>
-                <TabsTrigger value="json">
-                  {t.schemaEditorEditModeJson}
-                </TabsTrigger>
-              </TabsList>
-            </div>
-          </div>
-
-          <TabsContent
-            value="visual"
-            className={cn(
-              "focus:outline-hidden w-full",
-              isFullscreen ? "h-screen" : "h-[500px]",
-            )}
+      <Box display={{ base: "block", lg: "none" }} h="100%">
+        <Tabs
+          defaultValue="visual"
+          h="100%"
+          display="flex"
+          style={{ flexDirection: "column" }}
+        >
+          <Group
+            justify="space-between"
+            px="md"
+            py="xs"
+            style={{
+              borderBottom: "1px solid var(--mantine-color-default-border)",
+            }}
           >
+            <Tabs.List>
+              <Tabs.Tab value="visual">{t.schemaEditorEditModeVisual}</Tabs.Tab>
+              <Tabs.Tab value="code">{t.schemaEditorEditModeJson}</Tabs.Tab>
+            </Tabs.List>
+            <ActionIcon
+              variant="subtle"
+              color="gray"
+              onClick={toggleFullscreen}
+              aria-label={t.schemaEditorToggleFullscreen}
+            >
+              <Maximize2 size={16} />
+            </ActionIcon>
+          </Group>
+          <Tabs.Panel value="visual" style={{ flex: 1, overflow: "hidden" }}>
             <SchemaVisualEditor
               readOnly={readOnly}
               schema={schema}
               onChange={handleSchemaChange}
               showDescription={showDescription}
-              disableAnimations={disableAnimations}
               theme={theme}
             />
-          </TabsContent>
-
-          <TabsContent
-            value="json"
-            className={cn(
-              "focus:outline-hidden w-full",
-              isFullscreen ? "h-screen" : "h-[500px]",
-            )}
-          >
+          </Tabs.Panel>
+          <Tabs.Panel value="code" style={{ flex: 1, overflow: "hidden" }}>
             <JsonSchemaVisualizer
               schema={schema}
               onChange={handleSchemaChange}
               theme={theme}
             />
-          </TabsContent>
+          </Tabs.Panel>
         </Tabs>
-      </div>
+      </Box>
 
       {/* For large screens - show side by side */}
-      <div
+      <Box
         ref={containerRef}
-        className={cn(
-          "hidden lg:flex lg:flex-col w-full",
-          isFullscreen ? "h-screen" : "h-[600px]",
-        )}
+        display={{ base: "none", lg: "flex" }}
+        style={{ flexDirection: "column", width: "100%", height: "100%" }}
       >
-        <div className="flex items-center justify-between px-4 py-3 border-b w-full shrink-0">
-          <h3 className="font-medium text-foreground">{t.schemaEditorTitle}</h3>
-          <button
-            type="button"
+        <Group
+          justify="space-between"
+          px="md"
+          py="xs"
+          style={{
+            borderBottom: "1px solid var(--mantine-color-default-border)",
+          }}
+        >
+          <Text fw={500}>{t.schemaEditorTitle}</Text>
+          <ActionIcon
+            variant="subtle"
+            color="gray"
             onClick={toggleFullscreen}
-            className="p-1.5 rounded-md hover:bg-secondary transition-colors"
             aria-label={t.schemaEditorToggleFullscreen}
           >
             <Maximize2 size={16} />
-          </button>
-        </div>
-        <div className="flex flex-row w-full grow min-h-0">
-          <div
-            className="h-full min-h-0"
-            style={{ width: `${leftPanelWidth}%` }}
-          >
+          </ActionIcon>
+        </Group>
+        <Box display="flex" style={{ flex: 1, minHeight: 0, width: "100%" }}>
+          <Box h="100%" style={{ width: `${leftPanelWidth}%`, minHeight: 0 }}>
             <SchemaVisualEditor
               readOnly={readOnly}
               schema={schema}
               onChange={handleSchemaChange}
               showDescription={showDescription}
-              disableAnimations={disableAnimations}
               theme={theme}
             />
-          </div>
-          {/** biome-ignore lint/a11y/noStaticElementInteractions: What exactly does this div do? */}
-          <div
+          </Box>
+          <Box
             ref={resizeRef}
-            className="w-1 bg-border hover:bg-primary cursor-col-resize shrink-0"
+            w={4}
+            style={{
+              cursor: "col-resize",
+              backgroundColor: "var(--mantine-color-default-border)",
+            }}
             onMouseDown={handleMouseDown}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor =
+                "var(--mantine-color-primary-filled)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor =
+                "var(--mantine-color-default-border)";
+            }}
           />
-          <div
-            className="h-full min-h-0"
-            style={{ width: `${100 - leftPanelWidth}%` }}
+          <Box
+            h="100%"
+            style={{ width: `${100 - leftPanelWidth}%`, minHeight: 0 }}
           >
             <JsonSchemaVisualizer
               schema={schema}
               onChange={handleSchemaChange}
               theme={theme}
             />
-          </div>
-        </div>
-      </div>
-    </div>
+          </Box>
+        </Box>
+      </Box>
+    </Paper>
   );
 };
 

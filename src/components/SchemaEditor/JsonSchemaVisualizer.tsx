@@ -1,6 +1,7 @@
 import Editor, { type BeforeMount, type OnMount } from "@monaco-editor/react";
-import { Download, FileJson, Loader2 } from "lucide-react";
+import { Download, FileJson } from "lucide-react";
 import { type FC, useRef } from "react";
+import { ActionIcon, Box, Group, Loader, Paper, Text } from "@mantine/core";
 import { useMonacoTheme } from "../../hooks/use-monaco-theme.ts";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import { cn } from "../../lib/utils.ts";
@@ -68,29 +69,40 @@ const JsonSchemaVisualizer: FC<JsonSchemaVisualizerProps> = ({
   };
 
   return (
-    <div
+    <Paper
       className={cn(
-        "relative overflow-hidden h-full flex flex-col",
+        "json-visualizer-container",
         className,
         "jsonjoy",
         theme === "dark" && "dark",
       )}
+      h="100%"
+      display="flex"
+      style={{ flexDirection: "column", overflow: "hidden", position: "relative" }}
     >
-      <div className="flex items-center justify-between bg-secondary/80 backdrop-blur-xs px-4 py-2 border-b shrink-0">
-        <div className="flex items-center gap-2 text-foreground">
+      <Group
+        justify="space-between"
+        px="md"
+        py="xs"
+        style={{
+          borderBottom: "1px solid var(--mantine-color-default-border)",
+          backgroundColor: "var(--mantine-color-body)",
+        }}
+      >
+        <Group gap="xs">
           <FileJson size={18} />
-          <span className="font-medium text-sm">{t.visualizerSource}</span>
-        </div>
-        <button
-          type="button"
+          <Text size="sm" fw={500}>{t.visualizerSource}</Text>
+        </Group>
+        <ActionIcon
+          variant="subtle"
+          color="gray"
           onClick={handleDownload}
-          className="p-1.5 hover:bg-secondary rounded-md transition-colors"
           title={t.visualizerDownloadTitle}
         >
           <Download size={16} />
-        </button>
-      </div>
-      <div className="grow flex min-h-0">
+        </ActionIcon>
+      </Group>
+      <Box style={{ flex: 1, minHeight: 0 }}>
         <Editor
           height="100%"
           defaultLanguage="json"
@@ -98,17 +110,17 @@ const JsonSchemaVisualizer: FC<JsonSchemaVisualizerProps> = ({
           onChange={handleEditorChange}
           beforeMount={handleBeforeMount}
           onMount={handleEditorDidMount}
-          className="monaco-editor-container w-full h-full"
+          className="monaco-editor-container"
           loading={
-            <div className="flex items-center justify-center h-full w-full bg-secondary/30">
-              <Loader2 className="h-6 w-6 animate-spin" />
-            </div>
+            <Box display="flex" style={{ alignItems: "center", justifyContent: "center", height: "100%", width: "100%" }}>
+              <Loader size="sm" />
+            </Box>
           }
           options={defaultEditorOptions}
           theme={currentTheme}
         />
-      </div>
-    </div>
+      </Box>
+    </Paper>
   );
 };
 

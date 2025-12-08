@@ -6,9 +6,9 @@ import {
 } from "@hello-pangea/dnd";
 import { type FC, useMemo } from "react";
 import { createPortal } from "react-dom";
+import { Stack } from "@mantine/core";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import { getSchemaProperties } from "../../lib/schemaEditor.ts";
-import { cn } from "../../lib/utils.ts";
 import type {
   JSONSchema as JSONSchemaType,
   NewField,
@@ -26,7 +26,6 @@ interface SchemaFieldListProps {
   onDeleteField: (name: string) => void;
   onReorderFields?: (fromIndex: number, toIndex: number) => void;
   showDescription?: boolean;
-  disableAnimations?: boolean;
 }
 
 const SchemaFieldList: FC<SchemaFieldListProps> = ({
@@ -36,7 +35,6 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
   onReorderFields,
   readOnly = false,
   showDescription = true,
-  disableAnimations = false,
 }) => {
   const t = useTranslation();
 
@@ -131,7 +129,7 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
   // When readOnly or no reorder handler, render without drag-drop
   if (readOnly || !onReorderFields) {
     return (
-      <div className={cn("space-y-2", !disableAnimations && "animate-in")}>
+      <Stack gap="xs" className="animate-in">
         {properties.map((property) => (
           <SchemaPropertyEditor
             key={property.name}
@@ -149,10 +147,9 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
             }
             readOnly={readOnly}
             showDescription={showDescription}
-            disableAnimations={disableAnimations}
           />
         ))}
-      </div>
+      </Stack>
     );
   }
 
@@ -160,10 +157,11 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
     <DragDropContext onDragEnd={handleDragEnd}>
       <Droppable droppableId="schema-fields">
         {(provided) => (
-          <div
+          <Stack
             {...provided.droppableProps}
             ref={provided.innerRef}
-            className={cn("space-y-2", !disableAnimations && "animate-in")}
+            gap="xs"
+            className="animate-in"
           >
             {properties.map((property, index) => (
               <Draggable
@@ -176,7 +174,13 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
                     <div
                       ref={provided.innerRef}
                       {...provided.draggableProps}
-                      className={snapshot.isDragging ? "opacity-90 shadow-lg" : ""}
+                      style={{
+                        ...provided.draggableProps.style,
+                        opacity: snapshot.isDragging ? 0.9 : 1,
+                        boxShadow: snapshot.isDragging
+                          ? "var(--mantine-shadow-lg)"
+                          : "none",
+                      }}
                     >
                       <SchemaPropertyEditor
                         name={property.name}
@@ -198,7 +202,6 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
                         readOnly={readOnly}
                         dragHandleProps={provided.dragHandleProps}
                         showDescription={showDescription}
-                        disableAnimations={disableAnimations}
                       />
                     </div>
                   );
@@ -216,7 +219,7 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
               </Draggable>
             ))}
             {provided.placeholder}
-          </div>
+          </Stack>
         )}
       </Droppable>
     </DragDropContext>

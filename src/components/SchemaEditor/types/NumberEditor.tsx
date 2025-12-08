@@ -1,14 +1,17 @@
 import { X } from "lucide-react";
-import { useId, useMemo, useState } from "react";
-import { Input } from "../../../components/ui/input.tsx";
-import { Label } from "../../../components/ui/label.tsx";
-import { useTranslation } from "../../../hooks/use-translation.ts";
-import { cn } from "../../../lib/utils.ts";
-import type { ObjectJSONSchema } from "../../../types/jsonSchema.ts";
+import { useId, useState } from "react";
 import {
-  isBooleanSchema,
-  withObjectSchema,
-} from "../../../types/jsonSchema.ts";
+  Text,
+  Stack,
+  Button,
+  Badge,
+  ActionIcon,
+  SimpleGrid,
+  Group,
+  TextInput,
+} from "@mantine/core";
+import { useTranslation } from "../../../hooks/use-translation.ts";
+import { withObjectSchema } from "../../../types/jsonSchema.ts";
 import type { TypeEditorProps } from "../TypeEditor.tsx";
 
 interface NumberEditorProps extends TypeEditorProps {
@@ -25,7 +28,6 @@ type Property =
 
 const NumberEditor: React.FC<NumberEditorProps> = ({
   schema,
-  validationNode,
   onChange,
   integer = false,
   readOnly = false,
@@ -38,6 +40,7 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
   const exclusiveMinimumId = useId();
   const exclusiveMaximumId = useId();
   const multipleOfId = useId();
+  const enumInputId = useId();
 
   // Extract number-specific validations
   const minimum = withObjectSchema(schema, (s) => s.minimum, undefined);
@@ -55,422 +58,194 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
   const multipleOf = withObjectSchema(schema, (s) => s.multipleOf, undefined);
   const enumValues = withObjectSchema(
     schema,
-    (s) => (s.enum as number[]) || [],
-    [],
+    (s) => s.enum as number[] | undefined,
+    undefined,
   );
 
-  // Handle validation change
-  const handleValidationChange = (property: Property, value: unknown) => {
-    // Create a safe base schema with necessary properties
-    const baseProperties: Partial<ObjectJSONSchema> = {
-      type: integer ? "integer" : "number",
-    };
+  const handleNumberChange = (property: Property, value: string) => {
+    const numValue = value === "" ? undefined : Number.parseFloat(value);
 
-    // Copy existing validation properties (except type and description) if schema is an object
-    if (!isBooleanSchema(schema)) {
-      if (schema.minimum !== undefined) baseProperties.minimum = schema.minimum;
-      if (schema.maximum !== undefined) baseProperties.maximum = schema.maximum;
-      if (schema.exclusiveMinimum !== undefined)
-        baseProperties.exclusiveMinimum = schema.exclusiveMinimum;
-      if (schema.exclusiveMaximum !== undefined)
-        baseProperties.exclusiveMaximum = schema.exclusiveMaximum;
-      if (schema.multipleOf !== undefined)
-        baseProperties.multipleOf = schema.multipleOf;
-      if (schema.enum !== undefined) baseProperties.enum = schema.enum;
-    }
-
-    // Only add the property if the value is defined, otherwise remove it
-    if (value !== undefined) {
-      // Create updated object with modified property
-      const updatedProperties: Partial<ObjectJSONSchema> = {
-        ...baseProperties,
-      };
-
-      if (property === "minimum") updatedProperties.minimum = value as number;
-      else if (property === "maximum")
-        updatedProperties.maximum = value as number;
-      else if (property === "exclusiveMinimum")
-        updatedProperties.exclusiveMinimum = value as number;
-      else if (property === "exclusiveMaximum")
-        updatedProperties.exclusiveMaximum = value as number;
-      else if (property === "multipleOf")
-        updatedProperties.multipleOf = value as number;
-      else if (property === "enum") updatedProperties.enum = value as unknown[];
-
-      onChange(updatedProperties as ObjectJSONSchema);
-      return;
-    }
-
-    // Handle removing a property (value is undefined)
-    if (property === "minimum") {
-      const { minimum: _, ...rest } = baseProperties;
-      onChange(rest as ObjectJSONSchema);
-      return;
-    }
-
-    if (property === "maximum") {
-      const { maximum: _, ...rest } = baseProperties;
-      onChange(rest as ObjectJSONSchema);
-      return;
-    }
-
-    if (property === "exclusiveMinimum") {
-      const { exclusiveMinimum: _, ...rest } = baseProperties;
-      onChange(rest as ObjectJSONSchema);
-      return;
-    }
-
-    if (property === "exclusiveMaximum") {
-      const { exclusiveMaximum: _, ...rest } = baseProperties;
-      onChange(rest as ObjectJSONSchema);
-      return;
-    }
-
-    if (property === "multipleOf") {
-      const { multipleOf: _, ...rest } = baseProperties;
-      onChange(rest as ObjectJSONSchema);
-      return;
-    }
-
-    if (property === "enum") {
-      const { enum: _, ...rest } = baseProperties;
-      onChange(rest as ObjectJSONSchema);
-      return;
-    }
-
-    // Fallback case - just use the base properties
-    onChange(baseProperties as ObjectJSONSchema);
+    onChange({
+      ...withObjectSchema(schema, (s) => s, {}),
+      [property]: numValue,
+    });
   };
 
-  // Handle adding enum value
-  const handleAddEnumValue = () => {
-    if (!enumValue.trim()) return;
-
-    const numValue = Number(enumValue);
+  const handleAddEnum = () => {
+    if (enumValue === "") return;
+    const numValue = Number.parseFloat(enumValue);
     if (Number.isNaN(numValue)) return;
 
-    // For integer type, ensure the value is an integer
-    const validValue = integer ? Math.floor(numValue) : numValue;
-
-    if (!enumValues.includes(validValue)) {
-      handleValidationChange("enum", [...enumValues, validValue]);
+    const currentEnum = enumValues || [];
+    if (!currentEnum.includes(numValue)) {
+      onChange({
+        ...withObjectSchema(schema, (s) => s, {}),
+        enum: [...currentEnum, numValue],
+      });
     }
-
     setEnumValue("");
   };
 
-  // Handle removing enum value
-  const handleRemoveEnumValue = (index: number) => {
-    const newEnumValues = [...enumValues];
-    newEnumValues.splice(index, 1);
-
-    if (newEnumValues.length === 0) {
-      // If empty, remove the enum property entirely by setting it to undefined
-      handleValidationChange("enum", undefined);
-    } else {
-      handleValidationChange("enum", newEnumValues);
-    }
+  const handleRemoveEnum = (value: number) => {
+    const currentEnum = enumValues || [];
+    const newEnum = currentEnum.filter((v) => v !== value);
+    onChange({
+      ...withObjectSchema(schema, (s) => s, {}),
+      enum: newEnum.length > 0 ? newEnum : undefined,
+    });
   };
 
-  const minMaxError = useMemo(
-    () =>
-      validationNode?.validation.errors?.find((err) => err.path[0] === "minMax")
-        ?.message,
-    [validationNode],
-  );
-
-  const redundantMinError = useMemo(
-    () =>
-      validationNode?.validation.errors?.find(
-        (err) => err.path[0] === "redundantMinimum",
-      )?.message,
-    [validationNode],
-  );
-
-  const redundantMaxError = useMemo(
-    () =>
-      validationNode?.validation.errors?.find(
-        (err) => err.path[0] === "redundantMaximum",
-      )?.message,
-    [validationNode],
-  );
-
-  const enumError = useMemo(
-    () =>
-      validationNode?.validation.errors?.find((err) => err.path[0] === "enum")
-        ?.message,
-    [validationNode],
-  );
-
-  const multipleOfError = useMemo(
-    () =>
-      validationNode?.validation.errors?.find(
-        (err) => err.path[0] === "multipleOf",
-      )?.message,
-    [validationNode],
-  );
-
-  const hasConstraint =
-    !!minimum ||
-    !!maximum ||
-    !!exclusiveMinimum ||
-    !!exclusiveMaximum ||
-    !!multipleOf ||
-    enumValues.length > 0;
-
   return (
-    <div className="space-y-4">
-      {readOnly && !hasConstraint && (
-        <p className="text-sm text-muted-foreground italic">
-          {t.numberNoConstraint}
-        </p>
-      )}
-
-      {(!readOnly || hasConstraint) && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-0 md:col-span-2">
-            {!!minMaxError && (
-              <div className="text-xs text-destructive italic">
-                {minMaxError}
-              </div>
-            )}
-            {!!redundantMinError && (
-              <div className="text-xs text-destructive italic">
-                {redundantMinError}
-              </div>
-            )}
-            {!!redundantMaxError && (
-              <div className="text-xs text-destructive italic">
-                {redundantMaxError}
-              </div>
-            )}
-            {!!enumError && (
-              <div className="text-xs text-destructive italic">{enumError}</div>
-            )}
-          </div>
-
-          {(!readOnly || !!minimum) && (
-            <div className="space-y-2">
-              <Label
-                htmlFor={minimumId}
-                className={
-                  minimum !== undefined &&
-                  (!!minMaxError || !!redundantMinError) &&
-                  "text-destructive"
-                }
-              >
-                {t.numberMinimumLabel}
-              </Label>
-              <Input
-                id={minimumId}
-                type="number"
-                value={minimum !== undefined ? minimum : ""}
-                onChange={(e) => {
-                  const value = e.target.value
-                    ? Number(e.target.value)
-                    : undefined;
-                  handleValidationChange("minimum", value);
-                }}
-                placeholder={t.numberMinimumPlaceholder}
-                className={cn(
-                  "h-8",
-                  minimum !== undefined &&
-                    (!!minMaxError || !!redundantMinError) &&
-                    "border-destructive",
-                )}
-                step={integer ? 1 : "any"}
-              />
-            </div>
-          )}
-
-          {(!readOnly || !!maximum) && (
-            <div className="space-y-2">
-              <Label
-                htmlFor={maximumId}
-                className={
-                  maximum !== undefined &&
-                  (!!minMaxError || !!redundantMaxError) &&
-                  "text-destructive"
-                }
-              >
-                {t.numberMaximumLabel}
-              </Label>
-              <Input
-                id={maximumId}
-                type="number"
-                value={maximum ?? ""}
-                onChange={(e) => {
-                  const value = e.target.value
-                    ? Number(e.target.value)
-                    : undefined;
-                  handleValidationChange("maximum", value);
-                }}
-                placeholder={t.numberMaximumPlaceholder}
-                className={cn(
-                  "h-8",
-                  maximum !== undefined &&
-                    (!!minMaxError || !!redundantMaxError) &&
-                    "border-destructive",
-                )}
-                step={integer ? 1 : "any"}
-              />
-            </div>
-          )}
-        </div>
-      )}
-
-      {(!readOnly || !!exclusiveMaximum || !!exclusiveMinimum) && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {(!readOnly || !!exclusiveMinimum) && (
-            <div className="space-y-2">
-              <Label
-                htmlFor={exclusiveMinimumId}
-                className={
-                  exclusiveMinimum !== undefined &&
-                  (!!minMaxError || !!redundantMinError) &&
-                  "text-destructive"
-                }
-              >
-                {t.numberExclusiveMinimumLabel}
-              </Label>
-              <Input
-                id={exclusiveMinimumId}
-                type="number"
-                value={exclusiveMinimum ?? ""}
-                onChange={(e) => {
-                  const value = e.target.value
-                    ? Number(e.target.value)
-                    : undefined;
-                  handleValidationChange("exclusiveMinimum", value);
-                }}
-                placeholder={t.numberExclusiveMinimumPlaceholder}
-                className={cn(
-                  "h-8",
-                  exclusiveMinimum !== undefined &&
-                    (!!minMaxError || !!redundantMinError) &&
-                    "border-destructive",
-                )}
-                step={integer ? 1 : "any"}
-              />
-            </div>
-          )}
-
-          {(!readOnly || !!exclusiveMaximum) && (
-            <div className="space-y-2">
-              <Label
-                htmlFor={exclusiveMaximumId}
-                className={
-                  exclusiveMaximum !== undefined &&
-                  (!!minMaxError || !!redundantMaxError) &&
-                  "text-destructive"
-                }
-              >
-                {t.numberExclusiveMaximumLabel}
-              </Label>
-              <Input
-                id={exclusiveMaximumId}
-                type="number"
-                value={exclusiveMaximum ?? ""}
-                onChange={(e) => {
-                  const value = e.target.value
-                    ? Number(e.target.value)
-                    : undefined;
-                  handleValidationChange("exclusiveMaximum", value);
-                }}
-                placeholder={t.numberExclusiveMaximumPlaceholder}
-                className={cn(
-                  "h-8",
-                  exclusiveMaximum !== undefined &&
-                    (!!minMaxError || !!redundantMaxError) &&
-                    "border-destructive",
-                )}
-                step={integer ? 1 : "any"}
-              />
-            </div>
-          )}
-        </div>
-      )}
-
-      {(!readOnly || !!multipleOf) && (
-        <div className="space-y-2">
-          <Label
-            htmlFor={multipleOfId}
-            className={!!multipleOfError && "text-destructive"}
-          >
-            {t.numberMultipleOfLabel}
-          </Label>
-          <Input
-            id={multipleOfId}
+    <Stack gap="md">
+      <SimpleGrid cols={2} spacing="md">
+        <Stack gap="xs">
+          <Text component="label" htmlFor={minimumId} size="sm" fw={500}>
+            {t.numberMinimumLabel}
+          </Text>
+          <TextInput
+            id={minimumId}
             type="number"
-            value={multipleOf ?? ""}
-            onChange={(e) => {
-              const value = e.target.value ? Number(e.target.value) : undefined;
-              handleValidationChange("multipleOf", value);
-            }}
-            placeholder={t.numberMultipleOfPlaceholder}
-            className={cn("h-8", !!multipleOfError && "border-destructive")}
-            min={0}
-            step={integer ? 1 : "any"}
+            step={integer ? "1" : "any"}
+            value={minimum ?? ""}
+            onChange={(e) => handleNumberChange("minimum", e.target.value)}
+            placeholder="-∞"
+            disabled={readOnly}
           />
-          {!!multipleOfError && (
-            <div className="text-xs text-destructive italic whitespace-pre-line">
-              {multipleOfError}
-            </div>
-          )}
-        </div>
-      )}
+        </Stack>
+        <Stack gap="xs">
+          <Text component="label" htmlFor={maximumId} size="sm" fw={500}>
+            {t.numberMaximumLabel}
+          </Text>
+          <TextInput
+            id={maximumId}
+            type="number"
+            step={integer ? "1" : "any"}
+            value={maximum ?? ""}
+            onChange={(e) => handleNumberChange("maximum", e.target.value)}
+            placeholder="∞"
+            disabled={readOnly}
+          />
+        </Stack>
+      </SimpleGrid>
 
-      {(!readOnly || enumValues.length > 0) && (
-        <div className="space-y-2 pt-2 border-t border-border/40">
-          <Label className={!!enumError && "text-destructive"}>
-            {t.numberAllowedValuesEnumLabel}
-          </Label>
+      <SimpleGrid cols={2} spacing="md">
+        <Stack gap="xs">
+          <Text
+            component="label"
+            htmlFor={exclusiveMinimumId}
+            size="sm"
+            fw={500}
+          >
+            {t.numberExclusiveMinimumLabel}
+          </Text>
+          <TextInput
+            id={exclusiveMinimumId}
+            type="number"
+            step={integer ? "1" : "any"}
+            value={exclusiveMinimum ?? ""}
+            onChange={(e) =>
+              handleNumberChange("exclusiveMinimum", e.target.value)
+            }
+            placeholder="-∞"
+            disabled={readOnly}
+          />
+        </Stack>
+        <Stack gap="xs">
+          <Text
+            component="label"
+            htmlFor={exclusiveMaximumId}
+            size="sm"
+            fw={500}
+          >
+            {t.numberExclusiveMaximumLabel}
+          </Text>
+          <TextInput
+            id={exclusiveMaximumId}
+            type="number"
+            step={integer ? "1" : "any"}
+            value={exclusiveMaximum ?? ""}
+            onChange={(e) =>
+              handleNumberChange("exclusiveMaximum", e.target.value)
+            }
+            placeholder="∞"
+            disabled={readOnly}
+          />
+        </Stack>
+      </SimpleGrid>
 
-          <div className="flex flex-wrap gap-2 mb-4">
-            {enumValues.length > 0 ? (
-              enumValues.map((value, index) => (
-                <div
-                  key={`enum-number-${value}`}
-                  className="flex items-center bg-muted/40 border rounded-md px-2 py-1 text-xs"
-                >
-                  <span className="mr-1">{value}</span>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveEnumValue(index)}
-                    className="text-muted-foreground hover:text-destructive"
-                  >
-                    <X size={12} />
-                  </button>
-                </div>
-              ))
-            ) : (
-              <p className="text-xs text-muted-foreground italic">
-                {t.numberAllowedValuesEnumNone}
-              </p>
-            )}
-          </div>
+      <Stack gap="xs">
+        <Text component="label" htmlFor={multipleOfId} size="sm" fw={500}>
+          {t.numberMultipleOfLabel}
+        </Text>
+        <TextInput
+          id={multipleOfId}
+          type="number"
+          step={integer ? "1" : "any"}
+          min={0}
+          value={multipleOf ?? ""}
+          onChange={(e) => handleNumberChange("multipleOf", e.target.value)}
+          placeholder="1"
+          disabled={readOnly}
+        />
+      </Stack>
 
-          <div className="flex items-center gap-2">
-            <Input
-              type="number"
-              value={enumValue}
-              onChange={(e) => setEnumValue(e.target.value)}
-              placeholder={t.numberAllowedValuesEnumAddPlaceholder}
-              className="h-8 text-xs flex-1"
-              onKeyDown={(e) => e.key === "Enter" && handleAddEnumValue()}
-              step={integer ? 1 : "any"}
-            />
-            <button
-              type="button"
-              onClick={handleAddEnumValue}
-              className="px-3 py-1 h-8 rounded-md bg-secondary text-xs font-medium hover:bg-secondary/80"
-            >
-              {t.numberAllowedValuesEnumAddLabel}
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+      <Stack gap="xs">
+        <Text size="sm" fw={500}>
+          {t.numberAllowedValuesEnumLabel}
+        </Text>
+        <Group gap="xs">
+          <TextInput
+            id={enumInputId}
+            type="number"
+            step={integer ? "1" : "any"}
+            value={enumValue}
+            onChange={(e) => setEnumValue(e.target.value)}
+            placeholder={t.numberAllowedValuesEnumAddPlaceholder}
+            disabled={readOnly}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleAddEnum();
+              }
+            }}
+            style={{ flex: 1 }}
+          />
+          <Button
+            onClick={handleAddEnum}
+            disabled={readOnly || enumValue === ""}
+            variant="default"
+          >
+            {t.numberAllowedValuesEnumAddLabel}
+          </Button>
+        </Group>
+
+        {enumValues && enumValues.length > 0 && (
+          <Group gap="xs" mt="xs">
+            {enumValues.map((value) => (
+              <Badge
+                key={value}
+                variant="light"
+                rightSection={
+                  !readOnly && (
+                    <ActionIcon
+                      size="xs"
+                      color="blue"
+                      radius="xl"
+                      variant="transparent"
+                      onClick={() => handleRemoveEnum(value)}
+                    >
+                      <X size={10} />
+                    </ActionIcon>
+                  )
+                }
+              >
+                {value}
+              </Badge>
+            ))}
+          </Group>
+        )}
+      </Stack>
+    </Stack>
   );
 };
 

@@ -1,3 +1,4 @@
+import { Stack, Text, Paper, Box } from "@mantine/core";
 import {
   DragDropContext,
   Draggable,
@@ -28,7 +29,6 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
   depth = 0,
   readOnly = false,
   showDescription = true,
-  disableAnimations = false,
 }) => {
   const t = useTranslation();
 
@@ -136,15 +136,15 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
   };
 
   return (
-    <div className="space-y-4">
+    <Stack gap="md">
       {properties.length > 0 ? (
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId={droppableId}>
             {(provided) => (
-              <div
+              <Stack
+                gap="xs"
                 ref={provided.innerRef}
                 {...provided.droppableProps}
-                className="space-y-2"
               >
                 {properties.map((property, index) => (
                   <Draggable
@@ -167,20 +167,24 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
                             name={property.name}
                             schema={property.schema}
                             required={property.required}
-                            validationNode={validationNode?.children[property.name]}
+                            validationNode={
+                              validationNode?.children[property.name]
+                            }
                             onDelete={() => handleDeleteProperty(property.name)}
                             onNameChange={(newName) =>
                               handlePropertyNameChange(property.name, newName)
                             }
                             onRequiredChange={(required) =>
-                              handlePropertyRequiredChange(property.name, required)
+                              handlePropertyRequiredChange(
+                                property.name,
+                                required,
+                              )
                             }
                             onSchemaChange={(schema) =>
                               handlePropertySchemaChange(property.name, schema)
                             }
                             depth={depth}
                             showDescription={showDescription}
-                            disableAnimations={disableAnimations}
                             dragHandleProps={provided.dragHandleProps}
                           />
                         </div>
@@ -199,22 +203,28 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
                   </Draggable>
                 ))}
                 {provided.placeholder}
-              </div>
+              </Stack>
             )}
           </Droppable>
         </DragDropContext>
       ) : (
-        <div className="text-sm text-muted-foreground italic p-2 text-center border rounded-md">
-          {t.objectPropertiesNone}
-        </div>
+        <Paper withBorder p="xs" radius="md">
+          <Text size="sm" c="dimmed" fs="italic" ta="center">
+            {t.objectPropertiesNone}
+          </Text>
+        </Paper>
       )}
 
       {!readOnly && (
-        <div className="mt-4">
-          <AddFieldButton onAddField={handleAddProperty} variant="secondary" showDescription={showDescription} disableAnimations={disableAnimations} />
-        </div>
+        <Box mt="md">
+          <AddFieldButton
+            onAddField={handleAddProperty}
+            variant="secondary"
+            showDescription={showDescription}
+          />
+        </Box>
       )}
-    </div>
+    </Stack>
   );
 };
 

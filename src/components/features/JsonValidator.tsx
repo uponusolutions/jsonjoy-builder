@@ -1,14 +1,8 @@
 import Editor, { type BeforeMount, type OnMount } from "@monaco-editor/react";
-import { AlertCircle, Check, Loader2 } from "lucide-react";
+import { AlertCircle, Check } from "lucide-react";
 import type * as Monaco from "monaco-editor";
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "../../components/ui/dialog.tsx";
+import { Modal, Text, Box, Group, Stack, Alert, ScrollArea, UnstyledButton, Badge, Loader } from "@mantine/core";
 import { useMonacoTheme } from "../../hooks/use-monaco-theme.ts";
 import {
   formatTranslation,
@@ -115,138 +109,115 @@ export function JsonValidator({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-5xl max-h-[700px] flex flex-col jsonjoy">
-        <DialogHeader>
-          <DialogTitle>{t.validatorTitle}</DialogTitle>
-          <DialogDescription>{t.validatorDescription}</DialogDescription>
-        </DialogHeader>
-        <div className="flex-1 flex flex-col md:flex-row gap-4 py-4 overflow-hidden h-[600px]">
-          <div className="flex-1 flex flex-col h-full">
-            <div className="text-sm font-medium mb-2">{t.validatorContent}</div>
-            <div className="border rounded-md flex-1 h-full">
+    <Modal 
+      opened={open} 
+      onClose={() => onOpenChange(false)} 
+      title={t.validatorTitle} 
+      size="90%"
+      styles={{ body: { height: '80vh', display: 'flex', flexDirection: 'column' } }}
+    >
+        <Text size="sm" c="dimmed" mb="md">{t.validatorDescription}</Text>
+        
+        <Group style={{ flex: 1, overflow: 'hidden', minHeight: 0 }} gap="md">
+          <Stack style={{ flex: 1, height: '100%' }} gap="xs">
+            <Text size="sm" fw={500}>{t.validatorContent}</Text>
+            <Box style={{ border: '1px solid var(--mantine-color-default-border)', borderRadius: 'var(--mantine-radius-md)', flex: 1, overflow: 'hidden' }}>
               <Editor
-                height="600px"
+                height="100%"
                 defaultLanguage="json"
                 value={jsonInput}
                 onChange={handleEditorChange}
                 beforeMount={handleJsonEditorBeforeMount}
                 onMount={handleEditorDidMount}
                 loading={
-                  <div className="flex items-center justify-center h-full w-full bg-secondary/30">
-                    <Loader2 className="h-6 w-6 animate-spin" />
-                  </div>
+                  <Box display="flex" style={{ alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                    <Loader size="sm" />
+                  </Box>
                 }
                 options={editorOptions}
                 theme={currentTheme}
               />
-            </div>
-          </div>
+            </Box>
+          </Stack>
 
-          <div className="flex-1 flex flex-col h-full">
-            <div className="text-sm font-medium mb-2">
-              {t.validatorCurrentSchema}
-            </div>
-            <div className="border rounded-md flex-1 h-full">
+          <Stack style={{ flex: 1, height: '100%' }} gap="xs">
+            <Text size="sm" fw={500}>{t.validatorCurrentSchema}</Text>
+            <Box style={{ border: '1px solid var(--mantine-color-default-border)', borderRadius: 'var(--mantine-radius-md)', flex: 1, overflow: 'hidden' }}>
               <Editor
-                height="600px"
+                height="100%"
                 defaultLanguage="json"
                 value={JSON.stringify(schema, null, 2)}
                 beforeMount={handleSchemaEditorBeforeMount}
                 loading={
-                  <div className="flex items-center justify-center h-full w-full bg-secondary/30">
-                    <Loader2 className="h-6 w-6 animate-spin" />
-                  </div>
+                  <Box display="flex" style={{ alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                    <Loader size="sm" />
+                  </Box>
                 }
                 options={schemaViewerOptions}
                 theme={currentTheme}
               />
-            </div>
-          </div>
-        </div>
+            </Box>
+          </Stack>
+        </Group>
 
         {validationResult && (
-          <div
-            className={`rounded-md p-4 ${validationResult.valid ? "bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800" : "bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800"} transition-all duration-300 ease-in-out`}
-          >
-            <div className="flex items-center">
-              {validationResult.valid ? (
-                <>
-                  <Check className="h-5 w-5 text-green-500 mr-2" />
-                  <p className="text-green-700 dark:text-green-300 font-medium">
-                    {t.validatorValid}
-                  </p>
-                </>
-              ) : (
-                <>
-                  <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
-                  <p className="text-red-700 dark:text-red-300 font-medium">
-                    {validationResult.errors.length === 1
+          <Alert 
+            mt="md" 
+            color={validationResult.valid ? "green" : "red"} 
+            variant="light"
+            title={
+              <Group>
+                {validationResult.valid ? <Check size={20} /> : <AlertCircle size={20} />}
+                <Text fw={500}>
+                  {validationResult.valid 
+                    ? t.validatorValid 
+                    : validationResult.errors.length === 1
                       ? validationResult.errors[0].path === "/"
                         ? t.validatorErrorInvalidSyntax
                         : t.validatorErrorSchemaValidation
                       : formatTranslation(t.validatorErrorCount, {
                           count: validationResult.errors.length,
-                        })}
-                  </p>
-                </>
-              )}
-            </div>
-
+                        })
+                  }
+                </Text>
+              </Group>
+            }
+          >
             {!validationResult.valid &&
               validationResult.errors &&
               validationResult.errors.length > 0 && (
-                <div className="mt-3 max-h-[200px] overflow-y-auto">
-                  {validationResult.errors[0] && (
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-red-700 dark:text-red-300">
-                        {validationResult.errors[0].path === "/"
-                          ? t.validatorErrorPathRoot
-                          : validationResult.errors[0].path}
-                      </span>
-                      {validationResult.errors[0].line && (
-                        <span className="text-xs bg-secondary px-2 py-1 rounded text-muted-foreground">
-                          {validationResult.errors[0].column
-                            ? formatTranslation(
-                                t.validatorErrorLocationLineAndColumn,
-                                {
-                                  line: validationResult.errors[0].line,
-                                  column: validationResult.errors[0].column,
-                                },
-                              )
-                            : formatTranslation(
-                                t.validatorErrorLocationLineOnly,
-                                { line: validationResult.errors[0].line },
-                              )}
-                        </span>
-                      )}
-                    </div>
-                  )}
-                  <ul className="space-y-2">
+                <ScrollArea h={200} mt="sm">
+                  <Stack gap="xs">
                     {validationResult.errors.map((error, index) => (
-                      <button
+                      <UnstyledButton
                         key={`error-${error.path}-${index}`}
-                        type="button"
-                        className="w-full text-left bg-card border border-red-100 dark:border-red-900 rounded-md p-3 shadow-xs hover:shadow-md transition-shadow duration-200 cursor-pointer"
                         onClick={() =>
                           error.line &&
                           error.column &&
                           goToError(error.line, error.column)
                         }
+                        style={{ 
+                          width: '100%', 
+                          textAlign: 'left', 
+                          padding: '8px', 
+                          borderRadius: 'var(--mantine-radius-sm)',
+                          border: '1px solid var(--mantine-color-red-2)',
+                          backgroundColor: 'var(--mantine-color-body)'
+                        }}
                       >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <p className="text-sm font-medium text-red-700 dark:text-red-300">
+                        <Group justify="space-between" align="flex-start">
+                          <Box style={{ flex: 1 }}>
+                            <Text size="sm" fw={500} c="red">
                               {error.path === "/"
                                 ? t.validatorErrorPathRoot
                                 : error.path}
-                            </p>
-                            <p className="text-sm text-muted-foreground mt-1">
+                            </Text>
+                            <Text size="sm" c="dimmed">
                               {error.message}
-                            </p>
-                          </div>
+                            </Text>
+                          </Box>
                           {error.line && (
-                            <div className="text-xs bg-secondary px-2 py-1 rounded text-muted-foreground">
+                            <Badge variant="light" color="gray">
                               {error.column
                                 ? formatTranslation(
                                     t.validatorErrorLocationLineAndColumn,
@@ -256,17 +227,16 @@ export function JsonValidator({
                                     t.validatorErrorLocationLineOnly,
                                     { line: error.line },
                                   )}
-                            </div>
+                            </Badge>
                           )}
-                        </div>
-                      </button>
+                        </Group>
+                      </UnstyledButton>
                     ))}
-                  </ul>
-                </div>
+                  </Stack>
+                </ScrollArea>
               )}
-          </div>
+          </Alert>
         )}
-      </DialogContent>
-    </Dialog>
+    </Modal>
   );
 }
