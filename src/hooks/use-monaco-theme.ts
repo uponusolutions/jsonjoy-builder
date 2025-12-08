@@ -172,11 +172,16 @@ export function useMonacoTheme(themeOverride?: "light" | "dark") {
     monaco: typeof Monaco,
     schema?: JSONSchema,
   ) => {
+    // Use the top-level json namespace as languages.json is deprecated
+    if (!monaco.json) {
+      return;
+    }
+
     // Create a new diagnostics options object
-    const diagnosticsOptions: Monaco.languages.json.DiagnosticsOptions = {
+    const diagnosticsOptions = {
       validate: true,
       allowComments: false,
-      schemaValidation: "error",
+      schemaValidation: "error" as const,
       enableSchemaRequest: true,
       schemas: schema
         ? [
@@ -202,9 +207,7 @@ export function useMonacoTheme(themeOverride?: "light" | "dark") {
           ],
     };
 
-    monaco.languages.json.jsonDefaults.setDiagnosticsOptions(
-      diagnosticsOptions,
-    );
+    monaco.json.jsonDefaults.setDiagnosticsOptions(diagnosticsOptions);
   };
 
   return {
