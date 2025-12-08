@@ -11,6 +11,7 @@ export interface JsonSchemaVisualizerProps {
   schema: JSONSchema;
   className?: string;
   onChange?: (schema: JSONSchema) => void;
+  theme?: "light" | "dark";
 }
 
 /** @public */
@@ -18,6 +19,7 @@ const JsonSchemaVisualizer: FC<JsonSchemaVisualizerProps> = ({
   schema,
   className,
   onChange,
+  theme,
 }) => {
   const editorRef = useRef<Parameters<OnMount>[0] | null>(null);
   const {
@@ -25,7 +27,7 @@ const JsonSchemaVisualizer: FC<JsonSchemaVisualizerProps> = ({
     defineMonacoThemes,
     configureJsonDefaults,
     defaultEditorOptions,
-  } = useMonacoTheme();
+  } = useMonacoTheme(theme);
 
   const t = useTranslation();
 
@@ -71,6 +73,7 @@ const JsonSchemaVisualizer: FC<JsonSchemaVisualizerProps> = ({
         "relative overflow-hidden h-full flex flex-col",
         className,
         "jsonjoy",
+        theme === "dark" && "dark",
       )}
     >
       <div className="flex items-center justify-between bg-secondary/80 backdrop-blur-xs px-4 py-2 border-b shrink-0">

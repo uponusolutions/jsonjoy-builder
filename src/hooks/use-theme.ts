@@ -2,6 +2,9 @@ import { useCallback, useEffect, useState } from "react";
 
 export type Theme = "light" | "dark" | "system";
 
+const THEME_STORAGE_KEY = "jsonjoy-theme";
+const THEME_CHANGE_EVENT = "jsonjoy-theme-change";
+
 function getSystemTheme(): "light" | "dark" {
   if (typeof window === "undefined") return "light";
   return window.matchMedia("(prefers-color-scheme: dark)").matches
@@ -11,12 +14,13 @@ function getSystemTheme(): "light" | "dark" {
 
 function getStoredTheme(): Theme | null {
   if (typeof window === "undefined") return null;
-  return localStorage.getItem("jsonjoy-theme") as Theme | null;
+  return localStorage.getItem(THEME_STORAGE_KEY) as Theme | null;
 }
 
 function setStoredTheme(theme: Theme): void {
   if (typeof window === "undefined") return;
-  localStorage.setItem("jsonjoy-theme", theme);
+  localStorage.setItem(THEME_STORAGE_KEY, theme);
+  window.dispatchEvent(new CustomEvent(THEME_CHANGE_EVENT, { detail: theme }));
 }
 
 /**
@@ -38,6 +42,18 @@ export function useTheme(defaultTheme: Theme = "light") {
   const setTheme = useCallback((newTheme: Theme) => {
     setThemeState(newTheme);
     setStoredTheme(newTheme);
+  }, []);
+
+  // Listen for theme changes from other components
+  useEffect(() => {
+    const handleThemeChange = (e: Event) => {
+      const customEvent = e as CustomEvent<Theme>;
+      setThemeState(customEvent.detail);
+    };
+
+    window.addEventListener(THEME_CHANGE_EVENT, handleThemeChange);
+    return () =>
+      window.removeEventListener(THEME_CHANGE_EVENT, handleThemeChange);
   }, []);
 
   // Listen for system theme changes

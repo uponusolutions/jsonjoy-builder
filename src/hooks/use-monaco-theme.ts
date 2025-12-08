@@ -62,11 +62,16 @@ export const defaultEditorOptions: MonacoEditorOptions = {
   },
 };
 
-export function useMonacoTheme() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+export function useMonacoTheme(themeOverride?: "light" | "dark") {
+  const [isDarkMode, setIsDarkMode] = useState(themeOverride === "dark");
 
   // Check for dark mode by examining the dark class on document or .jsonjoy element
   useEffect(() => {
+    if (themeOverride) {
+      setIsDarkMode(themeOverride === "dark");
+      return;
+    }
+
     const checkDarkMode = () => {
       // Check if dark class is present on html element or any jsonjoy container
       const htmlHasDark = document.documentElement.classList.contains("dark");
@@ -96,7 +101,7 @@ export function useMonacoTheme() {
     }
 
     return () => observer.disconnect();
-  }, []);
+  }, [themeOverride]);
 
   const defineMonacoThemes = (monaco: typeof Monaco) => {
     // Define custom light theme that matches app colors

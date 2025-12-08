@@ -25,6 +25,7 @@ export interface JsonSchemaEditorProps {
   className?: string;
   showDescription?: boolean;
   disableAnimations?: boolean;
+  theme?: "light" | "dark";
 }
 
 /** @public */
@@ -35,6 +36,7 @@ const JsonSchemaEditor: FC<JsonSchemaEditorProps> = ({
   className,
   showDescription = true,
   disableAnimations = false,
+  theme,
 }) => {
   // Handle schema changes and propagate to parent if needed
   const handleSchemaChange = (newSchema: JSONSchema) => {
@@ -90,6 +92,7 @@ const JsonSchemaEditor: FC<JsonSchemaEditorProps> = ({
         fullscreenClass,
         className,
         "jsonjoy",
+        theme === "dark" && "dark",
       )}
     >
       {/* For mobile screens - show as tabs */}
@@ -130,6 +133,7 @@ const JsonSchemaEditor: FC<JsonSchemaEditorProps> = ({
               onChange={handleSchemaChange}
               showDescription={showDescription}
               disableAnimations={disableAnimations}
+              theme={theme}
             />
           </TabsContent>
 
@@ -143,6 +147,7 @@ const JsonSchemaEditor: FC<JsonSchemaEditorProps> = ({
             <JsonSchemaVisualizer
               schema={schema}
               onChange={handleSchemaChange}
+              theme={theme}
             />
           </TabsContent>
         </Tabs>
@@ -178,6 +183,7 @@ const JsonSchemaEditor: FC<JsonSchemaEditorProps> = ({
               onChange={handleSchemaChange}
               showDescription={showDescription}
               disableAnimations={disableAnimations}
+              theme={theme}
             />
           </div>
           {/** biome-ignore lint/a11y/noStaticElementInteractions: What exactly does this div do? */}
@@ -193,6 +199,7 @@ const JsonSchemaEditor: FC<JsonSchemaEditorProps> = ({
             <JsonSchemaVisualizer
               schema={schema}
               onChange={handleSchemaChange}
+              theme={theme}
             />
           </div>
         </div>

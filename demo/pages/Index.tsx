@@ -12,7 +12,7 @@ import {
   User,
   Zap,
 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { exampleSchema } from "../../demo/utils/schemaExample.ts";
 import { JsonValidator } from "../../src/components/features/JsonValidator.tsx";
 import { SchemaInferencer } from "../../src/components/features/SchemaInferencer.tsx";
@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "../../src/components/ui/select.tsx";
 import { ThemeToggle } from "../../src/components/ui/theme-toggle.tsx";
+import { useTheme } from "../../src/hooks/use-theme.ts";
 import { en } from "../../src/i18n/locales/en.ts";
 import { TranslationContext } from "../../src/i18n/translation-context.ts";
 import type { JSONSchema } from "../../src/types/jsonSchema.ts";
@@ -39,6 +40,15 @@ const Index = () => {
   const [validateDialogOpen, setValidateDialogOpen] = useState(false);
   const [language, setLanguage] = useState("en");
   const [translation, setTranslation] = useState(en);
+  const { resolvedTheme } = useTheme();
+
+  useEffect(() => {
+    if (resolvedTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [resolvedTheme]);
 
   const handleReset = () => setSchema(exampleSchema);
 
@@ -68,7 +78,11 @@ const Index = () => {
 
   return (
     <TranslationContext value={translation}>
-      <div className="min-h-screen bg-linear-to-b from-background to-background/95 relative overflow-hidden jsonjoy">
+      <div
+        className={`min-h-screen bg-linear-to-b from-background to-background/95 relative overflow-hidden jsonjoy ${
+          resolvedTheme === "dark" ? "dark" : ""
+        }`}
+      >
         {/* Background accent */}
         <div
           className="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-3xl opacity-50 animate-float"
@@ -187,16 +201,18 @@ const Index = () => {
           <div className="flex justify-center mb-6"></div>
 
           {/* Schema Editor - full width on large screens */}
-          <div className="max-w-4xl mx-auto lg:max-w-none">
+                    <div className="max-w-4xl mx-auto lg:max-w-none">
             <JsonSchemaEditor
               schema={schema}
               readOnly={readOnly}
               setSchema={setSchema}
               showDescription={showDescription}
               disableAnimations={disableAnimations}
+              theme={resolvedTheme}
               className="shadow-lg animate-in border-border/50 backdrop-blur-xs"
             />
           </div>
+
 
           {/* Schema inferencer component */}
           <SchemaInferencer
