@@ -64,7 +64,7 @@
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
     "clsx": "^2.1.1",
-    "lucide-react": "^0.556.0",
+    "lucide-react": "^0.554.0",
     "zod": "^4.1.13"
   },
   "peerDependencies": {
