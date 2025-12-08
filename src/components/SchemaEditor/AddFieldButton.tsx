@@ -224,7 +224,6 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
                 style={{
                   borderRadius: "var(--mantine-radius-md)",
                   border: "1px solid var(--mantine-color-default-border)",
-                  backgroundColor: "var(--mantine-color-gray-0)",
                 }}
               >
                 <Text size="xs" fw={500} mb={8}>
