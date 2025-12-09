@@ -20,13 +20,13 @@ import {
 } from "../../types/jsonSchema.ts";
 import type { ValidationTreeNode } from "../../types/validation.ts";
 import TypeDropdown from "./TypeDropdown.tsx";
+import RequiredDropdown from "./RequiredDropdown.tsx";
 import TypeEditor from "./TypeEditor.tsx";
 import {
   Paper,
   Group,
   Box,
   ActionIcon,
-  Button,
   UnstyledButton,
   Text,
   Stack,
@@ -298,16 +298,11 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
           />
 
           {/* Required toggle */}
-          <Button
-            variant={required ? "light" : "subtle"}
-            color={required ? "red" : "gray"}
-            size="xs"
-            onClick={() => !readOnly && onRequiredChange(!required)}
-            disabled={readOnly}
-            style={{ minWidth: 80 }}
-          >
-            {required ? t.propertyRequired : t.propertyOptional}
-          </Button>
+          <RequiredDropdown
+            required={required}
+            onChange={onRequiredChange}
+            readOnly={readOnly}
+          />
 
           {/* Error badge */}
           {validationNode?.cumulativeChildrenErrors > 0 && (
