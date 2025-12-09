@@ -6,10 +6,17 @@ export function cn(...inputs: ClassValue[]) {
   return clsx(inputs);
 }
 
-export function getTypeLabel(t: Translation, type: SchemaType | undefined): string {
+export function getTypeLabel(
+  t: Translation,
+  type: SchemaType | "textarea" | "html" | undefined,
+): string {
   switch (type) {
     case "string":
       return t.schemaTypeString;
+    case "textarea":
+      return t.schemaTypeTextarea;
+    case "html":
+      return t.schemaTypeHtml;
     case "number":
     case "integer":
       return t.schemaTypeNumber;

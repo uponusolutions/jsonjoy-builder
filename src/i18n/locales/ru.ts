@@ -123,6 +123,8 @@ export const ru: Translation = {
   schemaTypeNumber: "Число",
   schemaTypeObject: "Объект",
   schemaTypeString: "Текст",
+  schemaTypeTextarea: "Текстовая область",
+  schemaTypeHtml: "HTML-редактор",
   schemaTypeNull: "Пусто",
 
   inferrerTitle: "Вывести схему JSON",

@@ -120,6 +120,8 @@ export const en: Translation = {
   schemaTypeNumber: "Number",
   schemaTypeObject: "Object",
   schemaTypeString: "Text",
+  schemaTypeTextarea: "Textarea",
+  schemaTypeHtml: "HTML Editor",
   schemaTypeNull: "Empty",
 
   inferrerTitle: "Infer JSON Schema",

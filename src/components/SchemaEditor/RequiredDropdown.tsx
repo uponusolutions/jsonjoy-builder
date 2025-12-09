@@ -32,7 +32,7 @@ export const RequiredDropdown: React.FC<RequiredDropdownProps> = ({
           rightSection={!readOnly && <ChevronDown size={14} />}
           onClick={() => !readOnly && setIsOpen(!isOpen)}
           style={{
-            width: readOnly ? "auto" : 92,
+            width: readOnly ? "auto" : 120,
             padding: "0 8px",
           }}
         >

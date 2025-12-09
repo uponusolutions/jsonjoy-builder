@@ -7,13 +7,16 @@ import type { SchemaType } from "../../types/jsonSchema.ts";
 
 export interface TypeDropdownProps {
   value: SchemaType;
-  onChange: (value: SchemaType) => void;
+  format?: string;
+  onChange: (value: SchemaType, format?: string) => void;
   className?: string;
   readOnly: boolean;
 }
 
-const typeOptions: SchemaType[] = [
+const typeOptions: (SchemaType | "textarea" | "html")[] = [
   "string",
+  "textarea",
+  "html",
   "number",
   "boolean",
   "object",
@@ -21,10 +24,16 @@ const typeOptions: SchemaType[] = [
   "null",
 ];
 
-const getTypeColor = (type: SchemaType | undefined): string => {
+const getTypeColor = (
+  type: SchemaType | "textarea" | "html" | undefined,
+): string => {
   switch (type) {
     case "string":
       return "green";
+    case "textarea":
+      return "teal";
+    case "html":
+      return "cyan";
     case "number":
     case "integer":
       return "blue";
@@ -43,6 +52,7 @@ const getTypeColor = (type: SchemaType | undefined): string => {
 
 export const TypeDropdown: React.FC<TypeDropdownProps> = ({
   value,
+  format,
   onChange,
   className,
   readOnly,
@@ -51,22 +61,48 @@ export const TypeDropdown: React.FC<TypeDropdownProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const menuId = useId();
 
+  // Determine effective type for UI
+  const effectiveType =
+    value === "string" && format === "textarea"
+      ? "textarea"
+      : value === "string" && format === "html"
+        ? "html"
+        : value;
+
+  const handleTypeChange = (newType: SchemaType | "textarea" | "html") => {
+    if (newType === "textarea") {
+      onChange("string", "textarea");
+    } else if (newType === "html") {
+      onChange("string", "html");
+    } else {
+      // If switching away from textarea/html to string, clear format?
+      // Or if switching to any other type, format is irrelevant (usually cleared by parent or ignored)
+      // But if switching to string, we should probably clear format if it was textarea/html
+      const newFormat =
+        newType === "string" &&
+        (effectiveType === "textarea" || effectiveType === "html")
+          ? undefined
+          : undefined;
+      onChange(newType as SchemaType, newFormat);
+    }
+  };
+
   return (
     <Menu id={menuId} opened={isOpen} onChange={setIsOpen} disabled={readOnly}>
       <Menu.Target>
         <Button
           variant="light"
-          color={getTypeColor(value)}
+          color={getTypeColor(effectiveType)}
           size="xs"
           rightSection={!readOnly && <ChevronDown size={14} />}
           onClick={() => !readOnly && setIsOpen(!isOpen)}
           style={{
-            width: readOnly ? "auto" : 92,
+            width: readOnly ? "auto" : 120,
             padding: "0 8px",
           }}
           className={className}
         >
-          {getTypeLabel(t, value)}
+          {getTypeLabel(t, effectiveType)}
         </Button>
       </Menu.Target>
 
@@ -74,8 +110,8 @@ export const TypeDropdown: React.FC<TypeDropdownProps> = ({
         {typeOptions.map((type) => (
           <Menu.Item
             key={type}
-            onClick={() => onChange(type)}
-            rightSection={value === type && <Check size={14} />}
+            onClick={() => handleTypeChange(type)}
+            rightSection={effectiveType === type && <Check size={14} />}
           >
             <Badge size="xs" variant="light" color={getTypeColor(type)}>
               {getTypeLabel(t, type)}

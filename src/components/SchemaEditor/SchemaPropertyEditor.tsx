@@ -75,6 +75,7 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
     (s) => (s.type || "object") as SchemaType,
     "object" as SchemaType,
   );
+  const format = withObjectSchema(schema, (s) => s.format, undefined);
 
   // Update temp values when props change
   useEffect(() => {
@@ -288,11 +289,13 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
         <Group gap="xs" wrap="nowrap">
           <TypeDropdown
             value={type}
+            format={format}
             readOnly={readOnly}
-            onChange={(newType) => {
+            onChange={(newType, newFormat) => {
               onSchemaChange({
                 ...asObjectSchema(schema),
                 type: newType,
+                format: newFormat,
               });
             }}
           />

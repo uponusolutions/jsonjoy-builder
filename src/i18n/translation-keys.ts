@@ -580,6 +580,18 @@ export interface Translation {
    */
   readonly schemaTypeString: string;
   /**
+   * The translation for the key `schemaTypeTextarea`. English default is:
+   *
+   * > Textarea
+   */
+  readonly schemaTypeTextarea: string;
+  /**
+   * The translation for the key `schemaTypeHtml`. English default is:
+   *
+   * > HTML Editor
+   */
+  readonly schemaTypeHtml: string;
+  /**
    * The translation for the key `schemaTypeNumber`. English default is:
    *
    * > Number

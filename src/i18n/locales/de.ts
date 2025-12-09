@@ -123,6 +123,8 @@ export const de: Translation = {
   schemaTypeNumber: "Zahl",
   schemaTypeObject: "Objekt",
   schemaTypeString: "Text",
+  schemaTypeTextarea: "Textbereich",
+  schemaTypeHtml: "HTML-Editor",
   schemaTypeNull: "Leer",
 
   inferrerTitle: "JSON-Schema ableiten",
