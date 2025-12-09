@@ -11,12 +11,6 @@ importers:
       '@hello-pangea/dnd':
         specifier: ^18.0.1
         version: 18.0.1(@types/react@19.2.7)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
-      '@mantine/core':
-        specifier: ^8.3.9
-        version: 8.3.9(@mantine/hooks@8.3.9(react@19.2.1))(@types/react@19.2.7)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
-      '@mantine/hooks':
-        specifier: ^8.3.9
-        version: 8.3.9(react@19.2.1)
       '@monaco-editor/react':
         specifier: ^4.7.0
         version: 4.7.0(monaco-editor@0.55.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
@@ -39,23 +33,29 @@ importers:
       '@biomejs/biome':
         specifier: 2.2.0
         version: 2.2.0
+      '@mantine/core':
+        specifier: ^8.3.9
+        version: 8.3.9(@mantine/hooks@8.3.9(react@19.2.1))(@types/react@19.2.7)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
+      '@mantine/hooks':
+        specifier: ^8.3.9
+        version: 8.3.9(react@19.2.1)
       '@microsoft/api-extractor':
-        specifier: ^7.55.2
+        specifier: ^7.55.1
         version: 7.55.2(@types/node@24.10.1)
       '@rsbuild/core':
-        specifier: ^1.6.13
+        specifier: ^1.6.11
         version: 1.6.13
       '@rsbuild/plugin-react':
         specifier: ^1.4.2
         version: 1.4.2(@rsbuild/core@1.6.13)
       '@rslib/core':
-        specifier: ^0.18.3
+        specifier: ^0.18.2
         version: 0.18.3(@microsoft/api-extractor@7.55.2(@types/node@24.10.1))(typescript@5.9.3)
       '@rspack/binding-linux-x64-gnu':
-        specifier: ^1.6.6
+        specifier: ^1.6.5
         version: 1.6.6
       '@tanstack/react-query':
-        specifier: ^5.90.12
+        specifier: ^5.90.11
         version: 5.90.12(react@19.2.1)
       '@testing-library/react':
         specifier: ^16.3.0
@@ -88,13 +88,13 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1(postcss@8.5.6)
       react:
-        specifier: ^19.2.1
+        specifier: ^19.1.1
         version: 19.2.1
       react-dom:
-        specifier: ^19.2.1
+        specifier: ^19.1.1
         version: 19.2.1(react@19.2.1)
       react-router-dom:
-        specifier: ^7.10.1
+        specifier: ^7.9.6
         version: 7.10.1(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       sonner:
         specifier: ^2.0.7

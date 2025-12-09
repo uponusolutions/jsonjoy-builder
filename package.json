@@ -13,7 +13,7 @@
     "react"
   ],
   "private": false,
-  "version": "0.4.3",
+  "version": "0.4.4",
   "type": "module",
   "sideEffects": false,
   "repository": {
@@ -58,8 +58,6 @@
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
-    "@mantine/core": "^8.3.9",
-    "@mantine/hooks": "^8.3.9",
     "@monaco-editor/react": "^4.7.0",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
@@ -68,18 +66,22 @@
     "zod": "^4.1.13"
   },
   "peerDependencies": {
+    "@mantine/core": ">=8.3.9",
+    "@mantine/hooks": ">=8.3.9",
     "monaco-editor": ">= 0.25.0 < 1",
     "react": ">=19.0.0",
     "react-dom": ">=19.0.0"
   },
   "devDependencies": {
+    "@mantine/core": "^8.3.9",
+    "@mantine/hooks": "^8.3.9",
     "@biomejs/biome": "2.2.0",
-    "@microsoft/api-extractor": "^7.55.2",
-    "@rsbuild/core": "^1.6.13",
+    "@microsoft/api-extractor": "^7.55.1",
+    "@rsbuild/core": "^1.6.11",
     "@rsbuild/plugin-react": "^1.4.2",
-    "@rslib/core": "^0.18.3",
-    "@rspack/binding-linux-x64-gnu": "^1.6.6",
-    "@tanstack/react-query": "^5.90.12",
+    "@rslib/core": "^0.18.2",
+    "@rspack/binding-linux-x64-gnu": "^1.6.5",
+    "@tanstack/react-query": "^5.90.11",
     "@testing-library/react": "^16.3.0",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",
@@ -90,9 +92,9 @@
     "postcss": "^8.5.6",
     "postcss-preset-mantine": "^1.18.0",
     "postcss-simple-vars": "^7.0.1",
-    "react": "^19.2.1",
-    "react-dom": "^19.2.1",
-    "react-router-dom": "^7.10.1",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.9.6",
     "sonner": "^2.0.7",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
