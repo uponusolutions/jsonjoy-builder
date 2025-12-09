@@ -104,7 +104,7 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
             </Badge>
           </Group>
         }
-        size="xl"
+        size="75%"
       >
         <Text size="sm" c="dimmed" mb="md">
           {t.fieldAddNewDescription}
