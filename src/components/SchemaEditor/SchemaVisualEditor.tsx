@@ -131,6 +131,11 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
           <AddFieldButton
             onAddField={handleAddField}
             showDescription={showDescription}
+            existingFields={
+              !isBooleanSchema(schema) && schema.properties
+                ? Object.keys(schema.properties)
+                : []
+            }
           />
         </Box>
       )}

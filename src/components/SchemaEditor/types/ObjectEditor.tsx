@@ -221,6 +221,7 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
             onAddField={handleAddProperty}
             variant="secondary"
             showDescription={showDescription}
+            existingFields={properties.map((p) => p.name)}
           />
         </Box>
       )}
