@@ -113,6 +113,8 @@ export const fr: Translation = {
   stringFormatHostname: "Nom d'hôte",
   stringFormatIpv4: "Adresse IPv4",
   stringFormatIpv6: "Adresse IPv6",
+  stringFormatTextarea: "Zone de texte",
+  stringFormatHtml: "Éditeur HTML",
   stringAllowedValuesEnumLabel: "Valeurs autorisées (enum)",
   stringLengthEnumConflict: "Les énumérations et la validation de la longueur ne peuvent pas être utilisées ensemble.",
   stringAllowedValuesEnumNone: "Aucune valeur restreinte définie",
@@ -125,8 +127,6 @@ export const fr: Translation = {
   schemaTypeNumber: "Nombre",
   schemaTypeObject: "Objet",
   schemaTypeString: "Texte",
-  schemaTypeTextarea: "Zone de texte",
-  schemaTypeHtml: "Éditeur HTML",
   schemaTypeNull: "Vide",
 
   inferrerTitle: "Déduire le schéma JSON",

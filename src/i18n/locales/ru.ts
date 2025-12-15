@@ -112,6 +112,8 @@ export const ru: Translation = {
   stringFormatHostname: "Имя хоста",
   stringFormatIpv4: "Адрес IPv4",
   stringFormatIpv6: "Адрес IPv6",
+  stringFormatTextarea: "Текстовая область",
+  stringFormatHtml: "HTML-редактор",
   stringAllowedValuesEnumLabel: "Разрешенные значения (enum)",
   stringLengthEnumConflict: "Перечисления и проверка длины не могут использоваться вместе.",
   stringAllowedValuesEnumNone: "Нет ограниченных значений",
@@ -124,8 +126,6 @@ export const ru: Translation = {
   schemaTypeNumber: "Число",
   schemaTypeObject: "Объект",
   schemaTypeString: "Текст",
-  schemaTypeTextarea: "Текстовая область",
-  schemaTypeHtml: "HTML-редактор",
   schemaTypeNull: "Пусто",
 
   inferrerTitle: "Вывести схему JSON",

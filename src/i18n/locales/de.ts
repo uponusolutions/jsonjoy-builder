@@ -112,6 +112,8 @@ export const de: Translation = {
   stringFormatHostname: "Hostname",
   stringFormatIpv4: "IPv4-Adresse",
   stringFormatIpv6: "IPv6-Adresse",
+  stringFormatTextarea: "Textbereich",
+  stringFormatHtml: "HTML-Editor",
   stringAllowedValuesEnumLabel: "Erlaubte Werte (Enum)",
   stringLengthEnumConflict: "Enums und Längenvalidierung können nicht zusammen verwendet werden.",
   stringAllowedValuesEnumNone: "Keine Einschränkung für Werte festgelegt",
@@ -124,8 +126,6 @@ export const de: Translation = {
   schemaTypeNumber: "Zahl",
   schemaTypeObject: "Objekt",
   schemaTypeString: "Text",
-  schemaTypeTextarea: "Textbereich",
-  schemaTypeHtml: "HTML-Editor",
   schemaTypeNull: "Leer",
 
   inferrerTitle: "JSON-Schema ableiten",

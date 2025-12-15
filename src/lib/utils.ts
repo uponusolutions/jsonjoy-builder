@@ -8,15 +8,11 @@ export function cn(...inputs: ClassValue[]) {
 
 export function getTypeLabel(
   t: Translation,
-  type: SchemaType | "textarea" | "html" | undefined,
+  type: SchemaType | undefined,
 ): string {
   switch (type) {
     case "string":
       return t.schemaTypeString;
-    case "textarea":
-      return t.schemaTypeTextarea;
-    case "html":
-      return t.schemaTypeHtml;
     case "number":
     case "integer":
       return t.schemaTypeNumber;

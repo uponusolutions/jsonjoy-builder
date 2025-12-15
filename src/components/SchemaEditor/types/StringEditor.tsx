@@ -163,6 +163,8 @@ const StringEditor: React.FC<TypeEditorProps> = ({
             { value: "ipv6", label: t.stringFormatIpv6 },
             { value: "uri", label: t.stringFormatUri },
             { value: "uuid", label: t.stringFormatUuid },
+            { value: "textarea", label: t.stringFormatTextarea },
+            { value: "html", label: t.stringFormatHtml },
           ]}
           placeholder={t.stringFormatNone}
           clearable

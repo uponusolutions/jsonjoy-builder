@@ -13,10 +13,8 @@ export interface TypeDropdownProps {
   readOnly: boolean;
 }
 
-const typeOptions: (SchemaType | "textarea" | "html")[] = [
+const typeOptions: SchemaType[] = [
   "string",
-  "textarea",
-  "html",
   "number",
   "boolean",
   "object",
@@ -24,16 +22,10 @@ const typeOptions: (SchemaType | "textarea" | "html")[] = [
   "null",
 ];
 
-const getTypeColor = (
-  type: SchemaType | "textarea" | "html" | undefined,
-): string => {
+const getTypeColor = (type: SchemaType | undefined): string => {
   switch (type) {
     case "string":
       return "green";
-    case "textarea":
-      return "teal";
-    case "html":
-      return "cyan";
     case "number":
     case "integer":
       return "blue";
@@ -61,30 +53,8 @@ export const TypeDropdown: React.FC<TypeDropdownProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const menuId = useId();
 
-  // Determine effective type for UI
-  const effectiveType =
-    value === "string" && format === "textarea"
-      ? "textarea"
-      : value === "string" && format === "html"
-        ? "html"
-        : value;
-
-  const handleTypeChange = (newType: SchemaType | "textarea" | "html") => {
-    if (newType === "textarea") {
-      onChange("string", "textarea");
-    } else if (newType === "html") {
-      onChange("string", "html");
-    } else {
-      // If switching away from textarea/html to string, clear format?
-      // Or if switching to any other type, format is irrelevant (usually cleared by parent or ignored)
-      // But if switching to string, we should probably clear format if it was textarea/html
-      const newFormat =
-        newType === "string" &&
-        (effectiveType === "textarea" || effectiveType === "html")
-          ? undefined
-          : undefined;
-      onChange(newType as SchemaType, newFormat);
-    }
+  const handleTypeChange = (newType: SchemaType) => {
+    onChange(newType, undefined);
   };
 
   return (
@@ -92,7 +62,7 @@ export const TypeDropdown: React.FC<TypeDropdownProps> = ({
       <Menu.Target>
         <Button
           variant="light"
-          color={getTypeColor(effectiveType)}
+          color={getTypeColor(value)}
           size="xs"
           rightSection={!readOnly && <ChevronDown size={14} />}
           onClick={() => !readOnly && setIsOpen(!isOpen)}
@@ -102,7 +72,7 @@ export const TypeDropdown: React.FC<TypeDropdownProps> = ({
           }}
           className={className}
         >
-          {getTypeLabel(t, effectiveType)}
+          {getTypeLabel(t, value)}
         </Button>
       </Menu.Target>
 
@@ -111,7 +81,7 @@ export const TypeDropdown: React.FC<TypeDropdownProps> = ({
           <Menu.Item
             key={type}
             onClick={() => handleTypeChange(type)}
-            rightSection={effectiveType === type && <Check size={14} />}
+            rightSection={value === type && <Check size={14} />}
           >
             <Badge size="xs" variant="light" color={getTypeColor(type)}>
               {getTypeLabel(t, type)}

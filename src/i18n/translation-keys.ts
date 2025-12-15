@@ -549,6 +549,18 @@ export interface Translation {
    */
   readonly stringFormatIpv6: string;
   /**
+   * The translation for the key `stringFormatTextarea`. English default is:
+   *
+   * > Textarea
+   */
+  readonly stringFormatTextarea: string;
+  /**
+   * The translation for the key `stringFormatHtml`. English default is:
+   *
+   * > HTML Editor
+   */
+  readonly stringFormatHtml: string;
+  /**
    * The translation for the key `stringAllowedValuesEnumLabel`. English default is:
    *
    * > Allowed Values (enum)
@@ -587,18 +599,6 @@ export interface Translation {
    * The translation for the key `schemaTypeTextarea`. English default is:
    *
    * > Textarea
-   */
-  readonly schemaTypeTextarea: string;
-  /**
-   * The translation for the key `schemaTypeHtml`. English default is:
-   *
-   * > HTML Editor
-   */
-  readonly schemaTypeHtml: string;
-  /**
-   * The translation for the key `schemaTypeNumber`. English default is:
-   *
-   * > Number
    */
   readonly schemaTypeNumber: string;
   /**
