@@ -560,8 +560,12 @@ export interface Translation {
    * > No restricted values set
    */
   readonly stringAllowedValuesEnumNone: string;
-  /**
-   * The translation for the key `stringAllowedValuesEnumAddPlaceholder`. English default is:
+  /**   * The translation for the key `stringLengthEnumConflict`. English default is:
+   *
+   * > Enums and Length validation cannot be used together.
+   */
+  readonly stringLengthEnumConflict: string;
+  /**   * The translation for the key `stringAllowedValuesEnumAddPlaceholder`. English default is:
    *
    * > Add allowed value...
    */

@@ -114,6 +114,7 @@ export const fr: Translation = {
   stringFormatIpv4: "Adresse IPv4",
   stringFormatIpv6: "Adresse IPv6",
   stringAllowedValuesEnumLabel: "Valeurs autorisées (enum)",
+  stringLengthEnumConflict: "Les énumérations et la validation de la longueur ne peuvent pas être utilisées ensemble.",
   stringAllowedValuesEnumNone: "Aucune valeur restreinte définie",
   stringAllowedValuesEnumAddPlaceholder: "Ajouter une valeur autorisée...",
   stringValidationErrorLengthRange:

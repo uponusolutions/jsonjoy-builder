@@ -47,6 +47,18 @@ const getJsonStringType = (t: Translation) =>
         message: t.stringValidationErrorLengthRange,
         path: ["length"],
       },
+    )
+    // Enums and Length validation cannot be used together.
+    .refine(
+      ({ enum: enumValues, minLength, maxLength }) => {
+        const hasEnum = Array.isArray(enumValues) && enumValues.length > 0;
+        const hasLength = minLength !== undefined || maxLength !== undefined;
+        return !(hasEnum && hasLength);
+      },
+      {
+        message: t.stringLengthEnumConflict,
+        path: ["enumLengthConflict"],
+      },
     );
 
 const getJsonNumberType = (t: Translation) =>

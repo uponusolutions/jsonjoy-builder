@@ -113,6 +113,7 @@ export const ru: Translation = {
   stringFormatIpv4: "Адрес IPv4",
   stringFormatIpv6: "Адрес IPv6",
   stringAllowedValuesEnumLabel: "Разрешенные значения (enum)",
+  stringLengthEnumConflict: "Перечисления и проверка длины не могут использоваться вместе.",
   stringAllowedValuesEnumNone: "Нет ограниченных значений",
   stringAllowedValuesEnumAddPlaceholder: "Добавить разрешенное значение...",
   stringValidationErrorLengthRange:

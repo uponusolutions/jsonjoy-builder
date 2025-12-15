@@ -1,4 +1,4 @@
-import { X } from "lucide-react";
+import { X, AlertCircle } from "lucide-react";
 import { useId, useState } from "react";
 import {
   Select,
@@ -9,6 +9,7 @@ import {
   ActionIcon,
   Group,
   TextInput,
+  Alert,
 } from "@mantine/core";
 import { useTranslation } from "../../../hooks/use-translation.ts";
 import { withObjectSchema } from "../../../types/jsonSchema.ts";
@@ -20,6 +21,7 @@ const StringEditor: React.FC<TypeEditorProps> = ({
   schema,
   onChange,
   readOnly = false,
+  validationNode,
 }) => {
   const t = useTranslation();
   const [enumValue, setEnumValue] = useState("");
@@ -39,6 +41,12 @@ const StringEditor: React.FC<TypeEditorProps> = ({
     schema,
     (s) => (s.enum as string[]) || [],
     [],
+  );
+
+  // Find validation errors
+  const errors = validationNode?.validation.errors || [];
+  const conflictError = errors.find((e) =>
+    e.path.includes("enumLengthConflict"),
   );
 
   // Handle validation change
@@ -64,6 +72,15 @@ const StringEditor: React.FC<TypeEditorProps> = ({
 
   return (
     <Stack gap="md">
+      {conflictError && (
+        <Alert
+          icon={<AlertCircle size={16} />}
+          title="Validation Error"
+          color="red"
+        >
+          {conflictError.message}
+        </Alert>
+      )}
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Text component="label" htmlFor={minLengthId} size="sm" fw={500}>
