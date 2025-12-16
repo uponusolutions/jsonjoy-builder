@@ -1,13 +1,12 @@
 import { useId, useState } from "react";
 import {
-  Switch,
   Text,
   Group,
   Stack,
   Box,
   SimpleGrid,
-  Paper,
   TextInput,
+  Checkbox,
 } from "@mantine/core";
 import { useTranslation } from "../../../hooks/use-translation.ts";
 import { getArrayItemsSchema } from "../../../lib/schemaEditor.ts";
@@ -136,21 +135,13 @@ const ArrayEditor: React.FC<TypeEditorProps> = ({
         </Stack>
       </SimpleGrid>
 
-      <Paper withBorder p="xs" radius="md" shadow="xs">
-        <Group justify="space-between" align="center">
-          <Stack gap={2}>
-            <Text component="label" htmlFor={uniqueItemsId} size="sm" fw={500}>
-              {t.arrayForceUniqueItemsLabel}
-            </Text>
-          </Stack>
-          <Switch
-            id={uniqueItemsId}
-            checked={uniqueItems}
-            onChange={(e) => handleUniqueItemsChange(e.currentTarget.checked)}
-            disabled={readOnly}
-          />
-        </Group>
-      </Paper>
+      <Checkbox
+        label={t.arrayForceUniqueItemsLabel}
+        id={uniqueItemsId}
+        checked={uniqueItems}
+        onChange={(e) => handleUniqueItemsChange(e.currentTarget.checked)}
+        disabled={readOnly}
+      />
 
       <Stack
         gap="md"

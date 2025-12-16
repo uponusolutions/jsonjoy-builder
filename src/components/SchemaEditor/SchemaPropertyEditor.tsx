@@ -6,7 +6,7 @@ import {
   X,
   AlertCircle,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import type {
   JSONSchema,
@@ -116,7 +116,30 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
   };
 
   const hasErrors = validationNode?.validation?.success === false;
-  const errors = hasErrors ? validationNode?.validation?.errors : [];
+  const allErrors = useMemo(() => {
+    const collectErrors = (
+      node: ValidationTreeNode | undefined,
+      path: string | undefined,
+    ): Array<{ message: string; path?: string }> => {
+      if (!node) return [];
+      const ownErrors = node.validation.success
+        ? []
+        : node.validation.errors || [];
+      const current = ownErrors.map((err) => ({
+        message: err.message,
+        path,
+      }));
+      const children = Object.entries(node.children || {}).flatMap(
+        ([key, child]) => {
+          const childPath = path ? `${path}.${key}` : key;
+          return collectErrors(child, childPath);
+        },
+      );
+      return [...current, ...children];
+    };
+
+    return collectErrors(validationNode, name);
+  }, [name, validationNode]);
 
   return (
     <Paper
@@ -342,26 +365,28 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
         </Group>
       </Group>
 
+      {allErrors.length > 0 && (
+        <Alert
+          icon={<AlertCircle size={16} />}
+          color="red"
+          title="Validation Errors"
+          mt="xs"
+          mb="xs"
+        >
+          <Stack gap="xs">
+            {allErrors.map((err, idx) => (
+              <Text key={`${err.message}-${idx}`} size="sm">
+                {err.path ? `${err.path}: ` : ""}
+                {err.message}
+              </Text>
+            ))}
+          </Stack>
+        </Alert>
+      )}
+
       {/* Type-specific editor */}
       {expanded && (
         <Box pt="xs" px="xs">
-          {hasErrors && errors && errors.length > 0 && (
-            <Alert
-              variant="light"
-              color="red"
-              title="Validation Errors"
-              icon={<AlertCircle size={16} />}
-              mb="xs"
-            >
-              <Stack gap="xs">
-                {errors.map((error, i) => (
-                  <Text key={`${error.code}-${i}`} size="sm">
-                    {error.message}
-                  </Text>
-                ))}
-              </Stack>
-            </Alert>
-          )}
           {readOnly && tempDesc && (
             <p className="pb-2 text-sm text-gray-600">{tempDesc}</p>
           )}
