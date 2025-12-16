@@ -54,7 +54,7 @@ export const de: Translation = {
   arrayMinimumPlaceholder: "Kein Minimum",
   arrayMaximumLabel: "Maximale Anzahl an Elemente",
   arrayMaximumPlaceholder: "Kein Maximum",
-  arrayForceUniqueItemsLabel: "Nur eindeutige Elemente erlauben",
+  arrayForceUniqueItemsLabel: "Keine Dopplungen erlauben",
   arrayItemTypeLabel: "Elementtyp",
   arrayValidationErrorMinMax:
     "'minItems' darf nicht größer als 'maxItems' sein.",
