@@ -145,6 +145,8 @@ export const en: Translation = {
   validatorErrorLocationLineAndColumn: "Line {line}, Col {column}",
   validatorErrorLocationLineOnly: "Line {line}",
 
+  validationErrors: "Validation Errors",
+
   visualizerDownloadTitle: "Download Schema",
   visualizerDownloadFileName: "schema.json",
   visualizerSource: "JSON Schema Source",

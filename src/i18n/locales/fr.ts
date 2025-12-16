@@ -150,6 +150,8 @@ export const fr: Translation = {
   validatorErrorLocationLineAndColumn: "Ligne {line}, Col {column}",
   validatorErrorLocationLineOnly: "Ligne {line}",
 
+  validationErrors: "Erreurs de validation",
+
   visualizerDownloadTitle: "Télécharger le schéma",
   visualizerDownloadFileName: "schema.json",
   visualizerSource: "Source du schéma JSON",

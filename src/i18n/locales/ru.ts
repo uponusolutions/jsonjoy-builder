@@ -149,6 +149,8 @@ export const ru: Translation = {
   validatorErrorLocationLineAndColumn: "Строка {line}, столбец {column}",
   validatorErrorLocationLineOnly: "Строка {line}",
 
+  validationErrors: "Ошибки проверки",
+
   visualizerDownloadTitle: "Скачать схему",
   visualizerDownloadFileName: "schema.json",
   visualizerSource: "Источник схемы JSON",

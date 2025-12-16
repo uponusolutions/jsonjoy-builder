@@ -148,6 +148,8 @@ export const de: Translation = {
   validatorErrorLocationLineAndColumn: "Zeile {line}, Spalte {column}",
   validatorErrorLocationLineOnly: "Zeile {line}",
 
+  validationErrors: "Validierungsfehler",
+
   visualizerDownloadTitle: "Schema herunterladen",
   visualizerDownloadFileName: "schema.json",
   visualizerSource: "JSON-Schema-Quelle",

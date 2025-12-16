@@ -369,7 +369,7 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
         <Alert
           icon={<AlertCircle size={16} />}
           color="red"
-          title="Validation Errors"
+          title={t.validationErrors}
           mt="xs"
           mb="xs"
         >

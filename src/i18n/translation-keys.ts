@@ -750,6 +750,13 @@ export interface Translation {
   readonly validatorErrorLocationLineOnly: string;
 
   /**
+   * The translation for the key `validationErrors`. English default is:
+   *
+   * > Validation Errors
+   */
+  readonly validationErrors: string;
+
+  /**
    * The translation for the key `visualizerDownloadTitle`. English default is:
    *
    * > Download Schema
