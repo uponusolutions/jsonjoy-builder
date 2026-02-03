@@ -144,6 +144,7 @@ const StringEditor: React.FC<TypeEditorProps> = ({
             { value: "hostname", label: t.stringFormatHostname },
             { value: "ipv4", label: t.stringFormatIpv4 },
             { value: "ipv6", label: t.stringFormatIpv6 },
+            { value: "tel", label: t.stringFormatTel },
             { value: "uri", label: t.stringFormatUri },
             { value: "uuid", label: t.stringFormatUuid },
             { value: "textarea", label: t.stringFormatTextarea },

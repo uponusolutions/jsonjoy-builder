@@ -112,6 +112,7 @@ export const ru: Translation = {
   stringFormatHostname: "Имя хоста",
   stringFormatIpv4: "Адрес IPv4",
   stringFormatIpv6: "Адрес IPv6",
+  stringFormatTel: "Номер телефона",
   stringFormatTextarea: "Текстовая область",
   stringFormatHtml: "HTML-редактор",
   stringAllowedValuesEnumLabel: "Разрешенные значения (enum)",

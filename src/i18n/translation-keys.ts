@@ -549,6 +549,12 @@ export interface Translation {
    */
   readonly stringFormatIpv6: string;
   /**
+   * The translation for the key `stringFormatTel`. English default is:
+   *
+   * > Phone Number
+   */
+  readonly stringFormatTel: string;
+  /**
    * The translation for the key `stringFormatTextarea`. English default is:
    *
    * > Textarea

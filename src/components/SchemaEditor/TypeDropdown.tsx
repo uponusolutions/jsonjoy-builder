@@ -44,7 +44,6 @@ const getTypeColor = (type: SchemaType | undefined): string => {
 
 export const TypeDropdown: React.FC<TypeDropdownProps> = ({
   value,
-  format,
   onChange,
   className,
   readOnly,

@@ -109,6 +109,7 @@ export const en: Translation = {
   stringFormatHostname: "Hostname",
   stringFormatIpv4: "IPv4 Address",
   stringFormatIpv6: "IPv6 Address",
+  stringFormatTel: "Phone Number",
   stringFormatTextarea: "Textarea",
   stringFormatHtml: "HTML Editor",
   stringAllowedValuesEnumLabel: "Allowed Values (enum)",
