@@ -131,7 +131,7 @@ const StringEditor: React.FC<TypeEditorProps> = ({
         </Text>
         <Select
           id={formatId}
-          value={format}
+          value={format ?? null}
           onChange={(value) =>
             handleValidationChange("format", value || undefined)
           }
