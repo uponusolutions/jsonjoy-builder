@@ -27,7 +27,6 @@ import {
   Group,
   Box,
   ActionIcon,
-  UnstyledButton,
   Text,
   Stack,
   Alert,
@@ -66,8 +65,6 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
 }) => {
   const t = useTranslation();
   const [expanded, setExpanded] = useState(false);
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [isEditingDesc, setIsEditingDesc] = useState(false);
   const [tempName, setTempName] = useState(name);
   const [tempDesc, setTempDesc] = useState(getSchemaDescription(schema));
   const type = withObjectSchema(
@@ -90,7 +87,6 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
     } else {
       setTempName(name);
     }
-    setIsEditingName(false);
   };
 
   const handleDescSubmit = () => {
@@ -103,7 +99,6 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
     } else {
       setTempDesc(getSchemaDescription(schema));
     }
-    setIsEditingDesc(false);
   };
 
   // Handle schema changes, preserving description
@@ -178,133 +173,36 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
             {expanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
           </ActionIcon>
 
-          {/* Property name */}
+          {/* Property name and description (labels only) */}
           <Group
             gap="xs"
             style={{ flexGrow: 1, minWidth: 0, overflow: "hidden" }}
             wrap="nowrap"
           >
-            {!readOnly && isEditingName ? (
-              <TextInput
-                value={tempName}
-                onChange={(e) => setTempName(e.target.value)}
-                onBlur={handleNameSubmit}
-                onKeyDown={(e) => e.key === "Enter" && handleNameSubmit()}
-                size="xs"
-                style={{
-                  fontWeight: 500,
-                  minWidth: 120,
-                  maxWidth: "100%",
-                  zIndex: 10,
-                }}
-                autoFocus
-                onFocus={(e) => e.target.select()}
-              />
-            ) : readOnly ? (
+            <Text
+              fw={500}
+              px={8}
+              py={2}
+              truncate
+              style={{ minWidth: 80, maxWidth: "50%" }}
+            >
+              {name}
+            </Text>
+
+            {/* Description label */}
+            {showDescription && tempDesc && (
               <Text
-                fw={500}
+                size="xs"
+                c="dimmed"
+                fs="italic"
                 px={8}
                 py={2}
                 truncate
-                style={{ minWidth: 80, maxWidth: "50%" }}
+                style={{ flex: 1, maxWidth: "40%", marginRight: 8 }}
               >
-                {name}
+                {tempDesc}
               </Text>
-            ) : (
-              <UnstyledButton
-                onClick={() => setIsEditingName(true)}
-                onKeyDown={(e) => e.key === "Enter" && setIsEditingName(true)}
-                style={{
-                  fontWeight: 500,
-                  padding: "2px 8px",
-                  borderRadius: "var(--mantine-radius-sm)",
-                  textAlign: "left",
-                  minWidth: 80,
-                  maxWidth: "50%",
-                }}
-              >
-                <Text truncate fw={500}>
-                  {name}
-                </Text>
-              </UnstyledButton>
             )}
-
-            {/* Description */}
-            {showDescription &&
-              (!readOnly && isEditingDesc ? (
-                <TextInput
-                  value={tempDesc}
-                  onChange={(e) => setTempDesc(e.target.value)}
-                  onBlur={handleDescSubmit}
-                  onKeyDown={(e) => e.key === "Enter" && handleDescSubmit()}
-                  placeholder={t.propertyDescriptionPlaceholder}
-                  size="xs"
-                  style={{
-                    fontStyle: "italic",
-                    flex: 1,
-                    minWidth: 150,
-                    zIndex: 10,
-                  }}
-                  autoFocus
-                  onFocus={(e) => e.target.select()}
-                />
-              ) : tempDesc ? (
-                readOnly ? (
-                  <Text
-                    size="xs"
-                    c="dimmed"
-                    fs="italic"
-                    px={8}
-                    py={2}
-                    truncate
-                    style={{ flex: 1, maxWidth: "40%", marginRight: 8 }}
-                  >
-                    {tempDesc}
-                  </Text>
-                ) : (
-                  <UnstyledButton
-                    onClick={() => setIsEditingDesc(true)}
-                    onKeyDown={(e) =>
-                      e.key === "Enter" && setIsEditingDesc(true)
-                    }
-                    style={{
-                      padding: "2px 8px",
-                      borderRadius: "var(--mantine-radius-sm)",
-                      textAlign: "left",
-                      flex: 1,
-                      maxWidth: "40%",
-                      marginRight: 8,
-                    }}
-                  >
-                    <Text size="xs" c="dimmed" fs="italic" truncate>
-                      {tempDesc}
-                    </Text>
-                  </UnstyledButton>
-                )
-              ) : (
-                !readOnly && (
-                  <UnstyledButton
-                    onClick={() => setIsEditingDesc(true)}
-                    onKeyDown={(e) =>
-                      e.key === "Enter" && setIsEditingDesc(true)
-                    }
-                    style={{
-                      padding: "2px 8px",
-                      borderRadius: "var(--mantine-radius-sm)",
-                      color: "var(--mantine-color-dimmed)",
-                      fontSize: "var(--mantine-font-size-xs)",
-                      fontStyle: "italic",
-                      opacity: 0.5,
-                      textAlign: "left",
-                      flex: 1,
-                      maxWidth: "40%",
-                      marginRight: 8,
-                    }}
-                  >
-                    {t.propertyDescriptionButton}
-                  </UnstyledButton>
-                )
-              ))}
           </Group>
         </Group>
 
@@ -384,9 +282,32 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
         </Alert>
       )}
 
-      {/* Type-specific editor */}
+      {/* Expanded editor section */}
       {expanded && (
         <Box pt="xs" px="xs">
+          {!readOnly && (
+            <Stack gap="xs" mb="sm">
+              <TextInput
+                label={t.fieldNameLabel}
+                value={tempName}
+                onChange={(e) => setTempName(e.target.value)}
+                onBlur={handleNameSubmit}
+                onKeyDown={(e) => e.key === "Enter" && handleNameSubmit()}
+                size="xs"
+              />
+              {showDescription && (
+                <TextInput
+                  label={t.fieldDescription}
+                  value={tempDesc}
+                  onChange={(e) => setTempDesc(e.target.value)}
+                  onBlur={handleDescSubmit}
+                  onKeyDown={(e) => e.key === "Enter" && handleDescSubmit()}
+                  placeholder={t.propertyDescriptionPlaceholder}
+                  size="xs"
+                />
+              )}
+            </Stack>
+          )}
           {readOnly && tempDesc && (
             <p className="pb-2 text-sm text-gray-600">{tempDesc}</p>
           )}
