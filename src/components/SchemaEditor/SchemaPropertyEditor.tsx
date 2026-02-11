@@ -163,22 +163,29 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
             </ActionIcon>
           )}
 
-          {/* Expand/collapse button */}
-          <ActionIcon
-            variant="transparent"
-            color="gray"
-            onClick={() => setExpanded(!expanded)}
-            aria-label={expanded ? t.collapse : t.expand}
-          >
-            {expanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
-          </ActionIcon>
-
-          {/* Property name and description (labels only) */}
+          {/* Clickable area: chevron + name + description */}
           <Group
             gap="xs"
-            style={{ flexGrow: 1, minWidth: 0, overflow: "hidden" }}
+            onClick={() => setExpanded(!expanded)}
+            style={{ flexGrow: 1, minWidth: 0, cursor: "pointer" }}
             wrap="nowrap"
+            role="button"
+            tabIndex={0}
+            aria-expanded={expanded}
+            aria-label={expanded ? t.collapse : t.expand}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setExpanded(!expanded);
+              }
+            }}
           >
+            {/* Expand/collapse icon */}
+            <Box c="gray" style={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
+              {expanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+            </Box>
+
+            {/* Property name and description (labels only) */}
             <Text
               fw={500}
               px={8}
