@@ -13,7 +13,7 @@
     "react"
   ],
   "private": false,
-  "version": "0.4.9",
+  "version": "0.5.0",
   "type": "module",
   "sideEffects": false,
   "repository": {
