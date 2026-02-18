@@ -1,5 +1,6 @@
 import { render } from "@testing-library/react";
 import "../../../setup.ts";
+import { stabilizeHtml } from "../../../utils.ts";
 import { describe, test } from "node:test";
 import React from "react";
 import { MantineProvider } from "@mantine/core";
@@ -9,29 +10,33 @@ describe("NumberEditor", () => {
   test("write mode does show constraints", (t) => {
     const element = React.createElement(NumberEditor, {
       readOnly: false,
-      onChange: () => {},
+      onChange: () => { },
       validationNode: undefined,
       schema: {
         type: "number",
       },
     });
     t.assert.snapshot(
-      render(React.createElement(MantineProvider, null, element)).container
-        .innerHTML,
+      stabilizeHtml(
+        render(React.createElement(MantineProvider, null, element)).container
+          .innerHTML,
+      ),
     );
   });
   test("read-only mode doesn't show constraints", (t) => {
     const element = React.createElement(NumberEditor, {
       readOnly: true,
-      onChange: () => {},
+      onChange: () => { },
       validationNode: undefined,
       schema: {
         type: "number",
       },
     });
     t.assert.snapshot(
-      render(React.createElement(MantineProvider, null, element)).container
-        .innerHTML,
+      stabilizeHtml(
+        render(React.createElement(MantineProvider, null, element)).container
+          .innerHTML,
+      ),
     );
   });
 });

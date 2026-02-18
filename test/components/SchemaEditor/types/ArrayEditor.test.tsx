@@ -1,5 +1,6 @@
 import { render } from "@testing-library/react";
 import "../../../setup.ts";
+import { stabilizeHtml } from "../../../utils.ts";
 import { describe, test } from "node:test";
 import React from "react";
 import { MantineProvider } from "@mantine/core";
@@ -9,7 +10,7 @@ describe("ArrayEditor", () => {
   test("write mode does show constraints", (t) => {
     const element = React.createElement(ArrayEditor, {
       readOnly: false,
-      onChange: () => {},
+      onChange: () => { },
       depth: 0,
       validationNode: undefined,
       schema: {
@@ -20,14 +21,16 @@ describe("ArrayEditor", () => {
       },
     });
     t.assert.snapshot(
-      render(React.createElement(MantineProvider, null, element)).container
-        .innerHTML,
+      stabilizeHtml(
+        render(React.createElement(MantineProvider, null, element)).container
+          .innerHTML,
+      ),
     );
   });
   test("read-only mode doesn't show constraints", (t) => {
     const element = React.createElement(ArrayEditor, {
       readOnly: true,
-      onChange: () => {},
+      onChange: () => { },
       depth: 0,
       validationNode: undefined,
       schema: {
@@ -38,8 +41,10 @@ describe("ArrayEditor", () => {
       },
     });
     t.assert.snapshot(
-      render(React.createElement(MantineProvider, null, element)).container
-        .innerHTML,
+      stabilizeHtml(
+        render(React.createElement(MantineProvider, null, element)).container
+          .innerHTML,
+      ),
     );
   });
 });
