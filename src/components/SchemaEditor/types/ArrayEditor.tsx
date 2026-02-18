@@ -9,6 +9,7 @@ import {
   Checkbox,
 } from "@mantine/core";
 import { useTranslation } from "../../../hooks/use-translation.ts";
+import { useValidatedNumericInputs } from "../../../hooks/use-validated-numeric-inputs.ts";
 import { getArrayItemsSchema } from "../../../lib/schemaEditor.ts";
 import type {
   ObjectJSONSchema,
@@ -28,15 +29,33 @@ const ArrayEditor: React.FC<TypeEditorProps> = ({
   showDescription = true,
 }) => {
   const t = useTranslation();
-  const [minItems, setMinItems] = useState<number | undefined>(
-    withObjectSchema(schema, (s) => s.minItems, undefined),
-  );
-  const [maxItems, setMaxItems] = useState<number | undefined>(
-    withObjectSchema(schema, (s) => s.maxItems, undefined),
-  );
+  const minItems = withObjectSchema(schema, (s) => s.minItems, undefined);
+  const maxItems = withObjectSchema(schema, (s) => s.maxItems, undefined);
   const [uniqueItems, setUniqueItems] = useState<boolean>(
     withObjectSchema(schema, (s) => s.uniqueItems || false, false),
   );
+
+  const { values: lengthInputs, validations: lengthValidations, handleChange: handleLengthChange } =
+    useValidatedNumericInputs(
+      { minItems, maxItems },
+      (raw) => {
+        if (raw.trim() === "") return { value: undefined };
+        const v = Number(raw);
+        if (!Number.isInteger(v)) return { error: t.typeValidationErrorIntValue };
+        if (v < 0) return { error: t.typeValidationErrorNegativeLength };
+        return { value: v };
+      },
+    );
+
+  const hasMinMaxError =
+    lengthValidations.minItems.value !== undefined &&
+    lengthValidations.maxItems.value !== undefined &&
+    lengthValidations.minItems.value > lengthValidations.maxItems.value;
+
+  const minItemsError = lengthValidations.minItems.error;
+  const maxItemsError =
+    lengthValidations.maxItems.error ||
+    (hasMinMaxError ? t.arrayValidationErrorMinMax : undefined);
 
   const minItemsId = useId();
   const maxItemsId = useId();
@@ -52,26 +71,17 @@ const ArrayEditor: React.FC<TypeEditorProps> = ({
     "string" as SchemaType,
   );
 
-  const handleMinItemsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value
-      ? Number.parseInt(e.target.value, 10)
-      : undefined;
-    setMinItems(val);
-    onChange({
-      ...withObjectSchema(schema, (s) => s, {}),
-      minItems: val,
-    });
-  };
-
-  const handleMaxItemsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value
-      ? Number.parseInt(e.target.value, 10)
-      : undefined;
-    setMaxItems(val);
-    onChange({
-      ...withObjectSchema(schema, (s) => s, {}),
-      maxItems: val,
-    });
+  const handleArrayLengthInputChange = (
+    property: "minItems" | "maxItems",
+    rawValue: string,
+  ) => {
+    const parsed = handleLengthChange(property, rawValue);
+    if (!parsed.error) {
+      onChange({
+        ...withObjectSchema(schema, (s) => s, {}),
+        [property]: parsed.value,
+      });
+    }
   };
 
   const handleUniqueItemsChange = (checked: boolean) => {
@@ -111,11 +121,14 @@ const ArrayEditor: React.FC<TypeEditorProps> = ({
           </Text>
           <TextInput
             id={minItemsId}
-            type="number"
-            min={0}
-            value={minItems ?? ""}
-            onChange={handleMinItemsChange}
+            type="text"
+            inputMode="numeric"
+            value={lengthInputs.minItems}
+            onChange={(e) =>
+              handleArrayLengthInputChange("minItems", e.target.value)
+            }
             placeholder="0"
+            error={minItemsError}
             disabled={readOnly}
           />
         </Stack>
@@ -125,11 +138,14 @@ const ArrayEditor: React.FC<TypeEditorProps> = ({
           </Text>
           <TextInput
             id={maxItemsId}
-            type="number"
-            min={0}
-            value={maxItems ?? ""}
-            onChange={handleMaxItemsChange}
+            type="text"
+            inputMode="numeric"
+            value={lengthInputs.maxItems}
+            onChange={(e) =>
+              handleArrayLengthInputChange("maxItems", e.target.value)
+            }
             placeholder="∞"
+            error={maxItemsError}
             disabled={readOnly}
           />
         </Stack>

@@ -11,6 +11,7 @@ import {
   TextInput,
 } from "@mantine/core";
 import { useTranslation } from "../../../hooks/use-translation.ts";
+import { useValidatedNumericInputs } from "../../../hooks/use-validated-numeric-inputs.ts";
 import { withObjectSchema } from "../../../types/jsonSchema.ts";
 import type { TypeEditorProps } from "../TypeEditor.tsx";
 
@@ -18,13 +19,12 @@ interface NumberEditorProps extends TypeEditorProps {
   integer?: boolean;
 }
 
-type Property =
+type NumericProperty =
   | "minimum"
   | "maximum"
   | "exclusiveMinimum"
   | "exclusiveMaximum"
-  | "multipleOf"
-  | "enum";
+  | "multipleOf";
 
 const NumberEditor: React.FC<NumberEditorProps> = ({
   schema,
@@ -62,12 +62,43 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
     undefined,
   );
 
-  const handleNumberChange = (property: Property, value: string) => {
-    const numValue = value === "" ? undefined : Number.parseFloat(value);
+  const { values: numberInputs, validations: numberValidations, handleChange: handleNumberRawChange } =
+    useValidatedNumericInputs(
+      { minimum, maximum, exclusiveMinimum, exclusiveMaximum, multipleOf },
+      (raw, key) => {
+        if (raw.trim() === "") return { value: undefined };
+        const v = Number(raw);
+        if (Number.isNaN(v)) return { error: true };
+        if (integer && !Number.isInteger(v)) return { error: t.typeValidationErrorIntValue };
+        if (key === "multipleOf" && v <= 0) return { error: t.typeValidationErrorPositive };
+        return { value: v };
+      },
+    );
+
+  const hasMinMaxError =
+    numberValidations.minimum.value !== undefined &&
+    numberValidations.maximum.value !== undefined &&
+    numberValidations.minimum.value > numberValidations.maximum.value;
+
+  const numberErrors: Record<NumericProperty, string | boolean | undefined> = {
+    minimum: numberValidations.minimum.error,
+    maximum:
+      numberValidations.maximum.error ||
+      (hasMinMaxError ? t.numberValidationErrorMinMax : undefined),
+    exclusiveMinimum: numberValidations.exclusiveMinimum.error,
+    exclusiveMaximum: numberValidations.exclusiveMaximum.error,
+    multipleOf: numberValidations.multipleOf.error,
+  };
+
+  const handleNumberChange = (property: NumericProperty, value: string) => {
+    const parsed = handleNumberRawChange(property, value);
+    if (parsed.error) {
+      return;
+    }
 
     onChange({
       ...withObjectSchema(schema, (s) => s, {}),
-      [property]: numValue,
+      [property]: parsed.value,
     });
   };
 
@@ -104,11 +135,12 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
           </Text>
           <TextInput
             id={minimumId}
-            type="number"
-            step={integer ? "1" : "any"}
-            value={minimum ?? ""}
+            type="text"
+            inputMode={integer ? "numeric" : "decimal"}
+            value={numberInputs.minimum}
             onChange={(e) => handleNumberChange("minimum", e.target.value)}
             placeholder="-∞"
+            error={numberErrors.minimum}
             disabled={readOnly}
           />
         </Stack>
@@ -118,11 +150,12 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
           </Text>
           <TextInput
             id={maximumId}
-            type="number"
-            step={integer ? "1" : "any"}
-            value={maximum ?? ""}
+            type="text"
+            inputMode={integer ? "numeric" : "decimal"}
+            value={numberInputs.maximum}
             onChange={(e) => handleNumberChange("maximum", e.target.value)}
             placeholder="∞"
+            error={numberErrors.maximum}
             disabled={readOnly}
           />
         </Stack>
@@ -140,13 +173,14 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
           </Text>
           <TextInput
             id={exclusiveMinimumId}
-            type="number"
-            step={integer ? "1" : "any"}
-            value={exclusiveMinimum ?? ""}
+            type="text"
+            inputMode={integer ? "numeric" : "decimal"}
+            value={numberInputs.exclusiveMinimum}
             onChange={(e) =>
               handleNumberChange("exclusiveMinimum", e.target.value)
             }
             placeholder="-∞"
+            error={numberErrors.exclusiveMinimum}
             disabled={readOnly}
           />
         </Stack>
@@ -161,13 +195,14 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
           </Text>
           <TextInput
             id={exclusiveMaximumId}
-            type="number"
-            step={integer ? "1" : "any"}
-            value={exclusiveMaximum ?? ""}
+            type="text"
+            inputMode={integer ? "numeric" : "decimal"}
+            value={numberInputs.exclusiveMaximum}
             onChange={(e) =>
               handleNumberChange("exclusiveMaximum", e.target.value)
             }
             placeholder="∞"
+            error={numberErrors.exclusiveMaximum}
             disabled={readOnly}
           />
         </Stack>
@@ -179,12 +214,12 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
         </Text>
         <TextInput
           id={multipleOfId}
-          type="number"
-          step={integer ? "1" : "any"}
-          min={0}
-          value={multipleOf ?? ""}
+          type="text"
+          inputMode={integer ? "numeric" : "decimal"}
+          value={numberInputs.multipleOf}
           onChange={(e) => handleNumberChange("multipleOf", e.target.value)}
           placeholder="1"
+          error={numberErrors.multipleOf}
           disabled={readOnly}
         />
       </Stack>
