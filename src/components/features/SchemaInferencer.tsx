@@ -67,46 +67,61 @@ export function SchemaInferencer({
   };
 
   return (
-    <Modal 
-      opened={open} 
-      onClose={handleClose} 
-      title={t.inferrerTitle} 
+    <Modal
+      opened={open}
+      onClose={handleClose}
+      title={t.inferrerTitle}
       size="lg"
     >
-        <Text size="sm" c="dimmed" mb="md">{t.inferrerDescription}</Text>
-        
-        <Box style={{ border: '1px solid var(--mantine-color-default-border)', borderRadius: 'var(--mantine-radius-md)', height: '450px', overflow: 'hidden', marginBottom: '16px' }}>
-          <Editor
-            height="100%"
-            defaultLanguage="json"
-            value={jsonInput}
-            onChange={handleEditorChange}
-            beforeMount={handleBeforeMount}
-            onMount={handleEditorDidMount}
-            options={defaultEditorOptions}
-            theme={currentTheme}
-            loading={
-              <Box display="flex" style={{ alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                <Loader size="sm" />
-              </Box>
-            }
-          />
-        </Box>
+      <Text size="sm" c="dimmed" mb="md">
+        {t.inferrerDescription}
+      </Text>
 
-        {error && (
-          <Alert color="red" mb="md">
-            {error}
-          </Alert>
-        )}
+      <Box
+        style={{
+          border: "1px solid var(--mantine-color-default-border)",
+          borderRadius: "var(--mantine-radius-md)",
+          height: "450px",
+          overflow: "hidden",
+          marginBottom: "16px",
+        }}
+      >
+        <Editor
+          height="100%"
+          defaultLanguage="json"
+          value={jsonInput}
+          onChange={handleEditorChange}
+          beforeMount={handleBeforeMount}
+          onMount={handleEditorDidMount}
+          options={defaultEditorOptions}
+          theme={currentTheme}
+          loading={
+            <Box
+              display="flex"
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                height: "100%",
+              }}
+            >
+              <Loader size="sm" />
+            </Box>
+          }
+        />
+      </Box>
 
-        <Group justify="flex-end">
-          <Button variant="default" onClick={handleClose}>
-            {t.inferrerCancel}
-          </Button>
-          <Button onClick={inferSchemaFromJson}>
-            {t.inferrerGenerate}
-          </Button>
-        </Group>
+      {error && (
+        <Alert color="red" mb="md">
+          {error}
+        </Alert>
+      )}
+
+      <Group justify="flex-end">
+        <Button variant="default" onClick={handleClose}>
+          {t.inferrerCancel}
+        </Button>
+        <Button onClick={inferSchemaFromJson}>{t.inferrerGenerate}</Button>
+      </Group>
     </Modal>
   );
 }

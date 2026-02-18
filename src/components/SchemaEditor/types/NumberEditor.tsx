@@ -1,15 +1,4 @@
-import { X } from "lucide-react";
-import { useState } from "react";
-import {
-  Text,
-  Stack,
-  Button,
-  Badge,
-  ActionIcon,
-  SimpleGrid,
-  Group,
-  TextInput,
-} from "@mantine/core";
+import { Stack, SimpleGrid, TextInput, TagsInput } from "@mantine/core";
 import { useTranslation } from "../../../hooks/use-translation.ts";
 import { useValidatedNumericInputs } from "../../../hooks/use-validated-numeric-inputs.ts";
 import { withObjectSchema } from "../../../types/jsonSchema.ts";
@@ -32,7 +21,6 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
   integer = false,
   readOnly = false,
 }) => {
-  const [enumValue, setEnumValue] = useState("");
   const t = useTranslation();
 
   // Extract number-specific validations
@@ -55,18 +43,23 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
     undefined,
   );
 
-  const { values: numberInputs, validations: numberValidations, handleChange: handleNumberRawChange } =
-    useValidatedNumericInputs(
-      { minimum, maximum, exclusiveMinimum, exclusiveMaximum, multipleOf },
-      (raw, key) => {
-        if (raw.trim() === "") return { value: undefined };
-        const v = Number(raw);
-        if (Number.isNaN(v)) return { error: true };
-        if (integer && !Number.isInteger(v)) return { error: t.typeValidationErrorIntValue };
-        if (key === "multipleOf" && v <= 0) return { error: t.typeValidationErrorPositive };
-        return { value: v };
-      },
-    );
+  const {
+    values: numberInputs,
+    validations: numberValidations,
+    handleChange: handleNumberRawChange,
+  } = useValidatedNumericInputs(
+    { minimum, maximum, exclusiveMinimum, exclusiveMaximum, multipleOf },
+    (raw, key) => {
+      if (raw.trim() === "") return { value: undefined };
+      const v = Number(raw);
+      if (Number.isNaN(v)) return { error: true };
+      if (integer && !Number.isInteger(v))
+        return { error: t.typeValidationErrorIntValue };
+      if (key === "multipleOf" && v <= 0)
+        return { error: t.typeValidationErrorPositive };
+      return { value: v };
+    },
+  );
 
   const hasMinMaxError =
     numberValidations.minimum.value !== undefined &&
@@ -95,27 +88,15 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
     });
   };
 
-  const handleAddEnum = () => {
-    if (enumValue === "") return;
-    const numValue = Number.parseFloat(enumValue);
-    if (Number.isNaN(numValue)) return;
-
-    const currentEnum = enumValues || [];
-    if (!currentEnum.includes(numValue)) {
-      onChange({
-        ...withObjectSchema(schema, (s) => s, {}),
-        enum: [...currentEnum, numValue],
-      });
-    }
-    setEnumValue("");
-  };
-
-  const handleRemoveEnum = (value: number) => {
-    const currentEnum = enumValues || [];
-    const newEnum = currentEnum.filter((v) => v !== value);
+  const handleEnumChange = (tags: string[]) => {
+    const nums = tags
+      .map(Number)
+      .filter((v) => !Number.isNaN(v))
+      .filter((v) => !integer || Number.isInteger(v));
+    const unique = [...new Set(nums)];
     onChange({
       ...withObjectSchema(schema, (s) => s, {}),
-      enum: newEnum.length > 0 ? newEnum : undefined,
+      enum: unique.length > 0 ? unique : undefined,
     });
   };
 
@@ -182,61 +163,15 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
         disabled={readOnly}
       />
 
-      <Stack gap="xs">
-        <Text size="sm" fw={500}>
-          {t.numberAllowedValuesEnumLabel}
-        </Text>
-        <Group gap="xs">
-          <TextInput
-            type="number"
-            step={integer ? "1" : "any"}
-            value={enumValue}
-            onChange={(e) => setEnumValue(e.target.value)}
-            placeholder={t.numberAllowedValuesEnumAddPlaceholder}
-            disabled={readOnly}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                handleAddEnum();
-              }
-            }}
-            style={{ flex: 1 }}
-          />
-          <Button
-            onClick={handleAddEnum}
-            disabled={readOnly || enumValue === ""}
-            variant="default"
-          >
-            {t.numberAllowedValuesEnumAddLabel}
-          </Button>
-        </Group>
-
-        {enumValues && enumValues.length > 0 && (
-          <Group gap="xs" mt="xs">
-            {enumValues.map((value) => (
-              <Badge
-                key={value}
-                variant="light"
-                rightSection={
-                  !readOnly && (
-                    <ActionIcon
-                      size="xs"
-                      color="blue"
-                      radius="xl"
-                      variant="transparent"
-                      onClick={() => handleRemoveEnum(value)}
-                    >
-                      <X size={10} />
-                    </ActionIcon>
-                  )
-                }
-              >
-                {value}
-              </Badge>
-            ))}
-          </Group>
-        )}
-      </Stack>
+      <TagsInput
+        label={t.numberAllowedValuesEnumLabel}
+        placeholder={t.numberAllowedValuesEnumAddPlaceholder}
+        value={enumValues?.map(String) ?? []}
+        onChange={handleEnumChange}
+        disabled={readOnly}
+        splitChars={[",", " ", "Enter"]}
+        acceptValueOnBlur
+      />
     </Stack>
   );
 };

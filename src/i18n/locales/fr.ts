@@ -117,7 +117,8 @@ export const fr: Translation = {
   stringFormatTextarea: "Zone de texte",
   stringFormatHtml: "Éditeur HTML",
   stringAllowedValuesEnumLabel: "Valeurs autorisées (enum)",
-  stringLengthEnumConflict: "Les énumérations et la validation de la longueur ne peuvent pas être utilisées ensemble.",
+  stringLengthEnumConflict:
+    "Les énumérations et la validation de la longueur ne peuvent pas être utilisées ensemble.",
   stringAllowedValuesEnumNone: "Aucune valeur restreinte définie",
   stringAllowedValuesEnumAddPlaceholder: "Ajouter une valeur autorisée...",
   stringValidationErrorLengthRange:

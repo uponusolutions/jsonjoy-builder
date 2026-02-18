@@ -76,7 +76,8 @@ export function useMonacoTheme(themeOverride?: "light" | "dark") {
       // Check if dark class is present on html element or any jsonjoy container
       const htmlHasDark = document.documentElement.classList.contains("dark");
       const jsonjoyElement = document.querySelector(".jsonjoy");
-      const jsonjoyHasDark = jsonjoyElement?.classList.contains("dark") ?? false;
+      const jsonjoyHasDark =
+        jsonjoyElement?.classList.contains("dark") ?? false;
 
       setIsDarkMode(htmlHasDark || jsonjoyHasDark);
     };

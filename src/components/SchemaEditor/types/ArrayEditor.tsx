@@ -35,17 +35,17 @@ const ArrayEditor: React.FC<TypeEditorProps> = ({
     withObjectSchema(schema, (s) => s.uniqueItems || false, false),
   );
 
-  const { values: lengthInputs, validations: lengthValidations, handleChange: handleLengthChange } =
-    useValidatedNumericInputs(
-      { minItems, maxItems },
-      (raw) => {
-        if (raw.trim() === "") return { value: undefined };
-        const v = Number(raw);
-        if (!Number.isInteger(v)) return { error: t.typeValidationErrorIntValue };
-        if (v < 0) return { error: t.typeValidationErrorNegativeLength };
-        return { value: v };
-      },
-    );
+  const {
+    values: lengthInputs,
+    validations: lengthValidations,
+    handleChange: handleLengthChange,
+  } = useValidatedNumericInputs({ minItems, maxItems }, (raw) => {
+    if (raw.trim() === "") return { value: undefined };
+    const v = Number(raw);
+    if (!Number.isInteger(v)) return { error: t.typeValidationErrorIntValue };
+    if (v < 0) return { error: t.typeValidationErrorNegativeLength };
+    return { value: v };
+  });
 
   const hasMinMaxError =
     lengthValidations.minItems.value !== undefined &&

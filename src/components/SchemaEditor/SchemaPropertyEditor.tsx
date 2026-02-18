@@ -171,13 +171,17 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
             aria-label={expanded ? t.collapse : t.expand}
             style={{ flexGrow: 1, minWidth: 0 }}
           >
-            <Group
-              gap="xs"
-              wrap="nowrap"
-            >
+            <Group gap="xs" wrap="nowrap">
               {/* Expand/collapse icon */}
-              <Box c="gray" style={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
-                {expanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+              <Box
+                c="gray"
+                style={{ display: "flex", alignItems: "center", flexShrink: 0 }}
+              >
+                {expanded ? (
+                  <ChevronDown size={18} />
+                ) : (
+                  <ChevronRight size={18} />
+                )}
               </Box>
 
               {/* Property name and description (labels only) */}

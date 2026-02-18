@@ -78,7 +78,11 @@ const JsonSchemaVisualizer: FC<JsonSchemaVisualizerProps> = ({
       )}
       h="100%"
       display="flex"
-      style={{ flexDirection: "column", overflow: "hidden", position: "relative" }}
+      style={{
+        flexDirection: "column",
+        overflow: "hidden",
+        position: "relative",
+      }}
     >
       <Group
         justify="space-between"
@@ -91,7 +95,9 @@ const JsonSchemaVisualizer: FC<JsonSchemaVisualizerProps> = ({
       >
         <Group gap="xs">
           <FileJson size={18} />
-          <Text size="sm" fw={500}>{t.visualizerSource}</Text>
+          <Text size="sm" fw={500}>
+            {t.visualizerSource}
+          </Text>
         </Group>
         <ActionIcon
           variant="subtle"
@@ -112,7 +118,15 @@ const JsonSchemaVisualizer: FC<JsonSchemaVisualizerProps> = ({
           onMount={handleEditorDidMount}
           className="monaco-editor-container"
           loading={
-            <Box display="flex" style={{ alignItems: "center", justifyContent: "center", height: "100%", width: "100%" }}>
+            <Box
+              display="flex"
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                height: "100%",
+                width: "100%",
+              }}
+            >
               <Loader size="sm" />
             </Box>
           }

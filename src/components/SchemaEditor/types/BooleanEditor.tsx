@@ -80,7 +80,9 @@ const BooleanEditor: React.FC<TypeEditorProps> = ({
           <Switch
             label={t.booleanAllowFalseLabel}
             checked={allowsFalse}
-            onChange={(e) => handleAllowedChange(false, e.currentTarget.checked)}
+            onChange={(e) =>
+              handleAllowedChange(false, e.currentTarget.checked)
+            }
             disabled={readOnly}
           />
         </Group>

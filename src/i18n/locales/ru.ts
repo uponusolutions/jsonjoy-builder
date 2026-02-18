@@ -116,7 +116,8 @@ export const ru: Translation = {
   stringFormatTextarea: "Текстовая область",
   stringFormatHtml: "HTML-редактор",
   stringAllowedValuesEnumLabel: "Разрешенные значения (enum)",
-  stringLengthEnumConflict: "Перечисления и проверка длины не могут использоваться вместе.",
+  stringLengthEnumConflict:
+    "Перечисления и проверка длины не могут использоваться вместе.",
   stringAllowedValuesEnumNone: "Нет ограниченных значений",
   stringAllowedValuesEnumAddPlaceholder: "Добавить разрешенное значение...",
   stringValidationErrorLengthRange:

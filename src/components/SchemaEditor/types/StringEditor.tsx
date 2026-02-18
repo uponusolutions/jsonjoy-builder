@@ -1,16 +1,4 @@
-import { X } from "lucide-react";
-import { useState } from "react";
-import {
-  Select,
-  Text,
-  Stack,
-  Button,
-  Badge,
-  ActionIcon,
-  Group,
-  TextInput,
-  SimpleGrid,
-} from "@mantine/core";
+import { Select, Stack, TextInput, SimpleGrid, TagsInput } from "@mantine/core";
 import { useTranslation } from "../../../hooks/use-translation.ts";
 import { useValidatedNumericInputs } from "../../../hooks/use-validated-numeric-inputs.ts";
 import { withObjectSchema } from "../../../types/jsonSchema.ts";
@@ -25,7 +13,6 @@ const StringEditor: React.FC<TypeEditorProps> = ({
   readOnly = false,
 }) => {
   const t = useTranslation();
-  const [enumValue, setEnumValue] = useState("");
 
   const minLength = withObjectSchema(schema, (s) => s.minLength, undefined);
   const maxLength = withObjectSchema(schema, (s) => s.maxLength, undefined);
@@ -37,17 +24,17 @@ const StringEditor: React.FC<TypeEditorProps> = ({
     [],
   );
 
-  const { values: lengthInputs, validations: lengthValidations, handleChange: handleLengthRawChange } =
-    useValidatedNumericInputs(
-      { minLength, maxLength },
-      (raw) => {
-        if (raw.trim() === "") return { value: undefined };
-        const v = Number(raw);
-        if (!Number.isInteger(v)) return { error: t.typeValidationErrorIntValue };
-        if (v < 0) return { error: t.typeValidationErrorNegativeLength };
-        return { value: v };
-      },
-    );
+  const {
+    values: lengthInputs,
+    validations: lengthValidations,
+    handleChange: handleLengthRawChange,
+  } = useValidatedNumericInputs({ minLength, maxLength }, (raw) => {
+    if (raw.trim() === "") return { value: undefined };
+    const v = Number(raw);
+    if (!Number.isInteger(v)) return { error: t.typeValidationErrorIntValue };
+    if (v < 0) return { error: t.typeValidationErrorNegativeLength };
+    return { value: v };
+  });
 
   const hasLengthRangeError =
     lengthValidations.minLength.value !== undefined &&
@@ -66,17 +53,17 @@ const StringEditor: React.FC<TypeEditorProps> = ({
     label: string;
     placeholder: string;
   }> = [
-      {
-        property: "minLength",
-        label: t.stringMinimumLengthLabel,
-        placeholder: "0",
-      },
-      {
-        property: "maxLength",
-        label: t.stringMaximumLengthLabel,
-        placeholder: "∞",
-      },
-    ];
+    {
+      property: "minLength",
+      label: t.stringMinimumLengthLabel,
+      placeholder: "0",
+    },
+    {
+      property: "maxLength",
+      label: t.stringMaximumLengthLabel,
+      placeholder: "∞",
+    },
+  ];
 
   const handleValidationChange = (property: Property, value: unknown) => {
     onChange({
@@ -85,24 +72,19 @@ const StringEditor: React.FC<TypeEditorProps> = ({
     });
   };
 
-  const handleLengthInputChange = (property: LengthProperty, rawValue: string) => {
+  const handleLengthInputChange = (
+    property: LengthProperty,
+    rawValue: string,
+  ) => {
     const parsed = handleLengthRawChange(property, rawValue);
     if (!parsed.error) {
       handleValidationChange(property, parsed.value);
     }
   };
 
-  const handleAddEnum = () => {
-    if (enumValue.trim() === "") return;
-    if (!enumValues.includes(enumValue)) {
-      handleValidationChange("enum", [...enumValues, enumValue]);
-    }
-    setEnumValue("");
-  };
-
-  const handleRemoveEnum = (value: string) => {
-    const newEnum = enumValues.filter((enumValueItem) => enumValueItem !== value);
-    handleValidationChange("enum", newEnum.length > 0 ? newEnum : undefined);
+  const handleEnumChange = (tags: string[]) => {
+    const unique = [...new Set(tags.filter((v) => v.trim() !== ""))];
+    handleValidationChange("enum", unique.length > 0 ? unique : undefined);
   };
 
   return (
@@ -161,59 +143,15 @@ const StringEditor: React.FC<TypeEditorProps> = ({
         clearable
       />
 
-      <Stack gap="xs">
-        <Text size="sm" fw={500}>
-          {t.stringAllowedValuesEnumLabel}
-        </Text>
-        <Group gap="xs">
-          <TextInput
-            value={enumValue}
-            onChange={(e) => setEnumValue(e.target.value)}
-            placeholder={t.stringAllowedValuesEnumAddPlaceholder}
-            disabled={readOnly}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                handleAddEnum();
-              }
-            }}
-            style={{ flex: 1 }}
-          />
-          <Button
-            onClick={handleAddEnum}
-            disabled={readOnly || !enumValue.trim()}
-            variant="default"
-          >
-            {t.numberAllowedValuesEnumAddLabel}
-          </Button>
-        </Group>
-
-        {enumValues.length > 0 && (
-          <Group gap="xs" mt="xs">
-            {enumValues.map((value) => (
-              <Badge
-                key={value}
-                variant="light"
-                rightSection={
-                  !readOnly && (
-                    <ActionIcon
-                      size="xs"
-                      color="blue"
-                      radius="xl"
-                      variant="transparent"
-                      onClick={() => handleRemoveEnum(value)}
-                    >
-                      <X size={10} />
-                    </ActionIcon>
-                  )
-                }
-              >
-                {value}
-              </Badge>
-            ))}
-          </Group>
-        )}
-      </Stack>
+      <TagsInput
+        label={t.stringAllowedValuesEnumLabel}
+        placeholder={t.stringAllowedValuesEnumAddPlaceholder}
+        value={enumValues}
+        onChange={handleEnumChange}
+        disabled={readOnly}
+        splitChars={[",", "Enter"]}
+        acceptValueOnBlur
+      />
     </Stack>
   );
 };

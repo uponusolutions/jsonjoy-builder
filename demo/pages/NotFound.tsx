@@ -13,8 +13,12 @@ const NotFound = () => {
     <Center h="100vh" bg="gray.1">
       <Container>
         <Stack align="center" gap="md">
-          <Title order={1} size={60}>404</Title>
-          <Text size="xl" c="dimmed">Oops! Page not found</Text>
+          <Title order={1} size={60}>
+            404
+          </Title>
+          <Text size="xl" c="dimmed">
+            Oops! Page not found
+          </Text>
           <Anchor href="/" size="lg">
             Return to Home
           </Anchor>
