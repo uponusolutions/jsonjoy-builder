@@ -1,4 +1,4 @@
-import { Switch, Group, Stack, Paper } from "@mantine/core";
+import { Checkbox, Stack } from "@mantine/core";
 import { useTranslation } from "../../../hooks/use-translation.ts";
 import { withObjectSchema } from "../../../types/jsonSchema.ts";
 import type { TypeEditorProps } from "../TypeEditor.tsx";
@@ -24,6 +24,12 @@ const BooleanEditor: React.FC<TypeEditorProps> = ({
 
   // Handle changing the allowed values
   const handleAllowedChange = (value: boolean, allowed: boolean) => {
+    // Prevent disabling the last remaining allowed value
+    if (!allowed) {
+      const otherAllowed = value ? allowsFalse : allowsTrue;
+      if (!otherAllowed) return;
+    }
+
     let newEnum: boolean[] | undefined;
 
     if (allowed) {
@@ -64,29 +70,20 @@ const BooleanEditor: React.FC<TypeEditorProps> = ({
 
   return (
     <Stack gap="md">
-      <Paper withBorder p="xs" radius="md" shadow="xs">
-        <Group justify="space-between" align="center">
-          <Switch
-            label={t.booleanAllowTrueLabel}
-            checked={allowsTrue}
-            onChange={(e) => handleAllowedChange(true, e.currentTarget.checked)}
-            disabled={readOnly}
-          />
-        </Group>
-      </Paper>
-
-      <Paper withBorder p="xs" radius="md" shadow="xs">
-        <Group justify="space-between" align="center">
-          <Switch
-            label={t.booleanAllowFalseLabel}
-            checked={allowsFalse}
-            onChange={(e) =>
-              handleAllowedChange(false, e.currentTarget.checked)
-            }
-            disabled={readOnly}
-          />
-        </Group>
-      </Paper>
+      <Checkbox
+        label={t.booleanAllowTrueLabel}
+        checked={allowsTrue}
+        onChange={(e) => handleAllowedChange(true, e.currentTarget.checked)}
+        disabled={readOnly}
+      />
+      <Checkbox
+        label={t.booleanAllowFalseLabel}
+        checked={allowsFalse}
+        onChange={(e) =>
+          handleAllowedChange(false, e.currentTarget.checked)
+        }
+        disabled={readOnly}
+      />
     </Stack>
   );
 };
