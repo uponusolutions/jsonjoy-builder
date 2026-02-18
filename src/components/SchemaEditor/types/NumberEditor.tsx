@@ -1,5 +1,5 @@
 import { X } from "lucide-react";
-import { useId, useState } from "react";
+import { useState } from "react";
 import {
   Text,
   Stack,
@@ -34,13 +34,6 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
 }) => {
   const [enumValue, setEnumValue] = useState("");
   const t = useTranslation();
-
-  const maximumId = useId();
-  const minimumId = useId();
-  const exclusiveMinimumId = useId();
-  const exclusiveMaximumId = useId();
-  const multipleOfId = useId();
-  const enumInputId = useId();
 
   // Extract number-specific validations
   const minimum = withObjectSchema(schema, (s) => s.minimum, undefined);
@@ -129,100 +122,65 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
   return (
     <Stack gap="md">
       <SimpleGrid cols={2} spacing="md">
-        <Stack gap="xs">
-          <Text component="label" htmlFor={minimumId} size="sm" fw={500}>
-            {t.numberMinimumLabel}
-          </Text>
-          <TextInput
-            id={minimumId}
-            type="text"
-            inputMode={integer ? "numeric" : "decimal"}
-            value={numberInputs.minimum}
-            onChange={(e) => handleNumberChange("minimum", e.target.value)}
-            placeholder="-∞"
-            error={numberErrors.minimum}
-            disabled={readOnly}
-          />
-        </Stack>
-        <Stack gap="xs">
-          <Text component="label" htmlFor={maximumId} size="sm" fw={500}>
-            {t.numberMaximumLabel}
-          </Text>
-          <TextInput
-            id={maximumId}
-            type="text"
-            inputMode={integer ? "numeric" : "decimal"}
-            value={numberInputs.maximum}
-            onChange={(e) => handleNumberChange("maximum", e.target.value)}
-            placeholder="∞"
-            error={numberErrors.maximum}
-            disabled={readOnly}
-          />
-        </Stack>
+        <TextInput
+          label={t.numberMinimumLabel}
+          type="text"
+          inputMode={integer ? "numeric" : "decimal"}
+          value={numberInputs.minimum}
+          onChange={(e) => handleNumberChange("minimum", e.target.value)}
+          placeholder="-∞"
+          error={numberErrors.minimum}
+          disabled={readOnly}
+        />
+        <TextInput
+          label={t.numberMaximumLabel}
+          type="text"
+          inputMode={integer ? "numeric" : "decimal"}
+          value={numberInputs.maximum}
+          onChange={(e) => handleNumberChange("maximum", e.target.value)}
+          placeholder="∞"
+          error={numberErrors.maximum}
+          disabled={readOnly}
+        />
       </SimpleGrid>
 
       <SimpleGrid cols={2} spacing="md">
-        <Stack gap="xs">
-          <Text
-            component="label"
-            htmlFor={exclusiveMinimumId}
-            size="sm"
-            fw={500}
-          >
-            {t.numberExclusiveMinimumLabel}
-          </Text>
-          <TextInput
-            id={exclusiveMinimumId}
-            type="text"
-            inputMode={integer ? "numeric" : "decimal"}
-            value={numberInputs.exclusiveMinimum}
-            onChange={(e) =>
-              handleNumberChange("exclusiveMinimum", e.target.value)
-            }
-            placeholder="-∞"
-            error={numberErrors.exclusiveMinimum}
-            disabled={readOnly}
-          />
-        </Stack>
-        <Stack gap="xs">
-          <Text
-            component="label"
-            htmlFor={exclusiveMaximumId}
-            size="sm"
-            fw={500}
-          >
-            {t.numberExclusiveMaximumLabel}
-          </Text>
-          <TextInput
-            id={exclusiveMaximumId}
-            type="text"
-            inputMode={integer ? "numeric" : "decimal"}
-            value={numberInputs.exclusiveMaximum}
-            onChange={(e) =>
-              handleNumberChange("exclusiveMaximum", e.target.value)
-            }
-            placeholder="∞"
-            error={numberErrors.exclusiveMaximum}
-            disabled={readOnly}
-          />
-        </Stack>
-      </SimpleGrid>
-
-      <Stack gap="xs">
-        <Text component="label" htmlFor={multipleOfId} size="sm" fw={500}>
-          {t.numberMultipleOfLabel}
-        </Text>
         <TextInput
-          id={multipleOfId}
+          label={t.numberExclusiveMinimumLabel}
           type="text"
           inputMode={integer ? "numeric" : "decimal"}
-          value={numberInputs.multipleOf}
-          onChange={(e) => handleNumberChange("multipleOf", e.target.value)}
-          placeholder="1"
-          error={numberErrors.multipleOf}
+          value={numberInputs.exclusiveMinimum}
+          onChange={(e) =>
+            handleNumberChange("exclusiveMinimum", e.target.value)
+          }
+          placeholder="-∞"
+          error={numberErrors.exclusiveMinimum}
           disabled={readOnly}
         />
-      </Stack>
+        <TextInput
+          label={t.numberExclusiveMaximumLabel}
+          type="text"
+          inputMode={integer ? "numeric" : "decimal"}
+          value={numberInputs.exclusiveMaximum}
+          onChange={(e) =>
+            handleNumberChange("exclusiveMaximum", e.target.value)
+          }
+          placeholder="∞"
+          error={numberErrors.exclusiveMaximum}
+          disabled={readOnly}
+        />
+      </SimpleGrid>
+
+      <TextInput
+        label={t.numberMultipleOfLabel}
+        type="text"
+        inputMode={integer ? "numeric" : "decimal"}
+        value={numberInputs.multipleOf}
+        onChange={(e) => handleNumberChange("multipleOf", e.target.value)}
+        placeholder="1"
+        error={numberErrors.multipleOf}
+        disabled={readOnly}
+      />
 
       <Stack gap="xs">
         <Text size="sm" fw={500}>
@@ -230,7 +188,6 @@ const NumberEditor: React.FC<NumberEditorProps> = ({
         </Text>
         <Group gap="xs">
           <TextInput
-            id={enumInputId}
             type="number"
             step={integer ? "1" : "any"}
             value={enumValue}

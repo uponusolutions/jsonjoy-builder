@@ -32,6 +32,7 @@ import {
   Alert,
   Badge,
   TextInput,
+  UnstyledButton,
 } from "@mantine/core";
 
 export interface SchemaPropertyEditorProps {
@@ -164,53 +165,48 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
           )}
 
           {/* Clickable area: chevron + name + description */}
-          <Group
-            gap="xs"
+          <UnstyledButton
             onClick={() => setExpanded(!expanded)}
-            style={{ flexGrow: 1, minWidth: 0, cursor: "pointer" }}
-            wrap="nowrap"
-            role="button"
-            tabIndex={0}
             aria-expanded={expanded}
             aria-label={expanded ? t.collapse : t.expand}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                setExpanded(!expanded);
-              }
-            }}
+            style={{ flexGrow: 1, minWidth: 0 }}
           >
-            {/* Expand/collapse icon */}
-            <Box c="gray" style={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
-              {expanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
-            </Box>
-
-            {/* Property name and description (labels only) */}
-            <Text
-              fw={500}
-              px={8}
-              py={2}
-              truncate
-              style={{ minWidth: 80, maxWidth: "50%" }}
+            <Group
+              gap="xs"
+              wrap="nowrap"
             >
-              {name}
-            </Text>
+              {/* Expand/collapse icon */}
+              <Box c="gray" style={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
+                {expanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+              </Box>
 
-            {/* Description label */}
-            {showDescription && tempDesc && (
+              {/* Property name and description (labels only) */}
               <Text
-                size="xs"
-                c="dimmed"
-                fs="italic"
+                fw={500}
                 px={8}
                 py={2}
                 truncate
-                style={{ flex: 1, maxWidth: "40%", marginRight: 8 }}
+                style={{ minWidth: 80, maxWidth: "50%" }}
               >
-                {tempDesc}
+                {name}
               </Text>
-            )}
-          </Group>
+
+              {/* Description label */}
+              {showDescription && tempDesc && (
+                <Text
+                  size="xs"
+                  c="dimmed"
+                  fs="italic"
+                  px={8}
+                  py={2}
+                  truncate
+                  style={{ flex: 1, maxWidth: "40%", marginRight: 8 }}
+                >
+                  {tempDesc}
+                </Text>
+              )}
+            </Group>
+          </UnstyledButton>
         </Group>
 
         {/* Right side controls */}
@@ -293,14 +289,13 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
       {expanded && (
         <Box pt="xs" px="xs">
           {!readOnly && (
-            <Stack gap="xs" mb="sm">
+            <Stack gap="md" mb="sm">
               <TextInput
                 label={t.fieldNameLabel}
                 value={tempName}
                 onChange={(e) => setTempName(e.target.value)}
                 onBlur={handleNameSubmit}
                 onKeyDown={(e) => e.key === "Enter" && handleNameSubmit()}
-                size="xs"
               />
               {showDescription && (
                 <TextInput
@@ -310,7 +305,6 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
                   onBlur={handleDescSubmit}
                   onKeyDown={(e) => e.key === "Enter" && handleDescSubmit()}
                   placeholder={t.propertyDescriptionPlaceholder}
-                  size="xs"
                 />
               )}
             </Stack>

@@ -1,5 +1,4 @@
-import { useId } from "react";
-import { Switch, Text, Group, Stack, Paper } from "@mantine/core";
+import { Switch, Group, Stack, Paper } from "@mantine/core";
 import { useTranslation } from "../../../hooks/use-translation.ts";
 import { withObjectSchema } from "../../../types/jsonSchema.ts";
 import type { TypeEditorProps } from "../TypeEditor.tsx";
@@ -10,8 +9,6 @@ const BooleanEditor: React.FC<TypeEditorProps> = ({
   readOnly = false,
 }) => {
   const t = useTranslation();
-  const allowTrueId = useId();
-  const allowFalseId = useId();
 
   // Extract boolean-specific validation
   const enumValues = withObjectSchema(
@@ -69,13 +66,8 @@ const BooleanEditor: React.FC<TypeEditorProps> = ({
     <Stack gap="md">
       <Paper withBorder p="xs" radius="md" shadow="xs">
         <Group justify="space-between" align="center">
-          <Stack gap={2}>
-            <Text component="label" htmlFor={allowTrueId} size="sm" fw={500}>
-              {t.booleanAllowTrueLabel}
-            </Text>
-          </Stack>
           <Switch
-            id={allowTrueId}
+            label={t.booleanAllowTrueLabel}
             checked={allowsTrue}
             onChange={(e) => handleAllowedChange(true, e.currentTarget.checked)}
             disabled={readOnly}
@@ -85,13 +77,8 @@ const BooleanEditor: React.FC<TypeEditorProps> = ({
 
       <Paper withBorder p="xs" radius="md" shadow="xs">
         <Group justify="space-between" align="center">
-          <Stack gap={2}>
-            <Text component="label" htmlFor={allowFalseId} size="sm" fw={500}>
-              {t.booleanAllowFalseLabel}
-            </Text>
-          </Stack>
           <Switch
-            id={allowFalseId}
+            label={t.booleanAllowFalseLabel}
             checked={allowsFalse}
             onChange={(e) => handleAllowedChange(false, e.currentTarget.checked)}
             disabled={readOnly}

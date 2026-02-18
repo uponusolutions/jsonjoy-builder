@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useState } from "react";
 import {
   Text,
   Group,
@@ -57,10 +57,6 @@ const ArrayEditor: React.FC<TypeEditorProps> = ({
     lengthValidations.maxItems.error ||
     (hasMinMaxError ? t.arrayValidationErrorMinMax : undefined);
 
-  const minItemsId = useId();
-  const maxItemsId = useId();
-  const uniqueItemsId = useId();
-
   // Get the array's item schema
   const itemsSchema = getArrayItemsSchema(schema) || { type: "string" };
 
@@ -115,45 +111,34 @@ const ArrayEditor: React.FC<TypeEditorProps> = ({
   return (
     <Stack gap="md">
       <SimpleGrid cols={2} spacing="md">
-        <Stack gap="xs">
-          <Text component="label" htmlFor={minItemsId} size="sm" fw={500}>
-            {t.arrayMinimumLabel}
-          </Text>
-          <TextInput
-            id={minItemsId}
-            type="text"
-            inputMode="numeric"
-            value={lengthInputs.minItems}
-            onChange={(e) =>
-              handleArrayLengthInputChange("minItems", e.target.value)
-            }
-            placeholder="0"
-            error={minItemsError}
-            disabled={readOnly}
-          />
-        </Stack>
-        <Stack gap="xs">
-          <Text component="label" htmlFor={maxItemsId} size="sm" fw={500}>
-            {t.arrayMaximumLabel}
-          </Text>
-          <TextInput
-            id={maxItemsId}
-            type="text"
-            inputMode="numeric"
-            value={lengthInputs.maxItems}
-            onChange={(e) =>
-              handleArrayLengthInputChange("maxItems", e.target.value)
-            }
-            placeholder="∞"
-            error={maxItemsError}
-            disabled={readOnly}
-          />
-        </Stack>
+        <TextInput
+          label={t.arrayMinimumLabel}
+          type="text"
+          inputMode="numeric"
+          value={lengthInputs.minItems}
+          onChange={(e) =>
+            handleArrayLengthInputChange("minItems", e.target.value)
+          }
+          placeholder="0"
+          error={minItemsError}
+          disabled={readOnly}
+        />
+        <TextInput
+          label={t.arrayMaximumLabel}
+          type="text"
+          inputMode="numeric"
+          value={lengthInputs.maxItems}
+          onChange={(e) =>
+            handleArrayLengthInputChange("maxItems", e.target.value)
+          }
+          placeholder="∞"
+          error={maxItemsError}
+          disabled={readOnly}
+        />
       </SimpleGrid>
 
       <Checkbox
         label={t.arrayForceUniqueItemsLabel}
-        id={uniqueItemsId}
         checked={uniqueItems}
         onChange={(e) => handleUniqueItemsChange(e.currentTarget.checked)}
         disabled={readOnly}
