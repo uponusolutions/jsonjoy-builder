@@ -1,4 +1,4 @@
-import { Select, Stack, TextInput, SimpleGrid, TagsInput } from "@mantine/core";
+import { Select, SimpleGrid, Stack, TagsInput, TextInput } from "@mantine/core";
 import { useTranslation } from "../../../hooks/use-translation.ts";
 import { useValidatedNumericInputs } from "../../../hooks/use-validated-numeric-inputs.ts";
 import { withObjectSchema } from "../../../types/jsonSchema.ts";

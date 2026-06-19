@@ -1,19 +1,19 @@
+import {
+  Alert,
+  Badge,
+  Box,
+  Group,
+  Loader,
+  Modal,
+  ScrollArea,
+  Stack,
+  Text,
+  UnstyledButton,
+} from "@mantine/core";
 import Editor, { type BeforeMount, type OnMount } from "@monaco-editor/react";
 import { AlertCircle, Check } from "lucide-react";
 import type * as Monaco from "monaco-editor";
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Modal,
-  Text,
-  Box,
-  Group,
-  Stack,
-  Alert,
-  ScrollArea,
-  UnstyledButton,
-  Badge,
-  Loader,
-} from "@mantine/core";
 import { useMonacoTheme } from "../../hooks/use-monaco-theme.ts";
 import {
   formatTranslation,

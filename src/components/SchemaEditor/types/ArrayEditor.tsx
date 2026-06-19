@@ -1,13 +1,13 @@
-import { useState } from "react";
 import {
-  Text,
-  Group,
-  Stack,
   Box,
-  SimpleGrid,
-  TextInput,
   Checkbox,
+  Group,
+  SimpleGrid,
+  Stack,
+  Text,
+  TextInput,
 } from "@mantine/core";
+import { useState } from "react";
 import { useTranslation } from "../../../hooks/use-translation.ts";
 import { useValidatedNumericInputs } from "../../../hooks/use-validated-numeric-inputs.ts";
 import { getArrayItemsSchema } from "../../../lib/schemaEditor.ts";

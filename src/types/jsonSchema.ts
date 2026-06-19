@@ -166,6 +166,10 @@ export function getSchemaDescription(schema: JSONSchema): string {
   return isObjectSchema(schema) ? schema.description || "" : "";
 }
 
+export function getSchemaTitle(schema: JSONSchema): string {
+  return isObjectSchema(schema) ? schema.title || "" : "";
+}
+
 export function withObjectSchema<T>(
   schema: JSONSchema,
   fn: (schema: ObjectJSONSchema) => T,

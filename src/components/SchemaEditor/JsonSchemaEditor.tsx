@@ -1,3 +1,4 @@
+import { ActionIcon, Box, Group, Paper, Tabs, Text } from "@mantine/core";
 import { Maximize2 } from "lucide-react";
 import {
   type FC,
@@ -5,7 +6,6 @@ import {
   useRef,
   useState,
 } from "react";
-import { ActionIcon, Box, Group, Paper, Tabs, Text } from "@mantine/core";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import { cn } from "../../lib/utils.ts";
 import type { JSONSchema } from "../../types/jsonSchema.ts";

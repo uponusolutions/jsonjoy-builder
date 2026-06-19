@@ -33,9 +33,33 @@ export interface Translation {
   /**
    * The translation for the key `fieldNameLabel`. English default is:
    *
-   * > Field Name
+   * > Key
    */
   readonly fieldNameLabel: string;
+  /**
+   * The translation for the key `fieldLabelLabel`. English default is:
+   *
+   * > Label
+   */
+  readonly fieldLabelLabel: string;
+  /**
+   * The translation for the key `fieldLabelPlaceholder`. English default is:
+   *
+   * > e.g. First Name
+   */
+  readonly fieldLabelPlaceholder: string;
+  /**
+   * The translation for the key `fieldKeyInvalid`. English default is:
+   *
+   * > Only letters, digits and underscore; must not start with a digit.
+   */
+  readonly fieldKeyInvalid: string;
+  /**
+   * The translation for the key `fieldKeyDuplicate`. English default is:
+   *
+   * > This key is already used by another field.
+   */
+  readonly fieldKeyDuplicate: string;
   /**
    * The translation for the key `fieldNameTooltip`. English default is:
    *

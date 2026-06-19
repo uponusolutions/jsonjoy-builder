@@ -1,6 +1,6 @@
+import { MantineProvider } from "@mantine/core";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { MantineProvider } from "@mantine/core";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import "@mantine/core/styles.css";

@@ -1,4 +1,4 @@
-import { Stack, Box, Text, ScrollArea } from "@mantine/core";
+import { Box, ScrollArea, Stack, Text } from "@mantine/core";
 import type { FC } from "react";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import {

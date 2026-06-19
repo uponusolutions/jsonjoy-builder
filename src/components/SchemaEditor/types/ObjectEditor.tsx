@@ -1,16 +1,17 @@
-import { Stack, Text, Paper, Box } from "@mantine/core";
 import {
   DragDropContext,
   Draggable,
   Droppable,
   type DropResult,
 } from "@hello-pangea/dnd";
-import { useId } from "react";
+import { Box, Paper, Stack, Text } from "@mantine/core";
+import { useId, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "../../../hooks/use-translation.ts";
 import {
   getSchemaProperties,
   removeObjectProperty,
+  renameObjectProperty,
   reorderProperties,
   updateObjectProperty,
   updatePropertyRequired,
@@ -33,7 +34,13 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
   const t = useTranslation();
 
   // Get object properties
-  const properties = getSchemaProperties(schema);
+  const properties = useMemo(() => getSchemaProperties(schema), [schema]);
+
+  // Stable list of sibling keys, so SchemaPropertyEditor's otherKeys memo holds.
+  const existingKeys = useMemo(
+    () => properties.map((p) => p.name),
+    [properties],
+  );
 
   // Create a normalized schema object
   const normalizedSchema: ObjectJSONSchema = isBooleanSchema(schema)
@@ -72,28 +79,31 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
   };
 
   // Handle property name change
-  const handlePropertyNameChange = (oldName: string, newName: string) => {
-    if (oldName === newName) return;
+  const handlePropertyNameChange = (
+    oldName: string,
+    newName: string,
+    newSchema?: ObjectJSONSchema,
+  ) => {
+    if (oldName === newName && !newSchema) return;
 
     const property = properties.find((p) => p.name === oldName);
     if (!property) return;
 
-    const propertySchemaObj = asObjectSchema(property.schema);
+    // When the key is auto-derived from the label, the caller passes the
+    // updated schema (carrying the new title) so the rename and the title
+    // change land in one update instead of overwriting each other.
+    const propertySchemaObj = newSchema ?? asObjectSchema(property.schema);
 
-    // Add property with new name
-    let newSchema = updateObjectProperty(
-      normalizedSchema,
-      newName,
-      propertySchemaObj,
+    // renameObjectProperty preserves the property's position and remaps the
+    // required array; the old add-then-remove approach moved it to the end.
+    onChange(
+      renameObjectProperty(
+        normalizedSchema,
+        oldName,
+        newName,
+        propertySchemaObj,
+      ),
     );
-
-    if (property.required) {
-      newSchema = updatePropertyRequired(newSchema, newName, true);
-    }
-
-    newSchema = removeObjectProperty(newSchema, oldName);
-
-    onChange(newSchema);
   };
 
   // Handle property required status change
@@ -171,8 +181,12 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
                               validationNode?.children[property.name]
                             }
                             onDelete={() => handleDeleteProperty(property.name)}
-                            onNameChange={(newName) =>
-                              handlePropertyNameChange(property.name, newName)
+                            onNameChange={(newName, newSchema) =>
+                              handlePropertyNameChange(
+                                property.name,
+                                newName,
+                                newSchema,
+                              )
                             }
                             onRequiredChange={(required) =>
                               handlePropertyRequiredChange(
@@ -186,6 +200,7 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
                             depth={depth}
                             showDescription={showDescription}
                             dragHandleProps={provided.dragHandleProps}
+                            existingKeys={existingKeys}
                           />
                         </div>
                       );

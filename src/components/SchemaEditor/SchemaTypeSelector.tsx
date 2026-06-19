@@ -1,5 +1,5 @@
+import { Paper, SimpleGrid, Text, UnstyledButton } from "@mantine/core";
 import type { FC } from "react";
-import { SimpleGrid, UnstyledButton, Text, Paper } from "@mantine/core";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import type { Translation } from "../../i18n/translation-keys.ts";
 import type { SchemaType } from "../../types/jsonSchema.ts";

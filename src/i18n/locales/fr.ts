@@ -8,7 +8,12 @@ export const fr: Translation = {
   fieldDelete: "Supprimer le champ",
   fieldDescription: "Description",
   fieldDescriptionTooltip: "Ajoutez du contexte sur ce que ce champ représente",
-  fieldNameLabel: "Nom du champ",
+  fieldNameLabel: "Clé",
+  fieldLabelLabel: "Libellé",
+  fieldLabelPlaceholder: "ex. First Name",
+  fieldKeyInvalid:
+    "Uniquement lettres, chiffres et _ ; ne doit pas commencer par un chiffre.",
+  fieldKeyDuplicate: "Cette clé est déjà utilisée par un autre champ.",
   fieldNamePlaceholder: "ex. prenom, age, estActif",
   fieldNameTooltip:
     "Utilisez camelCase pour une meilleure lisibilité (ex. prenom)",

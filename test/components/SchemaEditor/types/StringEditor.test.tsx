@@ -1,16 +1,16 @@
 import { render } from "@testing-library/react";
 import "../../../setup.ts";
-import { stabilizeHtml } from "../../../utils.ts";
 import { describe, test } from "node:test";
-import React from "react";
 import { MantineProvider } from "@mantine/core";
+import React from "react";
 import StringEditor from "../../../../src/components/SchemaEditor/types/StringEditor.tsx";
+import { stabilizeHtml } from "../../../utils.ts";
 
 describe("StringEditor", () => {
   test("write mode does show constraints", (t) => {
     const element = React.createElement(StringEditor, {
       readOnly: false,
-      onChange: () => { },
+      onChange: () => {},
       validationNode: undefined,
       schema: {
         type: "number",
@@ -26,7 +26,7 @@ describe("StringEditor", () => {
   test("read-only mode doesn't show constraints", (t) => {
     const element = React.createElement(StringEditor, {
       readOnly: true,
-      onChange: () => { },
+      onChange: () => {},
       validationNode: undefined,
       schema: {
         type: "number",

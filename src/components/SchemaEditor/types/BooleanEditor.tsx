@@ -79,9 +79,7 @@ const BooleanEditor: React.FC<TypeEditorProps> = ({
       <Checkbox
         label={t.booleanAllowFalseLabel}
         checked={allowsFalse}
-        onChange={(e) =>
-          handleAllowedChange(false, e.currentTarget.checked)
-        }
+        onChange={(e) => handleAllowedChange(false, e.currentTarget.checked)}
         disabled={readOnly}
       />
     </Stack>

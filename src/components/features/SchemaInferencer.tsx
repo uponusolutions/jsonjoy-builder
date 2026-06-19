@@ -1,6 +1,6 @@
+import { Alert, Box, Button, Group, Loader, Modal, Text } from "@mantine/core";
 import Editor, { type BeforeMount, type OnMount } from "@monaco-editor/react";
 import { useRef, useState } from "react";
-import { Button, Modal, Text, Box, Group, Alert, Loader } from "@mantine/core";
 import { useMonacoTheme } from "../../hooks/use-monaco-theme.ts";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import { createSchemaFromJson } from "../../lib/schema-inference.ts";

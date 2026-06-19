@@ -1,7 +1,7 @@
+import { ActionIcon, Box, Group, Loader, Paper, Text } from "@mantine/core";
 import Editor, { type BeforeMount, type OnMount } from "@monaco-editor/react";
 import { Download, FileJson } from "lucide-react";
 import { type FC, useRef } from "react";
-import { ActionIcon, Box, Group, Loader, Paper, Text } from "@mantine/core";
 import { useMonacoTheme } from "../../hooks/use-monaco-theme.ts";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import { cn } from "../../lib/utils.ts";

@@ -1,5 +1,5 @@
+import { Center, Loader } from "@mantine/core";
 import { lazy, Suspense } from "react";
-import { Loader, Center } from "@mantine/core";
 import type {
   JSONSchema,
   ObjectJSONSchema,

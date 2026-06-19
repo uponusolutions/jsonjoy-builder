@@ -1,16 +1,16 @@
 import { render } from "@testing-library/react";
 import "../../../setup.ts";
-import { stabilizeHtml } from "../../../utils.ts";
 import { describe, test } from "node:test";
-import React from "react";
 import { MantineProvider } from "@mantine/core";
+import React from "react";
 import BooleanEditor from "../../../../src/components/SchemaEditor/types/BooleanEditor.tsx";
+import { stabilizeHtml } from "../../../utils.ts";
 
 describe("BooleanEditor", () => {
   test("write mode does show constraints", (t) => {
     const element = React.createElement(BooleanEditor, {
       readOnly: false,
-      onChange: () => { },
+      onChange: () => {},
       validationNode: undefined,
       schema: {
         type: "boolean",
@@ -26,7 +26,7 @@ describe("BooleanEditor", () => {
   test("read-only mode doesn't show constraints", (t) => {
     const element = React.createElement(BooleanEditor, {
       readOnly: true,
-      onChange: () => { },
+      onChange: () => {},
       validationNode: undefined,
       schema: {
         type: "boolean",

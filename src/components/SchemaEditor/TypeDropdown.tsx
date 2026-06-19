@@ -1,6 +1,6 @@
+import { Badge, Button, Menu } from "@mantine/core";
 import { Check, ChevronDown } from "lucide-react";
-import { useState, useId } from "react";
-import { Menu, Button, Badge } from "@mantine/core";
+import { useId, useState } from "react";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import { getTypeLabel } from "../../lib/utils.ts";
 import type { SchemaType } from "../../types/jsonSchema.ts";

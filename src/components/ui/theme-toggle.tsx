@@ -1,6 +1,6 @@
+import { ActionIcon, Select, Tooltip } from "@mantine/core";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "../../hooks/use-theme.ts";
-import { Select, Tooltip, ActionIcon } from "@mantine/core";
 
 export interface ThemeToggleProps {
   /** Show a simple toggle button instead of a dropdown */

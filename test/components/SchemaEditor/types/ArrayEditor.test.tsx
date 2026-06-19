@@ -1,16 +1,16 @@
 import { render } from "@testing-library/react";
 import "../../../setup.ts";
-import { stabilizeHtml } from "../../../utils.ts";
 import { describe, test } from "node:test";
-import React from "react";
 import { MantineProvider } from "@mantine/core";
+import React from "react";
 import ArrayEditor from "../../../../src/components/SchemaEditor/types/ArrayEditor.tsx";
+import { stabilizeHtml } from "../../../utils.ts";
 
 describe("ArrayEditor", () => {
   test("write mode does show constraints", (t) => {
     const element = React.createElement(ArrayEditor, {
       readOnly: false,
-      onChange: () => { },
+      onChange: () => {},
       depth: 0,
       validationNode: undefined,
       schema: {
@@ -30,7 +30,7 @@ describe("ArrayEditor", () => {
   test("read-only mode doesn't show constraints", (t) => {
     const element = React.createElement(ArrayEditor, {
       readOnly: true,
-      onChange: () => { },
+      onChange: () => {},
       depth: 0,
       validationNode: undefined,
       schema: {

@@ -1,18 +1,4 @@
 import {
-  CheckCircle,
-  CirclePlus,
-  Code,
-  FileJson,
-  FileText,
-  GitBranch,
-  Package,
-  Pencil,
-  PencilOff,
-  RefreshCw,
-  User,
-} from "lucide-react";
-import React, { useEffect, useState } from "react";
-import {
   Anchor,
   Badge,
   Box,
@@ -29,6 +15,20 @@ import {
   Title,
   useMantineColorScheme,
 } from "@mantine/core";
+import {
+  CheckCircle,
+  CirclePlus,
+  Code,
+  FileJson,
+  FileText,
+  GitBranch,
+  Package,
+  Pencil,
+  PencilOff,
+  RefreshCw,
+  User,
+} from "lucide-react";
+import React, { useEffect, useState } from "react";
 import { exampleSchema } from "../../demo/utils/schemaExample.ts";
 import { JsonValidator } from "../../src/components/features/JsonValidator.tsx";
 import { SchemaInferencer } from "../../src/components/features/SchemaInferencer.tsx";

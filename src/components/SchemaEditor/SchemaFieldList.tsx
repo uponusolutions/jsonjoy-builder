@@ -4,9 +4,9 @@ import {
   Droppable,
   type DropResult,
 } from "@hello-pangea/dnd";
+import { Stack } from "@mantine/core";
 import { type FC, useMemo } from "react";
 import { createPortal } from "react-dom";
-import { Stack } from "@mantine/core";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import { getSchemaProperties } from "../../lib/schemaEditor.ts";
 import type {
@@ -39,7 +39,13 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
   const t = useTranslation();
 
   // Get the properties from the schema
-  const properties = getSchemaProperties(schema);
+  const properties = useMemo(() => getSchemaProperties(schema), [schema]);
+
+  // Stable list of sibling keys, so SchemaPropertyEditor's otherKeys memo holds.
+  const existingKeys = useMemo(
+    () => properties.map((p) => p.name),
+    [properties],
+  );
 
   // Get schema type as a valid SchemaType
   const getValidSchemaType = (propSchema: JSONSchemaType): SchemaType => {
@@ -55,22 +61,29 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
   };
 
   // Handle field name change (generates an edit event)
-  const handleNameChange = (oldName: string, newName: string) => {
+  const handleNameChange = (
+    oldName: string,
+    newName: string,
+    newSchema?: ObjectJSONSchema,
+  ) => {
     const property = properties.find((prop) => prop.name === oldName);
     if (!property) return;
 
+    // When the key is auto-derived from the label, the caller passes the
+    // updated schema (carrying the new title) so the rename and the title
+    // change land in one update instead of overwriting each other.
+    const schema =
+      newSchema ??
+      (typeof property.schema === "boolean"
+        ? { type: "object" as const }
+        : property.schema);
+
     onEditField(oldName, {
       name: newName,
-      type: getValidSchemaType(property.schema),
-      description:
-        typeof property.schema === "boolean"
-          ? ""
-          : property.schema.description || "",
+      type: getValidSchemaType(schema),
+      description: schema.description || "",
       required: property.required,
-      validation:
-        typeof property.schema === "boolean"
-          ? { type: "object" }
-          : property.schema,
+      validation: schema,
     });
   };
 
@@ -138,7 +151,9 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
             required={property.required}
             validationNode={validationTree.children[property.name] ?? undefined}
             onDelete={() => onDeleteField(property.name)}
-            onNameChange={(newName) => handleNameChange(property.name, newName)}
+            onNameChange={(newName, newSchema) =>
+              handleNameChange(property.name, newName, newSchema)
+            }
             onRequiredChange={(required) =>
               handleRequiredChange(property.name, required)
             }
@@ -147,6 +162,7 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
             }
             readOnly={readOnly}
             showDescription={showDescription}
+            existingKeys={existingKeys}
           />
         ))}
       </Stack>
@@ -190,8 +206,8 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
                           validationTree.children[property.name] ?? undefined
                         }
                         onDelete={() => onDeleteField(property.name)}
-                        onNameChange={(newName) =>
-                          handleNameChange(property.name, newName)
+                        onNameChange={(newName, newSchema) =>
+                          handleNameChange(property.name, newName, newSchema)
                         }
                         onRequiredChange={(required) =>
                           handleRequiredChange(property.name, required)
@@ -202,6 +218,7 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
                         readOnly={readOnly}
                         dragHandleProps={provided.dragHandleProps}
                         showDescription={showDescription}
+                        existingKeys={existingKeys}
                       />
                     </div>
                   );

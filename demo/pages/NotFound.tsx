@@ -1,6 +1,6 @@
+import { Anchor, Center, Container, Stack, Text, Title } from "@mantine/core";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { Anchor, Center, Container, Stack, Text, Title } from "@mantine/core";
 
 const NotFound = () => {
   const location = useLocation();

@@ -179,16 +179,59 @@ export function createFieldSchema(field: NewField): JSONSchema {
 }
 
 /**
- * Validates a field name
+ * Validates a field name (property key).
+ *
+ * The key is restricted to characters that are safe to use as a Go template
+ * field name (`{{ .key }}`): letters, digits and underscore, not starting with
+ * a digit. Note this is stricter than a JS identifier — `$` is intentionally
+ * not allowed because Go templates reject it.
  */
 export function validateFieldName(name: string): boolean {
   if (!name || name.trim() === "") {
     return false;
   }
 
-  // Check that the name doesn't contain invalid characters for property names
-  const validNamePattern = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/;
+  const validNamePattern = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
   return validNamePattern.test(name);
+}
+
+/**
+ * Turns a free-form label into a template-safe camelCase property key.
+ *
+ * Splits on any non-alphanumeric character, joins the tokens in camelCase,
+ * prefixes a leading digit with `_`, and falls back to `"field"` when the
+ * label yields nothing usable.
+ *
+ * Examples: "First Name" -> "firstName", "E-Mail Adr." -> "eMailAdr",
+ * "2. Adresse" -> "_2Adresse".
+ */
+export function slugifyKey(label: string): string {
+  const tokens = label.split(/[^a-zA-Z0-9]+/).filter(Boolean);
+  if (tokens.length === 0) return "field";
+
+  const camel = tokens
+    .map((token, index) =>
+      index === 0
+        ? token.charAt(0).toLowerCase() + token.slice(1)
+        : token.charAt(0).toUpperCase() + token.slice(1),
+    )
+    .join("");
+
+  return /^[0-9]/.test(camel) ? `_${camel}` : camel;
+}
+
+/**
+ * Returns `base` if unused, otherwise appends a counter until the key is unique
+ * among `existingKeys` (e.g. "firstName", "firstName2", ...).
+ */
+export function uniqueKey(base: string, existingKeys: string[]): string {
+  if (!existingKeys.includes(base)) return base;
+
+  let counter = 2;
+  while (existingKeys.includes(`${base}${counter}`)) {
+    counter++;
+  }
+  return `${base}${counter}`;
 }
 
 /**

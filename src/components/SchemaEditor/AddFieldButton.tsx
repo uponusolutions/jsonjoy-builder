@@ -1,7 +1,8 @@
+import { Button } from "@mantine/core";
 import { CirclePlus } from "lucide-react";
 import type { FC } from "react";
-import { Button } from "@mantine/core";
 import { useTranslation } from "../../hooks/use-translation.ts";
+import { uniqueKey } from "../../lib/schemaEditor.ts";
 import type { NewField } from "../../types/jsonSchema.ts";
 
 interface AddFieldButtonProps {
@@ -19,12 +20,7 @@ const AddFieldButton: FC<AddFieldButtonProps> = ({
   const t = useTranslation();
 
   const handleAddField = () => {
-    let name = "newField";
-    let counter = 1;
-    while (existingFields.includes(name)) {
-      name = `newField${counter}`;
-      counter++;
-    }
+    const name = uniqueKey("newField", existingFields);
 
     onAddField({
       name,

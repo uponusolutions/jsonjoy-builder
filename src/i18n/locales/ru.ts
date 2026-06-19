@@ -8,7 +8,11 @@ export const ru: Translation = {
   fieldDelete: "Удалить поле",
   fieldDescription: "Описание",
   fieldDescriptionTooltip: "Добавьте контекст о том, что представляет это поле",
-  fieldNameLabel: "Имя поля",
+  fieldNameLabel: "Ключ",
+  fieldLabelLabel: "Подпись",
+  fieldLabelPlaceholder: "напр. First Name",
+  fieldKeyInvalid: "Только буквы, цифры и _; не может начинаться с цифры.",
+  fieldKeyDuplicate: "Этот ключ уже используется другим полем.",
   fieldNamePlaceholder: "например, имя, возраст, активен",
   fieldNameTooltip:
     "Используйте camelCase для лучшей читаемости (например, firstName)",

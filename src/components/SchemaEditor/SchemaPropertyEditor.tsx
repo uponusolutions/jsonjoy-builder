@@ -1,13 +1,30 @@
 import type { DraggableProvidedDragHandleProps } from "@hello-pangea/dnd";
 import {
+  ActionIcon,
+  Alert,
+  Badge,
+  Box,
+  Group,
+  Paper,
+  Stack,
+  Text,
+  TextInput,
+  UnstyledButton,
+} from "@mantine/core";
+import {
+  AlertCircle,
   ChevronDown,
   ChevronRight,
   GripVertical,
   X,
-  AlertCircle,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "../../hooks/use-translation.ts";
+import {
+  slugifyKey,
+  uniqueKey,
+  validateFieldName,
+} from "../../lib/schemaEditor.ts";
 import type {
   JSONSchema,
   ObjectJSONSchema,
@@ -16,24 +33,13 @@ import type {
 import {
   asObjectSchema,
   getSchemaDescription,
+  getSchemaTitle,
   withObjectSchema,
 } from "../../types/jsonSchema.ts";
 import type { ValidationTreeNode } from "../../types/validation.ts";
-import TypeDropdown from "./TypeDropdown.tsx";
 import RequiredDropdown from "./RequiredDropdown.tsx";
+import TypeDropdown from "./TypeDropdown.tsx";
 import TypeEditor from "./TypeEditor.tsx";
-import {
-  Paper,
-  Group,
-  Box,
-  ActionIcon,
-  Text,
-  Stack,
-  Alert,
-  Badge,
-  TextInput,
-  UnstyledButton,
-} from "@mantine/core";
 
 export interface SchemaPropertyEditorProps {
   name: string;
@@ -42,12 +48,14 @@ export interface SchemaPropertyEditorProps {
   readOnly: boolean;
   validationNode?: ValidationTreeNode;
   onDelete: () => void;
-  onNameChange: (newName: string) => void;
+  onNameChange: (newName: string, newSchema?: ObjectJSONSchema) => void;
   onRequiredChange: (required: boolean) => void;
   onSchemaChange: (schema: ObjectJSONSchema) => void;
   depth?: number;
   dragHandleProps?: DraggableProvidedDragHandleProps | null;
   showDescription?: boolean;
+  /** Keys of sibling properties, used to reject/avoid duplicate keys. */
+  existingKeys?: string[];
 }
 
 export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
@@ -63,11 +71,26 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
   depth = 0,
   dragHandleProps,
   showDescription = true,
+  existingKeys = [],
 }) => {
   const t = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [tempName, setTempName] = useState(name);
+  const [tempTitle, setTempTitle] = useState(getSchemaTitle(schema));
   const [tempDesc, setTempDesc] = useState(getSchemaDescription(schema));
+  // Live validation error for the key field (null = valid).
+  const [keyError, setKeyError] = useState<string | null>(null);
+  // Becomes true once the key is edited manually; stops label->key coupling.
+  const [keyEdited, setKeyEdited] = useState(false);
+
+  // Sibling keys excluding this property's own current key.
+  const otherKeys = useMemo(
+    () => existingKeys.filter((k) => k !== name),
+    [existingKeys, name],
+  );
+
+  // The key still carries its generated default name (never named explicitly).
+  const isDefaultKey = /^newField\d*$/.test(name);
   const type = withObjectSchema(
     schema,
     (s) => (s.type || "object") as SchemaType,
@@ -78,15 +101,76 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
   // Update temp values when props change
   useEffect(() => {
     setTempName(name);
+    setTempTitle(getSchemaTitle(schema));
     setTempDesc(getSchemaDescription(schema));
+    setKeyError(null);
   }, [name, schema]);
 
-  const handleNameSubmit = () => {
+  // Validates a candidate key and returns a translation message, or null if ok.
+  const validateKey = useCallback(
+    (candidate: string): string | null => {
+      if (!validateFieldName(candidate)) return t.fieldKeyInvalid;
+      if (candidate !== name && otherKeys.includes(candidate))
+        return t.fieldKeyDuplicate;
+      return null;
+    },
+    [name, otherKeys, t],
+  );
+
+  // Re-validate the key whenever the sibling keys change, so a duplicate error
+  // clears once the colliding field is removed/renamed (and reappears if a new
+  // collision is introduced) — validation otherwise only re-ran on keystrokes.
+  useEffect(() => {
+    const trimmed = tempName.trim();
+    setKeyError(trimmed === "" ? null : validateKey(trimmed));
+  }, [validateKey, tempName]);
+
+  const handleKeyInput = (value: string) => {
+    setTempName(value);
+    setKeyEdited(true);
+    const trimmed = value.trim();
+    setKeyError(trimmed === "" ? null : validateKey(trimmed));
+  };
+
+  const handleKeySubmit = () => {
     const trimmedName = tempName.trim();
-    if (trimmedName && trimmedName !== name) {
-      onNameChange(trimmedName);
-    } else {
+    if (trimmedName === name) {
+      setKeyError(null);
+      return;
+    }
+    const error = validateKey(trimmedName);
+    if (error) {
+      // Reject invalid/duplicate keys: revert and keep the existing key.
       setTempName(name);
+      setKeyError(null);
+      return;
+    }
+    onNameChange(trimmedName);
+  };
+
+  const handleTitleSubmit = () => {
+    const trimmedTitle = tempTitle.trim();
+    const titledSchema: ObjectJSONSchema = {
+      ...asObjectSchema(schema),
+      title: trimmedTitle || undefined,
+    };
+
+    // Couple key to label only for new, never-named fields.
+    if (!keyEdited && isDefaultKey && trimmedTitle) {
+      const candidate = uniqueKey(slugifyKey(trimmedTitle), otherKeys);
+      if (validateFieldName(candidate) && candidate !== name) {
+        // Rename and set the title in a single update: emitting them as two
+        // separate changes would have both derive from the same stale schema,
+        // so the rename would overwrite the just-set title (label disappears).
+        onNameChange(candidate, titledSchema);
+        return;
+      }
+    }
+
+    if (trimmedTitle !== getSchemaTitle(schema)) {
+      onSchemaChange(titledSchema);
+    } else {
+      setTempTitle(getSchemaTitle(schema));
     }
   };
 
@@ -102,11 +186,13 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
     }
   };
 
-  // Handle schema changes, preserving description
+  // Handle schema changes, preserving title and description
   const handleSchemaUpdate = (updatedSchema: ObjectJSONSchema) => {
+    const title = getSchemaTitle(schema);
     const description = getSchemaDescription(schema);
     onSchemaChange({
       ...updatedSchema,
+      title: title || undefined,
       description: description || undefined,
     });
   };
@@ -184,7 +270,7 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
                 )}
               </Box>
 
-              {/* Property name and description (labels only) */}
+              {/* Property label (title) with the technical key alongside */}
               <Text
                 fw={500}
                 px={8}
@@ -192,8 +278,21 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
                 truncate
                 style={{ minWidth: 80, maxWidth: "50%" }}
               >
-                {name}
+                {tempTitle || name}
               </Text>
+
+              {/* Show the template-relevant key when a label is set */}
+              {tempTitle && (
+                <Badge
+                  variant="light"
+                  color="gray"
+                  size="sm"
+                  ff="monospace"
+                  style={{ flexShrink: 0, textTransform: "none" }}
+                >
+                  {name}
+                </Badge>
+              )}
 
               {/* Description label */}
               {showDescription && tempDesc && (
@@ -295,11 +394,20 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
           {!readOnly && (
             <Stack gap="md" mb="sm">
               <TextInput
+                label={t.fieldLabelLabel}
+                value={tempTitle}
+                placeholder={t.fieldLabelPlaceholder}
+                onChange={(e) => setTempTitle(e.target.value)}
+                onBlur={handleTitleSubmit}
+                onKeyDown={(e) => e.key === "Enter" && handleTitleSubmit()}
+              />
+              <TextInput
                 label={t.fieldNameLabel}
                 value={tempName}
-                onChange={(e) => setTempName(e.target.value)}
-                onBlur={handleNameSubmit}
-                onKeyDown={(e) => e.key === "Enter" && handleNameSubmit()}
+                error={keyError}
+                onChange={(e) => handleKeyInput(e.target.value)}
+                onBlur={handleKeySubmit}
+                onKeyDown={(e) => e.key === "Enter" && handleKeySubmit()}
               />
               {showDescription && (
                 <TextInput

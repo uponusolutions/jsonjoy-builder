@@ -1,16 +1,16 @@
 import { render } from "@testing-library/react";
 import "../../setup.ts";
-import { stabilizeHtml } from "../../utils.ts";
 import { describe, test } from "node:test";
-import React from "react";
 import { MantineProvider } from "@mantine/core";
+import React from "react";
 import SchemaVisualEditor from "../../../src/components/SchemaEditor/SchemaVisualEditor.tsx";
+import { stabilizeHtml } from "../../utils.ts";
 
 describe("SchemaVisualEditor", () => {
   test("write mode does show constraints", (t) => {
     const element = React.createElement(SchemaVisualEditor, {
       readOnly: false,
-      onChange: () => { },
+      onChange: () => {},
       schema: {
         type: "object",
         properties: {
@@ -30,7 +30,7 @@ describe("SchemaVisualEditor", () => {
   test("read-only mode doesn't show constraints", (t) => {
     const element = React.createElement(SchemaVisualEditor, {
       readOnly: true,
-      onChange: () => { },
+      onChange: () => {},
       schema: {
         type: "object",
         properties: {
