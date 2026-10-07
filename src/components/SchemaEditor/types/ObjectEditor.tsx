@@ -20,6 +20,11 @@ import { cn } from "../../../lib/utils.ts";
 import type { NewField, ObjectJSONSchema } from "../../../types/jsonSchema.ts";
 import { asObjectSchema, isBooleanSchema } from "../../../types/jsonSchema.ts";
 import AddFieldButton from "../AddFieldButton.tsx";
+import {
+  applyRename,
+  ParentObjectContext,
+  useSchemaEditorExtensions,
+} from "../extensions.tsx";
 import SchemaPropertyEditor from "../SchemaPropertyEditor.tsx";
 import type { TypeEditorProps } from "../TypeEditor.tsx";
 
@@ -32,6 +37,7 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
   showDescription = true,
 }) => {
   const t = useTranslation();
+  const extensions = useSchemaEditorExtensions();
 
   // Get object properties
   const properties = useMemo(() => getSchemaProperties(schema), [schema]);
@@ -97,11 +103,16 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
     // renameObjectProperty preserves the property's position and remaps the
     // required array; the old add-then-remove approach moved it to the end.
     onChange(
-      renameObjectProperty(
-        normalizedSchema,
+      applyRename(
+        extensions,
+        renameObjectProperty(
+          normalizedSchema,
+          oldName,
+          newName,
+          propertySchemaObj,
+        ),
         oldName,
         newName,
-        propertySchemaObj,
       ),
     );
   };
@@ -146,101 +157,108 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
   };
 
   return (
-    <Stack gap="md">
-      {properties.length > 0 ? (
-        <DragDropContext onDragEnd={handleDragEnd}>
-          <Droppable droppableId={droppableId}>
-            {(provided) => (
-              <Stack
-                gap="xs"
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-              >
-                {properties.map((property, index) => (
-                  <Draggable
-                    key={property.name}
-                    draggableId={`${droppableId}-${property.name}`}
-                    index={index}
-                    isDragDisabled={readOnly}
-                  >
-                    {(provided, snapshot) => {
-                      const draggableContent = (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          className={cn(
-                            snapshot.isDragging && "opacity-90 shadow-lg",
-                          )}
-                        >
-                          <SchemaPropertyEditor
-                            readOnly={readOnly}
-                            name={property.name}
-                            schema={property.schema}
-                            required={property.required}
-                            validationNode={
-                              validationNode?.children[property.name]
-                            }
-                            onDelete={() => handleDeleteProperty(property.name)}
-                            onNameChange={(newName, newSchema) =>
-                              handlePropertyNameChange(
-                                property.name,
-                                newName,
-                                newSchema,
-                              )
-                            }
-                            onRequiredChange={(required) =>
-                              handlePropertyRequiredChange(
-                                property.name,
-                                required,
-                              )
-                            }
-                            onSchemaChange={(schema) =>
-                              handlePropertySchemaChange(property.name, schema)
-                            }
-                            depth={depth}
-                            showDescription={showDescription}
-                            dragHandleProps={provided.dragHandleProps}
-                            existingKeys={existingKeys}
-                          />
-                        </div>
-                      );
-
-                      // Use portal when dragging to escape stacking context
-                      // Wrap in jsonjoy class to preserve styles
-                      if (snapshot.isDragging) {
-                        return createPortal(
-                          <div className="jsonjoy">{draggableContent}</div>,
-                          document.body,
+    <ParentObjectContext.Provider value={normalizedSchema}>
+      <Stack gap="md">
+        {properties.length > 0 ? (
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <Droppable droppableId={droppableId}>
+              {(provided) => (
+                <Stack
+                  gap="xs"
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                >
+                  {properties.map((property, index) => (
+                    <Draggable
+                      key={property.name}
+                      draggableId={`${droppableId}-${property.name}`}
+                      index={index}
+                      isDragDisabled={readOnly}
+                    >
+                      {(provided, snapshot) => {
+                        const draggableContent = (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            className={cn(
+                              snapshot.isDragging && "opacity-90 shadow-lg",
+                            )}
+                          >
+                            <SchemaPropertyEditor
+                              readOnly={readOnly}
+                              name={property.name}
+                              schema={property.schema}
+                              required={property.required}
+                              validationNode={
+                                validationNode?.children[property.name]
+                              }
+                              onDelete={() =>
+                                handleDeleteProperty(property.name)
+                              }
+                              onNameChange={(newName, newSchema) =>
+                                handlePropertyNameChange(
+                                  property.name,
+                                  newName,
+                                  newSchema,
+                                )
+                              }
+                              onRequiredChange={(required) =>
+                                handlePropertyRequiredChange(
+                                  property.name,
+                                  required,
+                                )
+                              }
+                              onSchemaChange={(schema) =>
+                                handlePropertySchemaChange(
+                                  property.name,
+                                  schema,
+                                )
+                              }
+                              depth={depth}
+                              showDescription={showDescription}
+                              dragHandleProps={provided.dragHandleProps}
+                              existingKeys={existingKeys}
+                            />
+                          </div>
                         );
-                      }
-                      return draggableContent;
-                    }}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </Stack>
-            )}
-          </Droppable>
-        </DragDropContext>
-      ) : (
-        <Paper withBorder p="xs" radius="md">
-          <Text size="sm" c="dimmed" fs="italic" ta="center">
-            {t.objectPropertiesNone}
-          </Text>
-        </Paper>
-      )}
 
-      {!readOnly && (
-        <Box mt="md">
-          <AddFieldButton
-            onAddField={handleAddProperty}
-            variant="secondary"
-            showDescription={showDescription}
-            existingFields={properties.map((p) => p.name)}
-          />
-        </Box>
-      )}
-    </Stack>
+                        // Use portal when dragging to escape stacking context
+                        // Wrap in jsonjoy class to preserve styles
+                        if (snapshot.isDragging) {
+                          return createPortal(
+                            <div className="jsonjoy">{draggableContent}</div>,
+                            document.body,
+                          );
+                        }
+                        return draggableContent;
+                      }}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </Stack>
+              )}
+            </Droppable>
+          </DragDropContext>
+        ) : (
+          <Paper withBorder p="xs" radius="md">
+            <Text size="sm" c="dimmed" fs="italic" ta="center">
+              {t.objectPropertiesNone}
+            </Text>
+          </Paper>
+        )}
+
+        {!readOnly && (
+          <Box mt="md">
+            <AddFieldButton
+              onAddField={handleAddProperty}
+              variant="secondary"
+              showDescription={showDescription}
+              existingFields={properties.map((p) => p.name)}
+            />
+          </Box>
+        )}
+      </Stack>
+    </ParentObjectContext.Provider>
   );
 };
 

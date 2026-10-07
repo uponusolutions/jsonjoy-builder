@@ -11,6 +11,11 @@ import {
 import type { JSONSchema, NewField } from "../../types/jsonSchema.ts";
 import { asObjectSchema, isBooleanSchema } from "../../types/jsonSchema.ts";
 import AddFieldButton from "./AddFieldButton.tsx";
+import {
+  applyRename,
+  type SchemaEditorExtensions,
+  SchemaEditorExtensionsContext,
+} from "./extensions.tsx";
 import SchemaFieldList from "./SchemaFieldList.tsx";
 
 /** @public */
@@ -21,7 +26,11 @@ export interface SchemaVisualEditorProps {
   showDescription?: boolean;
   /** Theme mode: 'light' or 'dark'. Default is 'light'. */
   theme?: "light" | "dark";
+  /** Settings and badges of your own for every field; see `SchemaEditorExtensions`. */
+  extensions?: SchemaEditorExtensions;
 }
+
+const noExtensions: SchemaEditorExtensions = {};
 
 /** @public */
 const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
@@ -30,6 +39,7 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
   readOnly = false,
   showDescription = true,
   theme = "light",
+  extensions = noExtensions,
 }) => {
   const t = useTranslation();
   // Handle adding a top-level field
@@ -68,6 +78,7 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
         updatedField.name,
         fieldSchema,
       );
+      newSchema = applyRename(extensions, newSchema, name, updatedField.name);
     } else {
       newSchema = updateObjectProperty(newSchema, name, fieldSchema);
     }
@@ -125,40 +136,42 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
   const themeClass = theme === "dark" ? "dark" : "";
 
   return (
-    <Stack h="100%" p="md" className={`jsonjoy ${themeClass}`}>
-      {!readOnly && (
-        <Box mb="md">
-          <AddFieldButton
-            onAddField={handleAddField}
-            showDescription={showDescription}
-            existingFields={
-              !isBooleanSchema(schema) && schema.properties
-                ? Object.keys(schema.properties)
-                : []
-            }
-          />
-        </Box>
-      )}
-
-      <ScrollArea style={{ flexGrow: 1 }}>
-        {!hasFields ? (
-          <Stack align="center" py="xl" c="dimmed">
-            <Text mb="xs">{t.visualEditorNoFieldsHint1}</Text>
-            <Text size="sm">{t.visualEditorNoFieldsHint2}</Text>
-          </Stack>
-        ) : (
-          <SchemaFieldList
-            schema={schema}
-            readOnly={readOnly}
-            onAddField={handleAddField}
-            onEditField={handleEditField}
-            onDeleteField={handleDeleteField}
-            onReorderFields={handleReorderFields}
-            showDescription={showDescription}
-          />
+    <SchemaEditorExtensionsContext.Provider value={extensions}>
+      <Stack h="100%" p="md" className={`jsonjoy ${themeClass}`}>
+        {!readOnly && (
+          <Box mb="md">
+            <AddFieldButton
+              onAddField={handleAddField}
+              showDescription={showDescription}
+              existingFields={
+                !isBooleanSchema(schema) && schema.properties
+                  ? Object.keys(schema.properties)
+                  : []
+              }
+            />
+          </Box>
         )}
-      </ScrollArea>
-    </Stack>
+
+        <ScrollArea style={{ flexGrow: 1 }}>
+          {!hasFields ? (
+            <Stack align="center" py="xl" c="dimmed">
+              <Text mb="xs">{t.visualEditorNoFieldsHint1}</Text>
+              <Text size="sm">{t.visualEditorNoFieldsHint2}</Text>
+            </Stack>
+          ) : (
+            <SchemaFieldList
+              schema={schema}
+              readOnly={readOnly}
+              onAddField={handleAddField}
+              onEditField={handleEditField}
+              onDeleteField={handleDeleteField}
+              onReorderFields={handleReorderFields}
+              showDescription={showDescription}
+            />
+          )}
+        </ScrollArea>
+      </Stack>
+    </SchemaEditorExtensionsContext.Provider>
   );
 };
 

@@ -108,6 +108,31 @@ const es: Translation = {
 
 See also the [English localizations file](https://github.com/lovasoa/jsonjoy-builder/blob/main/src/i18n/locales/en.ts) for the default localizations.
 
+### Field extensions
+
+`SchemaVisualEditor` takes an optional `extensions` prop to add settings of your own to every
+field — for example custom keywords such as `x-ui` stored on the field's schema:
+
+```tsx
+<SchemaVisualEditor
+  schema={schema}
+  onChange={setSchema}
+  extensions={{
+    // Below the type specific settings of an expanded field.
+    renderFieldSettings: ({ name, schema, parent, readOnly, onChange }) => (
+      <MySettings schema={schema} onChange={onChange} disabled={readOnly} />
+    ),
+    // In the field's header, before the type dropdown.
+    renderFieldBadges: ({ schema }) => (schema["x-ui"] ? <Badge>ui</Badge> : null),
+    // Update references to a renamed property among its siblings.
+    onPropertyRenamed: (parent, oldName, newName) => parent,
+  }}
+/>
+```
+
+`parent` is the object schema whose `properties` hold the field, so settings can refer to sibling
+fields. Without `extensions` the editor renders exactly as before.
+
 ### Development
 
 ```bash

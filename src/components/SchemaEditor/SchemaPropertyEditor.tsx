@@ -37,6 +37,11 @@ import {
   withObjectSchema,
 } from "../../types/jsonSchema.ts";
 import type { ValidationTreeNode } from "../../types/validation.ts";
+import {
+  type FieldExtensionContext,
+  useParentObject,
+  useSchemaEditorExtensions,
+} from "./extensions.tsx";
 import RequiredDropdown from "./RequiredDropdown.tsx";
 import TypeDropdown from "./TypeDropdown.tsx";
 import TypeEditor from "./TypeEditor.tsx";
@@ -74,6 +79,15 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
   existingKeys = [],
 }) => {
   const t = useTranslation();
+  const extensions = useSchemaEditorExtensions();
+  const parent = useParentObject();
+  const extensionContext: FieldExtensionContext = {
+    name,
+    schema,
+    parent,
+    readOnly,
+    onChange: onSchemaChange,
+  };
   const [expanded, setExpanded] = useState(false);
   const [tempName, setTempName] = useState(name);
   const [tempTitle, setTempTitle] = useState(getSchemaTitle(schema));
@@ -314,6 +328,7 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
 
         {/* Right side controls */}
         <Group gap="xs" wrap="nowrap">
+          {extensions.renderFieldBadges?.(extensionContext)}
           <TypeDropdown
             value={type}
             format={format}
@@ -432,6 +447,11 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
             depth={depth + 1}
             showDescription={showDescription}
           />
+          {extensions.renderFieldSettings && (
+            <Box mt="md">
+              {extensions.renderFieldSettings(extensionContext)}
+            </Box>
+          )}
         </Box>
       )}
     </Paper>
