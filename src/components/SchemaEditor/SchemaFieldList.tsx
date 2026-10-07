@@ -15,7 +15,9 @@ import type {
   ObjectJSONSchema,
   SchemaType,
 } from "../../types/jsonSchema.ts";
+import { asObjectSchema } from "../../types/jsonSchema.ts";
 import { buildValidationTree } from "../../types/validation.ts";
+import { ParentObjectContext } from "./extensions.tsx";
 import SchemaPropertyEditor from "./SchemaPropertyEditor.tsx";
 
 interface SchemaFieldListProps {
@@ -139,107 +141,115 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
     onReorderFields?.(result.source.index, result.destination.index);
   };
 
+  const parent = useMemo(() => asObjectSchema(schema), [schema]);
+
   // When readOnly or no reorder handler, render without drag-drop
   if (readOnly || !onReorderFields) {
     return (
-      <Stack gap="xs" className="animate-in">
-        {properties.map((property) => (
-          <SchemaPropertyEditor
-            key={property.name}
-            name={property.name}
-            schema={property.schema}
-            required={property.required}
-            validationNode={validationTree.children[property.name] ?? undefined}
-            onDelete={() => onDeleteField(property.name)}
-            onNameChange={(newName, newSchema) =>
-              handleNameChange(property.name, newName, newSchema)
-            }
-            onRequiredChange={(required) =>
-              handleRequiredChange(property.name, required)
-            }
-            onSchemaChange={(schema) =>
-              handleSchemaChange(property.name, schema)
-            }
-            readOnly={readOnly}
-            showDescription={showDescription}
-            existingKeys={existingKeys}
-          />
-        ))}
-      </Stack>
+      <ParentObjectContext.Provider value={parent}>
+        <Stack gap="xs" className="animate-in">
+          {properties.map((property) => (
+            <SchemaPropertyEditor
+              key={property.name}
+              name={property.name}
+              schema={property.schema}
+              required={property.required}
+              validationNode={
+                validationTree.children[property.name] ?? undefined
+              }
+              onDelete={() => onDeleteField(property.name)}
+              onNameChange={(newName, newSchema) =>
+                handleNameChange(property.name, newName, newSchema)
+              }
+              onRequiredChange={(required) =>
+                handleRequiredChange(property.name, required)
+              }
+              onSchemaChange={(schema) =>
+                handleSchemaChange(property.name, schema)
+              }
+              readOnly={readOnly}
+              showDescription={showDescription}
+              existingKeys={existingKeys}
+            />
+          ))}
+        </Stack>
+      </ParentObjectContext.Provider>
     );
   }
 
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
-      <Droppable droppableId="schema-fields">
-        {(provided) => (
-          <Stack
-            {...provided.droppableProps}
-            ref={provided.innerRef}
-            gap="xs"
-            className="animate-in"
-          >
-            {properties.map((property, index) => (
-              <Draggable
-                key={property.name}
-                draggableId={property.name}
-                index={index}
-              >
-                {(provided, snapshot) => {
-                  const content = (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      style={{
-                        ...provided.draggableProps.style,
-                        opacity: snapshot.isDragging ? 0.9 : 1,
-                        boxShadow: snapshot.isDragging
-                          ? "var(--mantine-shadow-lg)"
-                          : "none",
-                      }}
-                    >
-                      <SchemaPropertyEditor
-                        name={property.name}
-                        schema={property.schema}
-                        required={property.required}
-                        validationNode={
-                          validationTree.children[property.name] ?? undefined
-                        }
-                        onDelete={() => onDeleteField(property.name)}
-                        onNameChange={(newName, newSchema) =>
-                          handleNameChange(property.name, newName, newSchema)
-                        }
-                        onRequiredChange={(required) =>
-                          handleRequiredChange(property.name, required)
-                        }
-                        onSchemaChange={(schema) =>
-                          handleSchemaChange(property.name, schema)
-                        }
-                        readOnly={readOnly}
-                        dragHandleProps={provided.dragHandleProps}
-                        showDescription={showDescription}
-                        existingKeys={existingKeys}
-                      />
-                    </div>
-                  );
-
-                  // Use portal when dragging to avoid transform issues
-                  // Wrap in jsonjoy class to preserve styles
-                  if (snapshot.isDragging) {
-                    return createPortal(
-                      <div className="jsonjoy">{content}</div>,
-                      document.body,
+    <ParentObjectContext.Provider value={parent}>
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <Droppable droppableId="schema-fields">
+          {(provided) => (
+            <Stack
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+              gap="xs"
+              className="animate-in"
+            >
+              {properties.map((property, index) => (
+                <Draggable
+                  key={property.name}
+                  draggableId={property.name}
+                  index={index}
+                >
+                  {(provided, snapshot) => {
+                    const content = (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        style={{
+                          ...provided.draggableProps.style,
+                          opacity: snapshot.isDragging ? 0.9 : 1,
+                          boxShadow: snapshot.isDragging
+                            ? "var(--mantine-shadow-lg)"
+                            : "none",
+                        }}
+                      >
+                        <SchemaPropertyEditor
+                          name={property.name}
+                          schema={property.schema}
+                          required={property.required}
+                          validationNode={
+                            validationTree.children[property.name] ?? undefined
+                          }
+                          onDelete={() => onDeleteField(property.name)}
+                          onNameChange={(newName, newSchema) =>
+                            handleNameChange(property.name, newName, newSchema)
+                          }
+                          onRequiredChange={(required) =>
+                            handleRequiredChange(property.name, required)
+                          }
+                          onSchemaChange={(schema) =>
+                            handleSchemaChange(property.name, schema)
+                          }
+                          readOnly={readOnly}
+                          dragHandleProps={provided.dragHandleProps}
+                          showDescription={showDescription}
+                          existingKeys={existingKeys}
+                        />
+                      </div>
                     );
-                  }
-                  return content;
-                }}
-              </Draggable>
-            ))}
-            {provided.placeholder}
-          </Stack>
-        )}
-      </Droppable>
-    </DragDropContext>
+
+                    // Use portal when dragging to avoid transform issues
+                    // Wrap in jsonjoy class to preserve styles
+                    if (snapshot.isDragging) {
+                      return createPortal(
+                        <div className="jsonjoy">{content}</div>,
+                        document.body,
+                      );
+                    }
+                    return content;
+                  }}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </Stack>
+          )}
+        </Droppable>
+      </DragDropContext>
+    </ParentObjectContext.Provider>
   );
 };
 
