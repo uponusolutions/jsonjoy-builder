@@ -7,6 +7,7 @@ import {
 import { Box, Paper, Stack, Text } from "@mantine/core";
 import { useId, useMemo } from "react";
 import { createPortal } from "react-dom";
+import { useStableKeys } from "../../../hooks/use-stable-keys.ts";
 import { useTranslation } from "../../../hooks/use-translation.ts";
 import {
   getSchemaProperties,
@@ -38,6 +39,7 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
 }) => {
   const t = useTranslation();
   const extensions = useSchemaEditorExtensions();
+  const { keyOf, rename } = useStableKeys();
 
   // Get object properties
   const properties = useMemo(() => getSchemaProperties(schema), [schema]);
@@ -99,6 +101,7 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
     // updated schema (carrying the new title) so the rename and the title
     // change land in one update instead of overwriting each other.
     const propertySchemaObj = newSchema ?? asObjectSchema(property.schema);
+    rename(oldName, newName);
 
     // renameObjectProperty preserves the property's position and remaps the
     // required array; the old add-then-remove approach moved it to the end.
@@ -170,8 +173,8 @@ const ObjectEditor: React.FC<TypeEditorProps> = ({
                 >
                   {properties.map((property, index) => (
                     <Draggable
-                      key={property.name}
-                      draggableId={`${droppableId}-${property.name}`}
+                      key={keyOf(property.name)}
+                      draggableId={`${droppableId}-${keyOf(property.name)}`}
                       index={index}
                       isDragDisabled={readOnly}
                     >

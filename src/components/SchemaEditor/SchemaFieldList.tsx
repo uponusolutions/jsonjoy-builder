@@ -7,6 +7,7 @@ import {
 import { Stack } from "@mantine/core";
 import { type FC, useMemo } from "react";
 import { createPortal } from "react-dom";
+import { useStableKeys } from "../../hooks/use-stable-keys.ts";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import { getSchemaProperties } from "../../lib/schemaEditor.ts";
 import type {
@@ -39,6 +40,7 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
   showDescription = true,
 }) => {
   const t = useTranslation();
+  const { keyOf, rename } = useStableKeys();
 
   // Get the properties from the schema
   const properties = useMemo(() => getSchemaProperties(schema), [schema]);
@@ -80,6 +82,7 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
         ? { type: "object" as const }
         : property.schema);
 
+    rename(oldName, newName);
     onEditField(oldName, {
       name: newName,
       type: getValidSchemaType(schema),
@@ -150,7 +153,7 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
         <Stack gap="xs" className="animate-in">
           {properties.map((property) => (
             <SchemaPropertyEditor
-              key={property.name}
+              key={keyOf(property.name)}
               name={property.name}
               schema={property.schema}
               required={property.required}
@@ -190,8 +193,8 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
             >
               {properties.map((property, index) => (
                 <Draggable
-                  key={property.name}
-                  draggableId={property.name}
+                  key={keyOf(property.name)}
+                  draggableId={keyOf(property.name)}
                   index={index}
                 >
                   {(provided, snapshot) => {
