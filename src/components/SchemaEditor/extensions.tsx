@@ -25,6 +25,11 @@ export interface SchemaEditorExtensions {
   /** Rendered in a field's header, before the type dropdown. */
   renderFieldBadges?: (ctx: FieldExtensionContext) => ReactNode;
   /**
+   * Leaves the allowed values (`enum`) input out of the text type settings, e.g. because
+   * `renderFieldSettings` edits the allowed values together with data of your own.
+   */
+  hideAllowedValues?: boolean;
+  /**
    * Called after a property of `parent` was renamed from `oldName` to `newName`; returns the parent
    * with any references to the old name updated.
    */

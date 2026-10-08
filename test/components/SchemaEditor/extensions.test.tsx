@@ -122,4 +122,17 @@ describe("SchemaVisualEditor extensions", () => {
     assert.equal(last.$comment, "renamed kind");
     assert.deepEqual(Object.keys(last.properties), ["type", "group"]);
   });
+
+  test("leave out the allowed values input of text fields on request", async () => {
+    renderEditor({});
+    expand("kind");
+    await waitFor(() =>
+      assert.ok(body().getByText(en.stringAllowedValuesEnumLabel)),
+    );
+    cleanup();
+    renderEditor({ hideAllowedValues: true });
+    expand("kind");
+    await waitFor(() => assert.ok(body().getByText(en.stringPatternLabel)));
+    assert.equal(body().queryByText(en.stringAllowedValuesEnumLabel), null);
+  });
 });

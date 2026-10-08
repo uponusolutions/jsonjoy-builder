@@ -126,6 +126,8 @@ field — for example custom keywords such as `x-ui` stored on the field's schem
     renderFieldBadges: ({ schema }) => (schema["x-ui"] ? <Badge>ui</Badge> : null),
     // Update references to a renamed property among its siblings.
     onPropertyRenamed: (parent, oldName, newName) => parent,
+    // Leave out the allowed values input of text fields, e.g. to edit them in your own settings.
+    hideAllowedValues: true,
   }}
 />
 ```

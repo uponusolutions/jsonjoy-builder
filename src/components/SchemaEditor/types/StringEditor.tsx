@@ -2,6 +2,7 @@ import { Select, SimpleGrid, Stack, TagsInput, TextInput } from "@mantine/core";
 import { useTranslation } from "../../../hooks/use-translation.ts";
 import { useValidatedNumericInputs } from "../../../hooks/use-validated-numeric-inputs.ts";
 import { withObjectSchema } from "../../../types/jsonSchema.ts";
+import { useSchemaEditorExtensions } from "../extensions.tsx";
 import type { TypeEditorProps } from "../TypeEditor.tsx";
 
 type Property = "enum" | "minLength" | "maxLength" | "pattern" | "format";
@@ -13,6 +14,7 @@ const StringEditor: React.FC<TypeEditorProps> = ({
   readOnly = false,
 }) => {
   const t = useTranslation();
+  const { hideAllowedValues } = useSchemaEditorExtensions();
 
   const minLength = withObjectSchema(schema, (s) => s.minLength, undefined);
   const maxLength = withObjectSchema(schema, (s) => s.maxLength, undefined);
@@ -143,15 +145,17 @@ const StringEditor: React.FC<TypeEditorProps> = ({
         clearable
       />
 
-      <TagsInput
-        label={t.stringAllowedValuesEnumLabel}
-        placeholder={t.stringAllowedValuesEnumAddPlaceholder}
-        value={enumValues}
-        onChange={handleEnumChange}
-        disabled={readOnly}
-        splitChars={[",", "Enter"]}
-        acceptValueOnBlur
-      />
+      {!hideAllowedValues && (
+        <TagsInput
+          label={t.stringAllowedValuesEnumLabel}
+          placeholder={t.stringAllowedValuesEnumAddPlaceholder}
+          value={enumValues}
+          onChange={handleEnumChange}
+          disabled={readOnly}
+          splitChars={[",", "Enter"]}
+          acceptValueOnBlur
+        />
+      )}
     </Stack>
   );
 };
