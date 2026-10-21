@@ -96,22 +96,25 @@ export function removeObjectProperty(
 }
 
 /**
- * Reorders properties in an object schema
+ * Reorders properties in an object schema: moves `count` consecutive entries starting at
+ * `fromIndex` so that they start at `toIndex` of the list without them.
  */
 export function reorderProperties(
   schema: ObjectJSONSchema,
   fromIndex: number,
   toIndex: number,
+  count = 1,
 ): ObjectJSONSchema {
   if (!isObjectSchema(schema) || !schema.properties) return schema;
 
   const entries = Object.entries(schema.properties);
-  if (fromIndex < 0 || fromIndex >= entries.length) return schema;
-  if (toIndex < 0 || toIndex >= entries.length) return schema;
+  if (count < 1) return schema;
+  if (fromIndex < 0 || fromIndex + count > entries.length) return schema;
+  if (toIndex < 0 || toIndex > entries.length - count) return schema;
 
   const newSchema = copySchema(schema);
-  const [moved] = entries.splice(fromIndex, 1);
-  entries.splice(toIndex, 0, moved);
+  const moved = entries.splice(fromIndex, count);
+  entries.splice(toIndex, 0, ...moved);
 
   newSchema.properties = Object.fromEntries(entries);
   return newSchema;

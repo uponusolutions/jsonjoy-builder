@@ -167,6 +167,45 @@ const heading: CustomFieldType = {
 />;
 ```
 
+#### Sections
+
+`sections` groups the root properties into boxes, e.g. the pages of a form. A property for which
+`isStart` returns true is the header of a section; the properties after it, up to the next start,
+are its fields and sit inside the box. The start keeps all of its row behaviour (expand to edit,
+badges, type dropdown, delete). Properties before the first start form an implicit first section,
+titled `firstTitle`, shown only when it has fields; it cannot be dragged or deleted.
+
+- Sections apply to the root list only, never inside objects or lists.
+- The top "Add field" button is replaced by one per section, which inserts at the end of that
+  section.
+- Drag a field to another section, or a whole section by the handle of its start property.
+- Deleting a start property removes only that property; its fields merge into the previous
+  section (into the implicit first section when it was the first start).
+- Without a section start (or without `sections`) the editor renders as before.
+
+The schema stays the flat property list, so sections are presentation only.
+
+```tsx
+const pageBreak: CustomFieldType = {
+  id: "pageBreak",
+  label: "Page break",
+  matches: (schema) => typeof schema === "object" && schema["x-page"] === true,
+  create: (schema) => ({ type: "string", title: schema.title, "x-page": true }),
+};
+
+<SchemaVisualEditor
+  schema={schema}
+  onChange={setSchema}
+  extensions={{
+    customTypes: [pageBreak],
+    sections: {
+      isStart: (schema) => pageBreak.matches(schema),
+      firstTitle: "Page 1",
+    },
+  }}
+/>;
+```
+
 ### Development
 
 ```bash

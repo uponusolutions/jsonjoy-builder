@@ -16,6 +16,7 @@ export type {
   CustomFieldType,
   FieldExtensionContext,
   SchemaEditorExtensions,
+  SectionExtension,
 } from "./components/SchemaEditor/extensions.tsx";
 export * from "./components/ui/theme-toggle.tsx";
 export * from "./hooks/use-theme.ts";

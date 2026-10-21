@@ -452,6 +452,12 @@ export interface Translation {
   readonly numberValidationErrorEnumOutOfRange: string;
 
   /**
+   * The translation for the key `sectionEmpty`. English default is:
+   *
+   * > No fields yet
+   */
+  readonly sectionEmpty: string;
+  /**
    * The translation for the key `objectPropertiesNone`. English default is:
    *
    * > No properties defined

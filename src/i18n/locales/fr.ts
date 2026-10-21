@@ -96,6 +96,7 @@ export const fr: Translation = {
   numberValidationErrorEnumOutOfRange:
     "Les valeurs d'énumération doivent être dans la plage définie.",
 
+  sectionEmpty: "Aucun champ pour le moment",
   objectPropertiesNone: "Aucune propriété définie",
   objectValidationErrorMinMax:
     "'minProperties' ne peut pas être supérieur à 'maxProperties'.",

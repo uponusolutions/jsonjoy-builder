@@ -94,6 +94,7 @@ export const ru: Translation = {
   numberValidationErrorEnumOutOfRange:
     "Значения перечисления должны быть в пределах определенного диапазона.",
 
+  sectionEmpty: "Полей пока нет",
   objectPropertiesNone: "Нет определенных свойств",
   objectValidationErrorMinMax:
     "'minProperties' не может быть больше 'maxProperties'.",

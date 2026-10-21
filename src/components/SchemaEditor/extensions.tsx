@@ -40,6 +40,14 @@ export interface CustomFieldType {
   canBeRequired?: boolean;
 }
 
+/** @public Splits the root object's properties into sections, e.g. the pages of a form. */
+export interface SectionExtension {
+  /** True when the property starts a section; the properties up to the next start belong to it. */
+  isStart: (schema: JSONSchema) => boolean;
+  /** Heading of the implicit first section: the properties before the first start. */
+  firstTitle: string;
+}
+
 /**
  * @public
  * Hooks to add settings of your own to every field, e.g. stored as custom keywords on the field's
@@ -70,6 +78,13 @@ export interface SchemaEditorExtensions {
    * `canBeRequired`); the first matching type wins.
    */
   customTypes?: CustomFieldType[];
+  /**
+   * Groups the root object's properties into boxes: every property matching `isStart` is the
+   * header of a section holding the properties after it, up to the next start. Fields can be
+   * dragged between sections and a section by its header. Root level only (never inside objects
+   * or lists); nothing changes without it or while no property starts a section.
+   */
+  sections?: SectionExtension;
 }
 
 export const SchemaEditorExtensionsContext =

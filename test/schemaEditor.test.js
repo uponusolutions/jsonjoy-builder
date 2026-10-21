@@ -1,6 +1,7 @@
 import assert from "node:assert";
 import { describe, test } from "node:test";
 import {
+  reorderProperties,
   slugifyKey,
   uniqueKey,
   validateFieldName,
@@ -62,5 +63,46 @@ describe("uniqueKey", () => {
       uniqueKey("firstName", ["firstName", "firstName2"]),
       "firstName3",
     );
+  });
+});
+
+describe("reorderProperties with count", () => {
+  const schema = {
+    type: "object",
+    required: ["a", "c"],
+    properties: {
+      a: { type: "string" },
+      b: { type: "string" },
+      c: { type: "string" },
+      d: { type: "string" },
+      e: { type: "string" },
+    },
+  };
+  const keys = (s) => Object.keys(s.properties).join("");
+
+  test("moves a block down", () => {
+    assert.strictEqual(keys(reorderProperties(schema, 0, 3, 2)), "cdeab");
+    assert.strictEqual(keys(reorderProperties(schema, 1, 2, 2)), "adbce");
+  });
+
+  test("moves a block up", () => {
+    assert.strictEqual(keys(reorderProperties(schema, 3, 0, 2)), "deabc");
+    assert.strictEqual(keys(reorderProperties(schema, 2, 1, 3)), "acdeb");
+  });
+
+  test("returns the schema unchanged when out of bounds", () => {
+    assert.strictEqual(reorderProperties(schema, 4, 0, 2), schema);
+    assert.strictEqual(reorderProperties(schema, -1, 0, 2), schema);
+    assert.strictEqual(reorderProperties(schema, 0, 4, 2), schema);
+    assert.strictEqual(reorderProperties(schema, 0, 1, 0), schema);
+    assert.strictEqual(reorderProperties(schema, 0, 5), schema);
+  });
+
+  test("keeps count 1 as before and leaves required untouched", () => {
+    assert.strictEqual(keys(reorderProperties(schema, 0, 4)), "bcdea");
+    assert.strictEqual(keys(reorderProperties(schema, 4, 0)), "eabcd");
+    const moved = reorderProperties(schema, 0, 3, 2);
+    assert.deepStrictEqual(moved.required, ["a", "c"]);
+    assert.deepStrictEqual(schema.properties.a, moved.properties.a);
   });
 });

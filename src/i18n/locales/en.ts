@@ -92,6 +92,7 @@ export const en: Translation = {
   numberValidationErrorEnumOutOfRange:
     "Enum values must be within the defined range.",
 
+  sectionEmpty: "No fields yet",
   objectPropertiesNone: "No properties defined",
   objectValidationErrorMinMax:
     "'minProperties' cannot be greater than 'maxProperties'.",

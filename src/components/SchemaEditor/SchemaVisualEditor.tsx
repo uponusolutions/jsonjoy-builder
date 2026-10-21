@@ -8,6 +8,7 @@ import {
   updateObjectProperty,
   updatePropertyRequired,
 } from "../../lib/schemaEditor.ts";
+import { hasSections } from "../../lib/sections.ts";
 import type { JSONSchema, NewField } from "../../types/jsonSchema.ts";
 import { asObjectSchema, isBooleanSchema } from "../../types/jsonSchema.ts";
 import AddFieldButton from "./AddFieldButton.tsx";
@@ -43,7 +44,7 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
 }) => {
   const t = useTranslation();
   // Handle adding a top-level field
-  const handleAddField = (newField: NewField) => {
+  const handleAddField = (newField: NewField, atIndex?: number) => {
     // Create a field schema based on the new field data
     const fieldSchema = createFieldSchema(newField);
 
@@ -57,6 +58,12 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
     // Update required status if needed
     if (newField.required) {
       newSchema = updatePropertyRequired(newSchema, newField.name, true);
+    }
+
+    // Move the new field from the end to the requested position
+    const lastIndex = Object.keys(newSchema.properties ?? {}).length - 1;
+    if (atIndex !== undefined && atIndex >= 0 && atIndex < lastIndex) {
+      newSchema = reorderProperties(newSchema, lastIndex, atIndex);
     }
 
     // Update the schema
@@ -119,11 +126,16 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
   };
 
   // Handle reordering fields via drag and drop
-  const handleReorderFields = (fromIndex: number, toIndex: number) => {
+  const handleReorderFields = (
+    fromIndex: number,
+    toIndex: number,
+    count = 1,
+  ) => {
     const newSchema = reorderProperties(
       asObjectSchema(schema),
       fromIndex,
       toIndex,
+      count,
     );
     onChange(newSchema);
   };
@@ -138,7 +150,7 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
   return (
     <SchemaEditorExtensionsContext.Provider value={extensions}>
       <Stack h="100%" p="md" className={`jsonjoy ${themeClass}`}>
-        {!readOnly && (
+        {!readOnly && !hasSections(schema, extensions) && (
           <Box mb="md">
             <AddFieldButton
               onAddField={handleAddField}

@@ -1,3 +1,4 @@
+import type { DraggableProvidedDragHandleProps } from "@hello-pangea/dnd";
 import {
   DragDropContext,
   Draggable,
@@ -9,7 +10,8 @@ import { type FC, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { useStableKeys } from "../../hooks/use-stable-keys.ts";
 import { useTranslation } from "../../hooks/use-translation.ts";
-import { getSchemaProperties } from "../../lib/schemaEditor.ts";
+import { getSchemaProperties, type Property } from "../../lib/schemaEditor.ts";
+import { hasSections } from "../../lib/sections.ts";
 import type {
   JSONSchema as JSONSchemaType,
   NewField,
@@ -18,21 +20,32 @@ import type {
 } from "../../types/jsonSchema.ts";
 import { asObjectSchema } from "../../types/jsonSchema.ts";
 import { buildValidationTree } from "../../types/validation.ts";
-import { ParentObjectContext } from "./extensions.tsx";
+import {
+  ParentObjectContext,
+  useSchemaEditorExtensions,
+} from "./extensions.tsx";
 import SchemaPropertyEditor from "./SchemaPropertyEditor.tsx";
+import SchemaSectionList from "./SchemaSectionList.tsx";
 
 interface SchemaFieldListProps {
   schema: JSONSchemaType;
   readOnly: boolean;
-  onAddField: (newField: NewField) => void;
+  /** `atIndex` is the flat position to insert the new field at; default: the end. */
+  onAddField: (newField: NewField, atIndex?: number) => void;
   onEditField: (name: string, updatedField: NewField) => void;
   onDeleteField: (name: string) => void;
-  onReorderFields?: (fromIndex: number, toIndex: number) => void;
+  /** Moves `count` (default 1) consecutive fields from `fromIndex` to `toIndex`. */
+  onReorderFields?: (
+    fromIndex: number,
+    toIndex: number,
+    count?: number,
+  ) => void;
   showDescription?: boolean;
 }
 
 const SchemaFieldList: FC<SchemaFieldListProps> = ({
   schema,
+  onAddField,
   onEditField,
   onDeleteField,
   onReorderFields,
@@ -41,6 +54,7 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
 }) => {
   const t = useTranslation();
   const { keyOf, rename } = useStableKeys();
+  const extensions = useSchemaEditorExtensions();
 
   // Get the properties from the schema
   const properties = useMemo(() => getSchemaProperties(schema), [schema]);
@@ -146,35 +160,52 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
 
   const parent = useMemo(() => asObjectSchema(schema), [schema]);
 
+  const renderRow = (
+    property: Property,
+    dragHandleProps?: DraggableProvidedDragHandleProps | null,
+  ) => (
+    <SchemaPropertyEditor
+      key={keyOf(property.name)}
+      name={property.name}
+      schema={property.schema}
+      required={property.required}
+      validationNode={validationTree.children[property.name] ?? undefined}
+      onDelete={() => onDeleteField(property.name)}
+      onNameChange={(newName, newSchema) =>
+        handleNameChange(property.name, newName, newSchema)
+      }
+      onRequiredChange={(required) =>
+        handleRequiredChange(property.name, required)
+      }
+      onSchemaChange={(schema) => handleSchemaChange(property.name, schema)}
+      readOnly={readOnly}
+      dragHandleProps={dragHandleProps}
+      showDescription={showDescription}
+      existingKeys={existingKeys}
+    />
+  );
+
+  if (hasSections(schema, extensions)) {
+    return (
+      <ParentObjectContext.Provider value={parent}>
+        <SchemaSectionList
+          schema={schema}
+          readOnly={readOnly}
+          onAddField={onAddField}
+          onReorderFields={onReorderFields}
+          renderRow={renderRow}
+          keyOf={keyOf}
+        />
+      </ParentObjectContext.Provider>
+    );
+  }
+
   // When readOnly or no reorder handler, render without drag-drop
   if (readOnly || !onReorderFields) {
     return (
       <ParentObjectContext.Provider value={parent}>
         <Stack gap="xs" className="animate-in">
-          {properties.map((property) => (
-            <SchemaPropertyEditor
-              key={keyOf(property.name)}
-              name={property.name}
-              schema={property.schema}
-              required={property.required}
-              validationNode={
-                validationTree.children[property.name] ?? undefined
-              }
-              onDelete={() => onDeleteField(property.name)}
-              onNameChange={(newName, newSchema) =>
-                handleNameChange(property.name, newName, newSchema)
-              }
-              onRequiredChange={(required) =>
-                handleRequiredChange(property.name, required)
-              }
-              onSchemaChange={(schema) =>
-                handleSchemaChange(property.name, schema)
-              }
-              readOnly={readOnly}
-              showDescription={showDescription}
-              existingKeys={existingKeys}
-            />
-          ))}
+          {properties.map((property) => renderRow(property))}
         </Stack>
       </ParentObjectContext.Provider>
     );
@@ -210,28 +241,7 @@ const SchemaFieldList: FC<SchemaFieldListProps> = ({
                             : "none",
                         }}
                       >
-                        <SchemaPropertyEditor
-                          name={property.name}
-                          schema={property.schema}
-                          required={property.required}
-                          validationNode={
-                            validationTree.children[property.name] ?? undefined
-                          }
-                          onDelete={() => onDeleteField(property.name)}
-                          onNameChange={(newName, newSchema) =>
-                            handleNameChange(property.name, newName, newSchema)
-                          }
-                          onRequiredChange={(required) =>
-                            handleRequiredChange(property.name, required)
-                          }
-                          onSchemaChange={(schema) =>
-                            handleSchemaChange(property.name, schema)
-                          }
-                          readOnly={readOnly}
-                          dragHandleProps={provided.dragHandleProps}
-                          showDescription={showDescription}
-                          existingKeys={existingKeys}
-                        />
+                        {renderRow(property, provided.dragHandleProps)}
                       </div>
                     );
 
