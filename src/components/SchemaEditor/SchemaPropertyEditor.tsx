@@ -18,7 +18,7 @@ import {
   GripVertical,
   X,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "../../hooks/use-translation.ts";
 import {
   slugifyKey,
@@ -38,7 +38,9 @@ import {
 } from "../../types/jsonSchema.ts";
 import type { ValidationTreeNode } from "../../types/validation.ts";
 import {
+  type CustomFieldType,
   type FieldExtensionContext,
+  matchingCustomType,
   useParentObject,
   useSchemaEditorExtensions,
 } from "./extensions.tsx";
@@ -88,6 +90,13 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
     readOnly,
     onChange: onSchemaChange,
   };
+  // A custom type of the extensions the field's schema is of, if any.
+  const customType = matchingCustomType(extensions, schema);
+  const showRequired = !customType || customType.canBeRequired === true;
+  // Set when the field was switched to a custom type that cannot be required, so its required
+  // entry is dropped once the new schema arrived (a second update right away would start from
+  // the old schema and restore the entry).
+  const dropRequired = useRef(false);
   const [expanded, setExpanded] = useState(false);
   const [tempName, setTempName] = useState(name);
   const [tempTitle, setTempTitle] = useState(getSchemaTitle(schema));
@@ -119,6 +128,12 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
     setTempDesc(getSchemaDescription(schema));
     setKeyError(null);
   }, [name, schema]);
+
+  useEffect(() => {
+    if (!dropRequired.current || !customType) return;
+    dropRequired.current = false;
+    if (required && !customType.canBeRequired) onRequiredChange(false);
+  });
 
   // Validates a candidate key and returns a translation message, or null if ok.
   const validateKey = useCallback(
@@ -209,6 +224,31 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
       title: title || undefined,
       description: description || undefined,
     });
+  };
+
+  const handleJsonType = (newType: SchemaType, newFormat?: string) => {
+    if (customType) {
+      // Nothing but the label and the description carries over from a custom type.
+      const title = getSchemaTitle(schema);
+      const description = getSchemaDescription(schema);
+      onSchemaChange({
+        type: newType,
+        ...(title && { title }),
+        ...(description && { description }),
+        ...(newFormat && { format: newFormat }),
+      });
+      return;
+    }
+    onSchemaChange({
+      ...asObjectSchema(schema),
+      type: newType,
+      format: newFormat,
+    });
+  };
+
+  const handleCustomType = (newType: CustomFieldType) => {
+    dropRequired.current = required && !newType.canBeRequired;
+    onSchemaChange(newType.create(asObjectSchema(schema)));
   };
 
   const hasErrors = validationNode?.validation?.success === false;
@@ -333,21 +373,19 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
             value={type}
             format={format}
             readOnly={readOnly}
-            onChange={(newType, newFormat) => {
-              onSchemaChange({
-                ...asObjectSchema(schema),
-                type: newType,
-                format: newFormat,
-              });
-            }}
+            schema={schema}
+            onChange={handleJsonType}
+            onCustomType={handleCustomType}
           />
 
           {/* Required toggle */}
-          <RequiredDropdown
-            required={required}
-            onChange={onRequiredChange}
-            readOnly={readOnly}
-          />
+          {showRequired && (
+            <RequiredDropdown
+              required={required}
+              onChange={onRequiredChange}
+              readOnly={readOnly}
+            />
+          )}
 
           {/* Error badge */}
           {validationNode?.cumulativeChildrenErrors > 0 && (
@@ -439,14 +477,16 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
           {readOnly && tempDesc && (
             <p className="pb-2 text-sm text-gray-600">{tempDesc}</p>
           )}
-          <TypeEditor
-            schema={schema}
-            readOnly={readOnly}
-            validationNode={validationNode}
-            onChange={handleSchemaUpdate}
-            depth={depth + 1}
-            showDescription={showDescription}
-          />
+          {!customType && (
+            <TypeEditor
+              schema={schema}
+              readOnly={readOnly}
+              validationNode={validationNode}
+              onChange={handleSchemaUpdate}
+              depth={depth + 1}
+              showDescription={showDescription}
+            />
+          )}
           {extensions.renderFieldSettings && (
             <Box mt="md">
               {extensions.renderFieldSettings(extensionContext)}

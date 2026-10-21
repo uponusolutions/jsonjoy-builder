@@ -16,6 +16,32 @@ export interface FieldExtensionContext {
 
 /**
  * @public
+ * A kind of field of your own, listed in the type dropdown after the JSON types, e.g. a static
+ * heading stored as a custom keyword. The editor shows no type settings for such a field; use
+ * `renderFieldSettings` to edit its keywords.
+ */
+export interface CustomFieldType {
+  /** Unique id, used as key. */
+  id: string;
+  /** Label of the type in the dropdown and the field header. */
+  label: string;
+  /** Shown as the menu item's description/tooltip. */
+  description?: string;
+  /** Mantine color of the badge; default "gray". */
+  color?: string;
+  /** True when the field's schema is of this kind. */
+  matches: (schema: JSONSchema) => boolean;
+  /**
+   * The schema a field gets when switched to this kind; receives the field's current schema.
+   * Include a JSON `type`: the editor adds `type: "object"` to a schema without one.
+   */
+  create: (schema: ObjectJSONSchema) => ObjectJSONSchema;
+  /** Keeps the required dropdown; default false: a static element cannot be required. */
+  canBeRequired?: boolean;
+}
+
+/**
+ * @public
  * Hooks to add settings of your own to every field, e.g. stored as custom keywords on the field's
  * schema. Without extensions the editor renders as before.
  */
@@ -38,6 +64,12 @@ export interface SchemaEditorExtensions {
     oldName: string,
     newName: string,
   ) => ObjectJSONSchema;
+  /**
+   * Kinds of fields of your own, listed after the JSON types in the type dropdown. A field whose
+   * schema matches one shows no type settings (and no required dropdown unless the type
+   * `canBeRequired`); the first matching type wins.
+   */
+  customTypes?: CustomFieldType[];
 }
 
 export const SchemaEditorExtensionsContext =
@@ -62,4 +94,12 @@ export function applyRename(
 ): ObjectJSONSchema {
   if (oldName === newName || !extensions.onPropertyRenamed) return parent;
   return extensions.onPropertyRenamed(parent, oldName, newName);
+}
+
+/** Returns the first custom type matching `schema`, if any. */
+export function matchingCustomType(
+  extensions: SchemaEditorExtensions,
+  schema: JSONSchema,
+): CustomFieldType | undefined {
+  return extensions.customTypes?.find((type) => type.matches(schema));
 }

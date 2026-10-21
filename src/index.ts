@@ -13,6 +13,7 @@ import SchemaVisualEditor, {
 export * from "./components/features/JsonValidator.tsx";
 export * from "./components/features/SchemaInferencer.tsx";
 export type {
+  CustomFieldType,
   FieldExtensionContext,
   SchemaEditorExtensions,
 } from "./components/SchemaEditor/extensions.tsx";

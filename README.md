@@ -135,6 +135,38 @@ field — for example custom keywords such as `x-ui` stored on the field's schem
 `parent` is the object schema whose `properties` hold the field, so settings can refer to sibling
 fields. Without `extensions` the editor renders exactly as before.
 
+#### Custom field types
+
+`customTypes` adds kinds of fields of your own to the type dropdown, listed after the JSON types.
+A field whose schema `matches` one shows its label and color, no type settings and, unless the type
+`canBeRequired`, no required dropdown (a static element cannot be required). The name, label and
+description inputs, `renderFieldBadges` and `renderFieldSettings` stay available. Choosing a JSON
+type for such a field keeps only its label and description.
+
+```tsx
+const heading: CustomFieldType = {
+  id: "heading",
+  label: "Heading",
+  description: "A static heading, not a value",
+  color: "teal",
+  // The field is a heading when it carries the custom keyword.
+  matches: (schema) => typeof schema === "object" && schema["x-heading"] === true,
+  // The schema the field gets when switched to a heading; keep a JSON `type`.
+  create: (schema) => ({
+    type: "string",
+    title: schema.title,
+    description: schema.description,
+    "x-heading": true,
+  }),
+};
+
+<SchemaVisualEditor
+  schema={schema}
+  onChange={setSchema}
+  extensions={{ customTypes: [heading] }}
+/>;
+```
+
 ### Development
 
 ```bash
