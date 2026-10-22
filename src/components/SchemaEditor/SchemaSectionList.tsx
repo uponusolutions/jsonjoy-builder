@@ -7,18 +7,27 @@ import {
   Droppable,
   type DropResult,
 } from "@hello-pangea/dnd";
-import { Box, Paper, Stack, Text } from "@mantine/core";
+import { Box, Button, Paper, Stack, Text } from "@mantine/core";
+import { CirclePlus } from "lucide-react";
 import { type FC, type ReactNode, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "../../hooks/use-translation.ts";
-import { getSchemaProperties, type Property } from "../../lib/schemaEditor.ts";
+import {
+  getSchemaProperties,
+  type Property,
+  uniqueKey,
+} from "../../lib/schemaEditor.ts";
 import {
   dropToReorder,
   type Section,
   sectionEnd,
   splitSections,
 } from "../../lib/sections.ts";
-import type { JSONSchema, NewField } from "../../types/jsonSchema.ts";
+import type {
+  JSONSchema,
+  NewField,
+  SchemaType,
+} from "../../types/jsonSchema.ts";
 import AddFieldButton from "./AddFieldButton.tsx";
 import { useSchemaEditorExtensions } from "./extensions.tsx";
 
@@ -211,6 +220,29 @@ const SchemaSectionList: FC<SchemaSectionListProps> = ({
     </>
   );
 
+  const addSection = sectionsExtension?.addSection;
+  const addSectionButton = !readOnly && addSection && (
+    <Box>
+      <Button
+        variant="outline"
+        size="sm"
+        leftSection={<CirclePlus size={16} />}
+        onClick={() => {
+          const startSchema = addSection.create();
+          onAddField({
+            name: uniqueKey(addSection.name, names),
+            type: (startSchema.type as SchemaType | undefined) ?? "object",
+            description: startSchema.description ?? "",
+            required: false,
+            validation: startSchema,
+          });
+        }}
+      >
+        {addSection.label}
+      </Button>
+    </Box>
+  );
+
   const implicit = sections.find((s) => s.start === undefined);
   const starts = sections.filter((s) => s.start !== undefined);
 
@@ -246,6 +278,7 @@ const SchemaSectionList: FC<SchemaSectionListProps> = ({
         {starts.map((section) => (
           <div key={droppableIdOf(section)}>{startBox(section)}</div>
         ))}
+        {addSectionButton}
       </Stack>
     );
   }
@@ -280,6 +313,7 @@ const SchemaSectionList: FC<SchemaSectionListProps> = ({
             </Stack>
           )}
         </Droppable>
+        {addSectionButton}
       </Stack>
     </DragDropContext>
   );

@@ -15,6 +15,7 @@ export * from "./components/features/SchemaInferencer.tsx";
 export type {
   CustomFieldType,
   FieldExtensionContext,
+  FieldInputOptions,
   SchemaEditorExtensions,
   SectionExtension,
 } from "./components/SchemaEditor/extensions.tsx";

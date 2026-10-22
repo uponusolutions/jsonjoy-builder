@@ -150,20 +150,6 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
   return (
     <SchemaEditorExtensionsContext.Provider value={extensions}>
       <Stack h="100%" p="md" className={`jsonjoy ${themeClass}`}>
-        {!readOnly && !hasSections(schema, extensions) && (
-          <Box mb="md">
-            <AddFieldButton
-              onAddField={handleAddField}
-              showDescription={showDescription}
-              existingFields={
-                !isBooleanSchema(schema) && schema.properties
-                  ? Object.keys(schema.properties)
-                  : []
-              }
-            />
-          </Box>
-        )}
-
         <ScrollArea style={{ flexGrow: 1 }}>
           {!hasFields ? (
             <Stack align="center" py="xl" c="dimmed">
@@ -180,6 +166,19 @@ const SchemaVisualEditor: FC<SchemaVisualEditorProps> = ({
               onReorderFields={handleReorderFields}
               showDescription={showDescription}
             />
+          )}
+          {!readOnly && !hasSections(schema, extensions) && (
+            <Box mt="md">
+              <AddFieldButton
+                onAddField={handleAddField}
+                showDescription={showDescription}
+                existingFields={
+                  !isBooleanSchema(schema) && schema.properties
+                    ? Object.keys(schema.properties)
+                    : []
+                }
+              />
+            </Box>
           )}
         </ScrollArea>
       </Stack>

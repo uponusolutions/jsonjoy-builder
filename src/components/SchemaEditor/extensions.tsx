@@ -16,6 +16,21 @@ export interface FieldExtensionContext {
 
 /**
  * @public
+ * How the editor presents the label (`title`) or description input of a custom type's field, e.g.
+ * to say where the text appears. Unset keys keep the data field's input.
+ */
+export interface FieldInputOptions {
+  /** Replaces the input's label. */
+  label?: string;
+  /** Help text below the label, e.g. where the text is shown. */
+  description?: string;
+  placeholder?: string;
+  /** A multi-line input that grows with its text (Enter starts a new line), e.g. for Markdown. */
+  multiline?: boolean;
+}
+
+/**
+ * @public
  * A kind of field of your own, listed in the type dropdown after the JSON types, e.g. a static
  * heading stored as a custom keyword. The editor shows no type settings for such a field; use
  * `renderFieldSettings` to edit its keywords.
@@ -38,6 +53,14 @@ export interface CustomFieldType {
   create: (schema: ObjectJSONSchema) => ObjectJSONSchema;
   /** Keeps the required dropdown; default false: a static element cannot be required. */
   canBeRequired?: boolean;
+  /**
+   * The label (`title`) and description inputs of such a field: `false` leaves one out, e.g. when
+   * the kind does not use that text. Default: the inputs of a data field.
+   */
+  inputs?: {
+    title?: FieldInputOptions | false;
+    description?: FieldInputOptions | false;
+  };
 }
 
 /** @public Splits the root object's properties into sections, e.g. the pages of a form. */
@@ -46,6 +69,19 @@ export interface SectionExtension {
   isStart: (schema: JSONSchema) => boolean;
   /** Heading of the implicit first section: the properties before the first start. */
   firstTitle: string;
+  /**
+   * Adds a button below the sections, outside of every box, that appends a new section: a start
+   * property with the schema of `create` (it has to match `isStart`), keyed `name` or, when taken,
+   * `name` with a counter.
+   */
+  addSection?: {
+    /** Label of the button. */
+    label: string;
+    /** Base key of the new start property. */
+    name: string;
+    /** The schema of the new start property. */
+    create: () => ObjectJSONSchema;
+  };
 }
 
 /**

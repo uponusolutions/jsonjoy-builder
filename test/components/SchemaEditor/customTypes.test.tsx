@@ -216,6 +216,45 @@ describe("custom field types", () => {
     );
   });
 
+  test("inputs relabel, explain or leave out the label and description inputs", async () => {
+    const schemas: JSONSchema[] = [];
+    const paragraph: CustomFieldType = {
+      ...heading,
+      inputs: {
+        title: false,
+        description: {
+          label: "Text",
+          description: "Shown in the form",
+          multiline: true,
+        },
+      },
+    };
+    render(
+      React.createElement(
+        MantineProvider,
+        null,
+        React.createElement(SchemaVisualEditor, {
+          readOnly: false,
+          schema: initial,
+          extensions: { customTypes: [paragraph] },
+          onChange: (s: JSONSchema) => schemas.push(s),
+        }),
+      ),
+    );
+    expand("Intro");
+    const text = await waitFor(() => body().getByLabelText("Text"));
+    assert.equal(text.tagName, "TEXTAREA");
+    assert.ok(body().getByText("Shown in the form"));
+    assert.equal(body().queryByLabelText(en.fieldLabelLabel), null);
+    assert.ok(body().getByLabelText(en.fieldNameLabel));
+    fireEvent.change(text, { target: { value: "Line 1\nLine 2" } });
+    fireEvent.blur(text);
+    const last = schemas.at(-1) as {
+      properties: Record<string, Record<string, unknown>>;
+    };
+    assert.equal(last.properties.title.description, "Line 1\nLine 2");
+  });
+
   test("choosing a JSON type for a custom field keeps only title and description", async () => {
     const schemas = renderHost();
     openTypeMenu("Intro", "Heading");

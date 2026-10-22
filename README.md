@@ -143,6 +143,10 @@ A field whose schema `matches` one shows its label and color, no type settings a
 description inputs, `renderFieldBadges` and `renderFieldSettings` stay available. Choosing a JSON
 type for such a field keeps only its label and description.
 
+`inputs` says what the label (`title`) and description inputs mean for the kind: a `label`, a help
+text (`description`) and a `placeholder` of their own, `multiline` for a growing text area (e.g.
+Markdown), or `false` to leave an input out when the kind does not use that text.
+
 ```tsx
 const heading: CustomFieldType = {
   id: "heading",
@@ -158,6 +162,11 @@ const heading: CustomFieldType = {
     description: schema.description,
     "x-heading": true,
   }),
+  // The label is the heading's text; a heading has no description.
+  inputs: {
+    title: { label: "Heading text", description: "Shown as the heading in the form" },
+    description: false,
+  },
 };
 
 <SchemaVisualEditor
@@ -176,11 +185,14 @@ badges, type dropdown, delete). Properties before the first start form an implic
 titled `firstTitle`, shown only when it has fields; it cannot be dragged or deleted.
 
 - Sections apply to the root list only, never inside objects or lists.
-- The top "Add field" button is replaced by one per section, which inserts at the end of that
+- The "Add field" button below the list is replaced by one per section, which inserts at the end of that
   section.
 - Drag a field to another section, or a whole section by the handle of its start property.
 - Deleting a start property removes only that property; its fields merge into the previous
   section (into the implicit first section when it was the first start).
+- With `addSection`, a button below the boxes (outside of every section) appends a new start
+  property: keyed `addSection.name` (with a counter when taken), with the schema of
+  `addSection.create()`, which has to match `isStart`.
 - Without a section start (or without `sections`) the editor renders as before.
 
 The schema stays the flat property list, so sections are presentation only.
@@ -201,6 +213,11 @@ const pageBreak: CustomFieldType = {
     sections: {
       isStart: (schema) => pageBreak.matches(schema),
       firstTitle: "Page 1",
+      addSection: {
+        label: "Add page",
+        name: "page",
+        create: () => ({ type: "string", "x-page": true }),
+      },
     },
   }}
 />;

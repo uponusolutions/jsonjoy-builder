@@ -8,6 +8,7 @@ import {
   Paper,
   Stack,
   Text,
+  Textarea,
   TextInput,
   UnstyledButton,
 } from "@mantine/core";
@@ -93,6 +94,8 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
   // A custom type of the extensions the field's schema is of, if any.
   const customType = matchingCustomType(extensions, schema);
   const showRequired = !customType || customType.canBeRequired === true;
+  const titleInput = customType?.inputs?.title;
+  const descriptionInput = customType?.inputs?.description;
   // Set when the field was switched to a custom type that cannot be required, so its required
   // entry is dropped once the new schema arrived (a second update right away would start from
   // the old schema and restore the entry).
@@ -446,14 +449,19 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
         <Box pt="xs" px="xs">
           {!readOnly && (
             <Stack gap="md" mb="sm">
-              <TextInput
-                label={t.fieldLabelLabel}
-                value={tempTitle}
-                placeholder={t.fieldLabelPlaceholder}
-                onChange={(e) => setTempTitle(e.target.value)}
-                onBlur={handleTitleSubmit}
-                onKeyDown={(e) => e.key === "Enter" && handleTitleSubmit()}
-              />
+              {titleInput !== false && (
+                <TextInput
+                  label={titleInput?.label ?? t.fieldLabelLabel}
+                  description={titleInput?.description}
+                  value={tempTitle}
+                  placeholder={
+                    titleInput?.placeholder ?? t.fieldLabelPlaceholder
+                  }
+                  onChange={(e) => setTempTitle(e.target.value)}
+                  onBlur={handleTitleSubmit}
+                  onKeyDown={(e) => e.key === "Enter" && handleTitleSubmit()}
+                />
+              )}
               <TextInput
                 label={t.fieldNameLabel}
                 value={tempName}
@@ -462,16 +470,36 @@ export const SchemaPropertyEditor: React.FC<SchemaPropertyEditorProps> = ({
                 onBlur={handleKeySubmit}
                 onKeyDown={(e) => e.key === "Enter" && handleKeySubmit()}
               />
-              {showDescription && (
-                <TextInput
-                  label={t.fieldDescription}
-                  value={tempDesc}
-                  onChange={(e) => setTempDesc(e.target.value)}
-                  onBlur={handleDescSubmit}
-                  onKeyDown={(e) => e.key === "Enter" && handleDescSubmit()}
-                  placeholder={t.propertyDescriptionPlaceholder}
-                />
-              )}
+              {showDescription &&
+                descriptionInput !== false &&
+                (descriptionInput?.multiline ? (
+                  <Textarea
+                    label={descriptionInput.label ?? t.fieldDescription}
+                    description={descriptionInput.description}
+                    value={tempDesc}
+                    autosize
+                    minRows={3}
+                    onChange={(e) => setTempDesc(e.target.value)}
+                    onBlur={handleDescSubmit}
+                    placeholder={
+                      descriptionInput.placeholder ??
+                      t.propertyDescriptionPlaceholder
+                    }
+                  />
+                ) : (
+                  <TextInput
+                    label={descriptionInput?.label ?? t.fieldDescription}
+                    description={descriptionInput?.description}
+                    value={tempDesc}
+                    onChange={(e) => setTempDesc(e.target.value)}
+                    onBlur={handleDescSubmit}
+                    onKeyDown={(e) => e.key === "Enter" && handleDescSubmit()}
+                    placeholder={
+                      descriptionInput?.placeholder ??
+                      t.propertyDescriptionPlaceholder
+                    }
+                  />
+                ))}
             </Stack>
           )}
           {readOnly && tempDesc && (

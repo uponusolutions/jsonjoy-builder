@@ -51,20 +51,35 @@ const initial: JSONSchema = {
   },
 };
 
+const withAddSection: SchemaEditorExtensions = {
+  ...extensions,
+  sections: {
+    isStart: pageBreak.matches,
+    firstTitle: "Page 1",
+    addSection: {
+      label: "Add page",
+      name: "page",
+      create: () => ({ type: "string", "x-page": true }) as never,
+    },
+  },
+};
+
 function Host({
   start,
   readOnly = false,
+  ext = extensions,
   onSchema,
 }: {
   start: JSONSchema;
   readOnly?: boolean;
+  ext?: SchemaEditorExtensions;
   onSchema: (s: JSONSchema) => void;
 }) {
   const [schema, setSchema] = useState(start);
   return React.createElement(SchemaVisualEditor, {
     readOnly,
     schema,
-    extensions,
+    extensions: ext,
     onChange: (s: JSONSchema) => {
       onSchema(s);
       setSchema(s);
@@ -72,7 +87,11 @@ function Host({
   });
 }
 
-function renderHost(start: JSONSchema = initial, readOnly = false) {
+function renderHost(
+  start: JSONSchema = initial,
+  readOnly = false,
+  ext: SchemaEditorExtensions = extensions,
+) {
   const schemas: JSONSchema[] = [];
   render(
     React.createElement(
@@ -81,6 +100,7 @@ function renderHost(start: JSONSchema = initial, readOnly = false) {
       React.createElement(Host, {
         start,
         readOnly,
+        ext,
         onSchema: (s) => schemas.push(s),
       }),
     ),
@@ -163,6 +183,34 @@ describe("sections", () => {
       }),
     );
     assert.equal(keys(schemas.at(-1)).at(-1), "newField3");
+  });
+
+  test("addSection adds a button outside the boxes that appends a section", async () => {
+    const schemas = renderHost(initial, false, withAddSection);
+    const add = body().getByRole("button", { name: "Add page" });
+    assert.equal(add.closest("[role=group]"), null);
+    fireEvent.click(add);
+    assert.deepEqual(keys(schemas.at(-1)).slice(-2), ["phone", "page"]);
+    assert.equal(
+      (schemas.at(-1) as { properties: Record<string, object> }).properties
+        .page["x-page" as never],
+      true,
+    );
+    await waitFor(() => assert.equal(groups().length, 4));
+    fireEvent.click(body().getByRole("button", { name: "Add page" }));
+    assert.equal(keys(schemas.at(-1)).at(-1), "page2");
+  });
+
+  test("addSection shows no button without a section or read-only", () => {
+    renderHost(
+      { type: "object", properties: { a: field("A") } },
+      false,
+      withAddSection,
+    );
+    assert.equal(body().queryByRole("button", { name: "Add page" }), null);
+    cleanup();
+    renderHost(initial, true, withAddSection);
+    assert.equal(body().queryByRole("button", { name: "Add page" }), null);
   });
 
   test("a schema starting with a break has no implicit section", () => {
